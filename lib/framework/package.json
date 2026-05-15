@@ -18,6 +18,10 @@
       "types": "./dist/agents/flagship/index.d.ts",
       "import": "./dist/agents/flagship/index.js"
     },
+    "./cognition": {
+      "types": "./dist/cognition/index.d.ts",
+      "import": "./dist/cognition/index.js"
+    },
     "./skills": {
       "types": "./dist/skills/index.d.ts",
       "import": "./dist/skills/index.js"

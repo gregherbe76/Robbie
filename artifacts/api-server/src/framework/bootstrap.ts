@@ -27,6 +27,11 @@ import {
   type TrajectoryResult,
   type CandidateDossier,
 } from "@workspace/framework/agents/flagship";
+import {
+  synthesizeCognition,
+  summarizeArchetypeFrequency,
+  type CognitiveSynthesis,
+} from "@workspace/framework/cognition";
 
 const startedAt = Date.now();
 
@@ -45,6 +50,7 @@ const contradiction = new ContradictionAgent();
 const trajectory = new TrajectoryAgent();
 
 const analyses = new Map<string, CandidateAnalysis>();
+const cognitions = new Map<string, CognitiveSynthesis>();
 const dossiers = new Map<string, CandidateDossier>();
 
 function seedAgents(registry: FrameworkRegistry): void {
@@ -347,6 +353,44 @@ async function seedAnalyses(registry: FrameworkRegistry): Promise<void> {
     };
     analyses.set(dossier.candidateId, analysis);
 
+    // Run the cross-agent cognition layer: influence propagation,
+    // disagreement, uncertainty fusion, reconciliation, archetype match.
+    const synthesis = synthesizeCognition(
+      {
+        candidateId: dossier.candidateId,
+        bayesian: b,
+        contradiction: c,
+        trajectory: t,
+      },
+      { now: () => new Date(now) },
+    );
+    cognitions.set(dossier.candidateId, synthesis);
+
+    // Persist the synthesis as a memory entry so the audit log reflects
+    // the cognitive layer's contribution.
+    await registry.memory.put({
+      id: `mem:${dossier.candidateId}:cognition`,
+      scope: "candidate",
+      subjectId: dossier.candidateId,
+      key: "cognition.synthesis",
+      value: {
+        recommendation: synthesis.reconciliation.recommendationCategory,
+        certaintyCategory: synthesis.uncertainty.certaintyCategory,
+        globalConfidence: synthesis.confidence.globalConfidence,
+        disagreementScore: synthesis.disagreement.disagreementScore,
+      },
+      summary: `${synthesis.uncertainty.certaintyCategory} → ${synthesis.reconciliation.recommendationCategory}; global confidence ${synthesis.confidence.globalConfidence}.`,
+      confidence: synthesis.confidence.globalConfidence,
+      provenance: {
+        producedBy: "cognition-engine",
+        producedAt: now,
+        rationale: synthesis.reconciliation.recommendation,
+        derivedFrom: synthesis.influences.map((i) => i.id),
+      },
+      createdAt: now,
+      tags: ["cognition", synthesis.uncertainty.certaintyCategory],
+    });
+
     // Persist summary memory entries (one per agent output) so the
     // memory introspection page reflects real reasoning artefacts.
     await registry.memory.put({
@@ -438,6 +482,36 @@ async function seedAnalyses(registry: FrameworkRegistry): Promise<void> {
       ],
     });
   }
+
+  // Organization-level cognition memory: archetype frequency across the
+  // current corpus. This is the longitudinal pattern surface.
+  const archetypeFreq = summarizeArchetypeFrequency(
+    Array.from(analyses.values()).map((a) => ({
+      candidateId: a.candidateId,
+      bayesian: a.bayesian,
+      contradiction: a.contradiction,
+      trajectory: a.trajectory,
+    })),
+  );
+  for (const f of archetypeFreq) {
+    await registry.memory.put({
+      id: `mem:org:archetype:${f.archetypeId}`,
+      scope: "organization",
+      subjectId: "org-001",
+      key: `archetype.${f.archetypeId}`,
+      value: f,
+      summary: `${f.matches}/${f.total} candidate(s) match "${f.archetypeName}" archetype.`,
+      confidence: Math.min(1, 0.4 + f.matches / Math.max(1, f.total)),
+      provenance: {
+        producedBy: "cross-agent-memory",
+        producedAt: now,
+        rationale: `Aggregated archetype matches across ${f.total} candidate analyses.`,
+        derivedFrom: [],
+      },
+      createdAt: now,
+      tags: ["archetype", "longitudinal"],
+    });
+  }
 }
 
 let cached: FrameworkRegistry | null = null;
@@ -474,6 +548,14 @@ export function getAnalyses(): CandidateAnalysis[] {
 
 export function getAnalysis(candidateId: string): CandidateAnalysis | null {
   return analyses.get(candidateId) ?? null;
+}
+
+export function getCognitions(): CognitiveSynthesis[] {
+  return Array.from(cognitions.values());
+}
+
+export function getCognition(candidateId: string): CognitiveSynthesis | null {
+  return cognitions.get(candidateId) ?? null;
 }
 
 export function getDossier(candidateId: string): CandidateDossier | null {

@@ -365,3 +365,165 @@ export interface CandidateAnalysis {
   trajectory: TrajectoryReasoning;
 }
 
+export type InfluenceKind = typeof InfluenceKind[keyof typeof InfluenceKind];
+
+
+export const InfluenceKind = {
+  'confidence-penalty': 'confidence-penalty',
+  'confidence-amplification': 'confidence-amplification',
+  'uncertainty-boost': 'uncertainty-boost',
+  'evidence-reinforcement': 'evidence-reinforcement',
+  'contradiction-pressure': 'contradiction-pressure',
+} as const;
+
+export type CertaintyCategory = typeof CertaintyCategory[keyof typeof CertaintyCategory];
+
+
+export const CertaintyCategory = {
+  'high-confidence-positive': 'high-confidence-positive',
+  'high-confidence-negative': 'high-confidence-negative',
+  'uncertain-positive': 'uncertain-positive',
+  'uncertain-negative': 'uncertain-negative',
+  ambiguous: 'ambiguous',
+} as const;
+
+export type RecommendationCategory = typeof RecommendationCategory[keyof typeof RecommendationCategory];
+
+
+export const RecommendationCategory = {
+  advance: 'advance',
+  investigate: 'investigate',
+  decline: 'decline',
+  ambiguous: 'ambiguous',
+} as const;
+
+export type AgentNodeMetric = {
+  name: string;
+  value: number;
+};
+
+export interface AgentNode {
+  id: string;
+  name: string;
+  initialConfidence: number;
+  adjustedConfidence: number;
+  metric: AgentNodeMetric;
+}
+
+export interface InfluenceEdge {
+  id: string;
+  from: string;
+  to: string;
+  kind: InfluenceKind;
+  weight: number;
+  reason: string;
+}
+
+export interface PropagatedInfluence {
+  id: string;
+  sourceAgent: string;
+  targetAgent: string;
+  kind: InfluenceKind;
+  reason: string;
+  adjustment: number;
+  before: number;
+  after: number;
+  derivedFrom: string[];
+}
+
+export type DisagreementMetricA = {
+  name: string;
+  value: number;
+};
+
+export type DisagreementMetricB = {
+  name: string;
+  value: number;
+};
+
+export interface Disagreement {
+  id: string;
+  agentA: string;
+  agentB: string;
+  metricA: DisagreementMetricA;
+  metricB: DisagreementMetricB;
+  score: number;
+  rationale: string;
+}
+
+export type ConfidencePropagationLocalAdjustments = {[key: string]: number};
+
+export type ConfidencePropagationUncertaintyMap = {[key: string]: number};
+
+export interface ConfidencePropagation {
+  globalConfidence: number;
+  localAdjustments: ConfidencePropagationLocalAdjustments;
+  uncertaintyMap: ConfidencePropagationUncertaintyMap;
+  saturationApplied: boolean;
+}
+
+export interface DisagreementAnalysis {
+  disagreementScore: number;
+  disagreements: Disagreement[];
+  unresolvedQuestions: string[];
+  ambiguityLevel: number;
+  confidenceTension: number;
+}
+
+export type UncertaintyFusionConfidenceDistribution = {[key: string]: number};
+
+export interface UncertaintyFusion {
+  certaintyCategory: CertaintyCategory;
+  uncertaintyLevel: number;
+  ambiguityScore: number;
+  evidenceReliability: number;
+  confidenceDistribution: UncertaintyFusionConfidenceDistribution;
+}
+
+export type ReconciliationSynthesisStrongestEvidenceItem = {
+  id: string;
+  summary: string;
+  weight: number;
+};
+
+export interface ReconciliationSynthesis {
+  recommendationCategory: RecommendationCategory;
+  recommendation: string;
+  majorTensions: string[];
+  strongestEvidence: ReconciliationSynthesisStrongestEvidenceItem[];
+  unresolvedConcerns: string[];
+  trajectoryOutlook: string;
+  confidenceNarrative: string;
+  nextInvestigations: string[];
+}
+
+export interface ArchetypeMatch {
+  archetypeId: string;
+  archetypeName: string;
+  matchScore: number;
+  rationale: string;
+  signals: string[];
+}
+
+export interface CrossAgentMemoryView {
+  matchedArchetypes: ArchetypeMatch[];
+  recurringPatterns: string[];
+}
+
+export type CognitiveSynthesisGraph = {
+  nodes: AgentNode[];
+  edges: InfluenceEdge[];
+};
+
+export interface CognitiveSynthesis {
+  candidateId: string;
+  generatedAt: string;
+  graph: CognitiveSynthesisGraph;
+  influences: PropagatedInfluence[];
+  confidence: ConfidencePropagation;
+  disagreement: DisagreementAnalysis;
+  uncertainty: UncertaintyFusion;
+  reconciliation: ReconciliationSynthesis;
+  memory: CrossAgentMemoryView;
+}
+

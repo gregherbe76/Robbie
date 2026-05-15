@@ -25,6 +25,8 @@ tags:
     description: Generated reports and explanations
   - name: intelligence
     description: Flagship intelligence agent analyses
+  - name: cognition
+    description: Cross-agent cognitive synthesis (influence, disagreement, uncertainty)
 paths:
   /healthz:
     get:
@@ -182,6 +184,43 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CandidateAnalysis"
+        "404":
+          description: Not found
+  /intelligence/cognition:
+    get:
+      operationId: listCognitiveSyntheses
+      tags: [cognition]
+      summary: List cross-agent cognitive syntheses
+      description: |
+        Returns the cognitive synthesis (influence propagation, disagreement,
+        uncertainty fusion, reconciliation, archetype memory) for every
+        candidate currently in the framework.
+      responses:
+        "200":
+          description: Syntheses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CognitiveSynthesis"
+  /intelligence/cognition/{candidateId}:
+    get:
+      operationId: getCognitiveSynthesis
+      tags: [cognition]
+      summary: Get a single cognitive synthesis
+      parameters:
+        - in: path
+          name: candidateId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Synthesis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CognitiveSynthesis"
         "404":
           description: Not found
   /reports:
@@ -660,3 +699,242 @@ components:
           $ref: "#/components/schemas/ContradictionReasoning"
         trajectory:
           $ref: "#/components/schemas/TrajectoryReasoning"
+    InfluenceKind:
+      type: string
+      enum:
+        - confidence-penalty
+        - confidence-amplification
+        - uncertainty-boost
+        - evidence-reinforcement
+        - contradiction-pressure
+    CertaintyCategory:
+      type: string
+      enum:
+        - high-confidence-positive
+        - high-confidence-negative
+        - uncertain-positive
+        - uncertain-negative
+        - ambiguous
+    RecommendationCategory:
+      type: string
+      enum: [advance, investigate, decline, ambiguous]
+    AgentNode:
+      type: object
+      required: [id, name, initialConfidence, adjustedConfidence, metric]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        initialConfidence: { type: number }
+        adjustedConfidence: { type: number }
+        metric:
+          type: object
+          required: [name, value]
+          properties:
+            name: { type: string }
+            value: { type: number }
+    InfluenceEdge:
+      type: object
+      required: [id, from, to, kind, weight, reason]
+      properties:
+        id: { type: string }
+        from: { type: string }
+        to: { type: string }
+        kind: { $ref: "#/components/schemas/InfluenceKind" }
+        weight: { type: number }
+        reason: { type: string }
+    PropagatedInfluence:
+      type: object
+      required:
+        [
+          id,
+          sourceAgent,
+          targetAgent,
+          kind,
+          reason,
+          adjustment,
+          before,
+          after,
+          derivedFrom,
+        ]
+      properties:
+        id: { type: string }
+        sourceAgent: { type: string }
+        targetAgent: { type: string }
+        kind: { $ref: "#/components/schemas/InfluenceKind" }
+        reason: { type: string }
+        adjustment: { type: number }
+        before: { type: number }
+        after: { type: number }
+        derivedFrom:
+          type: array
+          items: { type: string }
+    Disagreement:
+      type: object
+      required: [id, agentA, agentB, metricA, metricB, score, rationale]
+      properties:
+        id: { type: string }
+        agentA: { type: string }
+        agentB: { type: string }
+        metricA:
+          type: object
+          required: [name, value]
+          properties:
+            name: { type: string }
+            value: { type: number }
+        metricB:
+          type: object
+          required: [name, value]
+          properties:
+            name: { type: string }
+            value: { type: number }
+        score: { type: number }
+        rationale: { type: string }
+    ConfidencePropagation:
+      type: object
+      required:
+        [globalConfidence, localAdjustments, uncertaintyMap, saturationApplied]
+      properties:
+        globalConfidence: { type: number }
+        localAdjustments:
+          type: object
+          additionalProperties: { type: number }
+        uncertaintyMap:
+          type: object
+          additionalProperties: { type: number }
+        saturationApplied: { type: boolean }
+    DisagreementAnalysis:
+      type: object
+      required:
+        [
+          disagreementScore,
+          disagreements,
+          unresolvedQuestions,
+          ambiguityLevel,
+          confidenceTension,
+        ]
+      properties:
+        disagreementScore: { type: number }
+        disagreements:
+          type: array
+          items: { $ref: "#/components/schemas/Disagreement" }
+        unresolvedQuestions:
+          type: array
+          items: { type: string }
+        ambiguityLevel: { type: number }
+        confidenceTension: { type: number }
+    UncertaintyFusion:
+      type: object
+      required:
+        [
+          certaintyCategory,
+          uncertaintyLevel,
+          ambiguityScore,
+          evidenceReliability,
+          confidenceDistribution,
+        ]
+      properties:
+        certaintyCategory: { $ref: "#/components/schemas/CertaintyCategory" }
+        uncertaintyLevel: { type: number }
+        ambiguityScore: { type: number }
+        evidenceReliability: { type: number }
+        confidenceDistribution:
+          type: object
+          additionalProperties: { type: number }
+    ReconciliationSynthesis:
+      type: object
+      required:
+        [
+          recommendationCategory,
+          recommendation,
+          majorTensions,
+          strongestEvidence,
+          unresolvedConcerns,
+          trajectoryOutlook,
+          confidenceNarrative,
+          nextInvestigations,
+        ]
+      properties:
+        recommendationCategory:
+          $ref: "#/components/schemas/RecommendationCategory"
+        recommendation: { type: string }
+        majorTensions:
+          type: array
+          items: { type: string }
+        strongestEvidence:
+          type: array
+          items:
+            type: object
+            required: [id, summary, weight]
+            properties:
+              id: { type: string }
+              summary: { type: string }
+              weight: { type: number }
+        unresolvedConcerns:
+          type: array
+          items: { type: string }
+        trajectoryOutlook: { type: string }
+        confidenceNarrative: { type: string }
+        nextInvestigations:
+          type: array
+          items: { type: string }
+    ArchetypeMatch:
+      type: object
+      required: [archetypeId, archetypeName, matchScore, rationale, signals]
+      properties:
+        archetypeId: { type: string }
+        archetypeName: { type: string }
+        matchScore: { type: number }
+        rationale: { type: string }
+        signals:
+          type: array
+          items: { type: string }
+    CrossAgentMemoryView:
+      type: object
+      required: [matchedArchetypes, recurringPatterns]
+      properties:
+        matchedArchetypes:
+          type: array
+          items: { $ref: "#/components/schemas/ArchetypeMatch" }
+        recurringPatterns:
+          type: array
+          items: { type: string }
+    CognitiveSynthesis:
+      type: object
+      required:
+        [
+          candidateId,
+          generatedAt,
+          graph,
+          influences,
+          confidence,
+          disagreement,
+          uncertainty,
+          reconciliation,
+          memory,
+        ]
+      properties:
+        candidateId: { type: string }
+        generatedAt: { type: string, format: date-time }
+        graph:
+          type: object
+          required: [nodes, edges]
+          properties:
+            nodes:
+              type: array
+              items: { $ref: "#/components/schemas/AgentNode" }
+            edges:
+              type: array
+              items: { $ref: "#/components/schemas/InfluenceEdge" }
+        influences:
+          type: array
+          items: { $ref: "#/components/schemas/PropagatedInfluence" }
+        confidence:
+          $ref: "#/components/schemas/ConfidencePropagation"
+        disagreement:
+          $ref: "#/components/schemas/DisagreementAnalysis"
+        uncertainty:
+          $ref: "#/components/schemas/UncertaintyFusion"
+        reconciliation:
+          $ref: "#/components/schemas/ReconciliationSynthesis"
+        memory:
+          $ref: "#/components/schemas/CrossAgentMemoryView"

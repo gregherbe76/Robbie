@@ -444,6 +444,211 @@ export const GetIntelligenceAnalysisResponse = zod.object({
 
 
 /**
+ * Returns the cognitive synthesis (influence propagation, disagreement,
+uncertainty fusion, reconciliation, archetype memory) for every
+candidate currently in the framework.
+
+ * @summary List cross-agent cognitive syntheses
+ */
+export const ListCognitiveSynthesesResponseItem = zod.object({
+  "candidateId": zod.string(),
+  "generatedAt": zod.coerce.date(),
+  "graph": zod.object({
+  "nodes": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "initialConfidence": zod.number(),
+  "adjustedConfidence": zod.number(),
+  "metric": zod.object({
+  "name": zod.string(),
+  "value": zod.number()
+})
+})),
+  "edges": zod.array(zod.object({
+  "id": zod.string(),
+  "from": zod.string(),
+  "to": zod.string(),
+  "kind": zod.enum(['confidence-penalty', 'confidence-amplification', 'uncertainty-boost', 'evidence-reinforcement', 'contradiction-pressure']),
+  "weight": zod.number(),
+  "reason": zod.string()
+}))
+}),
+  "influences": zod.array(zod.object({
+  "id": zod.string(),
+  "sourceAgent": zod.string(),
+  "targetAgent": zod.string(),
+  "kind": zod.enum(['confidence-penalty', 'confidence-amplification', 'uncertainty-boost', 'evidence-reinforcement', 'contradiction-pressure']),
+  "reason": zod.string(),
+  "adjustment": zod.number(),
+  "before": zod.number(),
+  "after": zod.number(),
+  "derivedFrom": zod.array(zod.string())
+})),
+  "confidence": zod.object({
+  "globalConfidence": zod.number(),
+  "localAdjustments": zod.record(zod.string(), zod.number()),
+  "uncertaintyMap": zod.record(zod.string(), zod.number()),
+  "saturationApplied": zod.boolean()
+}),
+  "disagreement": zod.object({
+  "disagreementScore": zod.number(),
+  "disagreements": zod.array(zod.object({
+  "id": zod.string(),
+  "agentA": zod.string(),
+  "agentB": zod.string(),
+  "metricA": zod.object({
+  "name": zod.string(),
+  "value": zod.number()
+}),
+  "metricB": zod.object({
+  "name": zod.string(),
+  "value": zod.number()
+}),
+  "score": zod.number(),
+  "rationale": zod.string()
+})),
+  "unresolvedQuestions": zod.array(zod.string()),
+  "ambiguityLevel": zod.number(),
+  "confidenceTension": zod.number()
+}),
+  "uncertainty": zod.object({
+  "certaintyCategory": zod.enum(['high-confidence-positive', 'high-confidence-negative', 'uncertain-positive', 'uncertain-negative', 'ambiguous']),
+  "uncertaintyLevel": zod.number(),
+  "ambiguityScore": zod.number(),
+  "evidenceReliability": zod.number(),
+  "confidenceDistribution": zod.record(zod.string(), zod.number())
+}),
+  "reconciliation": zod.object({
+  "recommendationCategory": zod.enum(['advance', 'investigate', 'decline', 'ambiguous']),
+  "recommendation": zod.string(),
+  "majorTensions": zod.array(zod.string()),
+  "strongestEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "summary": zod.string(),
+  "weight": zod.number()
+})),
+  "unresolvedConcerns": zod.array(zod.string()),
+  "trajectoryOutlook": zod.string(),
+  "confidenceNarrative": zod.string(),
+  "nextInvestigations": zod.array(zod.string())
+}),
+  "memory": zod.object({
+  "matchedArchetypes": zod.array(zod.object({
+  "archetypeId": zod.string(),
+  "archetypeName": zod.string(),
+  "matchScore": zod.number(),
+  "rationale": zod.string(),
+  "signals": zod.array(zod.string())
+})),
+  "recurringPatterns": zod.array(zod.string())
+})
+})
+export const ListCognitiveSynthesesResponse = zod.array(ListCognitiveSynthesesResponseItem)
+
+
+/**
+ * @summary Get a single cognitive synthesis
+ */
+export const GetCognitiveSynthesisParams = zod.object({
+  "candidateId": zod.coerce.string()
+})
+
+export const GetCognitiveSynthesisResponse = zod.object({
+  "candidateId": zod.string(),
+  "generatedAt": zod.coerce.date(),
+  "graph": zod.object({
+  "nodes": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "initialConfidence": zod.number(),
+  "adjustedConfidence": zod.number(),
+  "metric": zod.object({
+  "name": zod.string(),
+  "value": zod.number()
+})
+})),
+  "edges": zod.array(zod.object({
+  "id": zod.string(),
+  "from": zod.string(),
+  "to": zod.string(),
+  "kind": zod.enum(['confidence-penalty', 'confidence-amplification', 'uncertainty-boost', 'evidence-reinforcement', 'contradiction-pressure']),
+  "weight": zod.number(),
+  "reason": zod.string()
+}))
+}),
+  "influences": zod.array(zod.object({
+  "id": zod.string(),
+  "sourceAgent": zod.string(),
+  "targetAgent": zod.string(),
+  "kind": zod.enum(['confidence-penalty', 'confidence-amplification', 'uncertainty-boost', 'evidence-reinforcement', 'contradiction-pressure']),
+  "reason": zod.string(),
+  "adjustment": zod.number(),
+  "before": zod.number(),
+  "after": zod.number(),
+  "derivedFrom": zod.array(zod.string())
+})),
+  "confidence": zod.object({
+  "globalConfidence": zod.number(),
+  "localAdjustments": zod.record(zod.string(), zod.number()),
+  "uncertaintyMap": zod.record(zod.string(), zod.number()),
+  "saturationApplied": zod.boolean()
+}),
+  "disagreement": zod.object({
+  "disagreementScore": zod.number(),
+  "disagreements": zod.array(zod.object({
+  "id": zod.string(),
+  "agentA": zod.string(),
+  "agentB": zod.string(),
+  "metricA": zod.object({
+  "name": zod.string(),
+  "value": zod.number()
+}),
+  "metricB": zod.object({
+  "name": zod.string(),
+  "value": zod.number()
+}),
+  "score": zod.number(),
+  "rationale": zod.string()
+})),
+  "unresolvedQuestions": zod.array(zod.string()),
+  "ambiguityLevel": zod.number(),
+  "confidenceTension": zod.number()
+}),
+  "uncertainty": zod.object({
+  "certaintyCategory": zod.enum(['high-confidence-positive', 'high-confidence-negative', 'uncertain-positive', 'uncertain-negative', 'ambiguous']),
+  "uncertaintyLevel": zod.number(),
+  "ambiguityScore": zod.number(),
+  "evidenceReliability": zod.number(),
+  "confidenceDistribution": zod.record(zod.string(), zod.number())
+}),
+  "reconciliation": zod.object({
+  "recommendationCategory": zod.enum(['advance', 'investigate', 'decline', 'ambiguous']),
+  "recommendation": zod.string(),
+  "majorTensions": zod.array(zod.string()),
+  "strongestEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "summary": zod.string(),
+  "weight": zod.number()
+})),
+  "unresolvedConcerns": zod.array(zod.string()),
+  "trajectoryOutlook": zod.string(),
+  "confidenceNarrative": zod.string(),
+  "nextInvestigations": zod.array(zod.string())
+}),
+  "memory": zod.object({
+  "matchedArchetypes": zod.array(zod.object({
+  "archetypeId": zod.string(),
+  "archetypeName": zod.string(),
+  "matchScore": zod.number(),
+  "rationale": zod.string(),
+  "signals": zod.array(zod.string())
+})),
+  "recurringPatterns": zod.array(zod.string())
+})
+})
+
+
+/**
  * @summary List generated reports
  */
 export const ListReportsResponseItem = zod.object({

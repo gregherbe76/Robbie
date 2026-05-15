@@ -21,6 +21,7 @@ import type {
 import type {
   Agent,
   CandidateAnalysis,
+  CognitiveSynthesis,
   GraphSnapshot,
   HealthStatus,
   MemoryEntry,
@@ -885,6 +886,164 @@ export function useGetIntelligenceAnalysis<TData = Awaited<ReturnType<typeof get
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetIntelligenceAnalysisQueryOptions(candidateId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListCognitiveSynthesesUrl = () => {
+
+
+
+
+  return `/api/intelligence/cognition`
+}
+
+/**
+ * Returns the cognitive synthesis (influence propagation, disagreement,
+uncertainty fusion, reconciliation, archetype memory) for every
+candidate currently in the framework.
+
+ * @summary List cross-agent cognitive syntheses
+ */
+export const listCognitiveSyntheses = async ( options?: RequestInit): Promise<CognitiveSynthesis[]> => {
+
+  return customFetch<CognitiveSynthesis[]>(getListCognitiveSynthesesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCognitiveSynthesesQueryKey = () => {
+    return [
+    `/api/intelligence/cognition`
+    ] as const;
+    }
+
+
+export const getListCognitiveSynthesesQueryOptions = <TData = Awaited<ReturnType<typeof listCognitiveSyntheses>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCognitiveSyntheses>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCognitiveSynthesesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCognitiveSyntheses>>> = ({ signal }) => listCognitiveSyntheses({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCognitiveSyntheses>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListCognitiveSynthesesQueryResult = NonNullable<Awaited<ReturnType<typeof listCognitiveSyntheses>>>
+export type ListCognitiveSynthesesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List cross-agent cognitive syntheses
+ */
+
+export function useListCognitiveSyntheses<TData = Awaited<ReturnType<typeof listCognitiveSyntheses>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCognitiveSyntheses>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListCognitiveSynthesesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetCognitiveSynthesisUrl = (candidateId: string,) => {
+
+
+
+
+  return `/api/intelligence/cognition/${candidateId}`
+}
+
+/**
+ * @summary Get a single cognitive synthesis
+ */
+export const getCognitiveSynthesis = async (candidateId: string, options?: RequestInit): Promise<CognitiveSynthesis> => {
+
+  return customFetch<CognitiveSynthesis>(getGetCognitiveSynthesisUrl(candidateId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCognitiveSynthesisQueryKey = (candidateId: string,) => {
+    return [
+    `/api/intelligence/cognition/${candidateId}`
+    ] as const;
+    }
+
+
+export const getGetCognitiveSynthesisQueryOptions = <TData = Awaited<ReturnType<typeof getCognitiveSynthesis>>, TError = ErrorType<void>>(candidateId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCognitiveSynthesis>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCognitiveSynthesisQueryKey(candidateId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCognitiveSynthesis>>> = ({ signal }) => getCognitiveSynthesis(candidateId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(candidateId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCognitiveSynthesis>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCognitiveSynthesisQueryResult = NonNullable<Awaited<ReturnType<typeof getCognitiveSynthesis>>>
+export type GetCognitiveSynthesisQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get a single cognitive synthesis
+ */
+
+export function useGetCognitiveSynthesis<TData = Awaited<ReturnType<typeof getCognitiveSynthesis>>, TError = ErrorType<void>>(
+ candidateId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCognitiveSynthesis>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCognitiveSynthesisQueryOptions(candidateId,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

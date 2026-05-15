@@ -1,10 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { Activity, Brain, Server, Shield, Workflow, Cpu, Network, FileText, Database, Sparkles } from "lucide-react";
+import { Activity, Brain, Server, Shield, Workflow, Cpu, Network, FileText, Database, Sparkles, GitBranch } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { name: "Overview", path: "/", icon: Activity },
   { name: "Intelligence", path: "/intelligence", icon: Sparkles },
+  { name: "Cognition", path: "/cognition", icon: GitBranch },
   { name: "Agents", path: "/agents", icon: Brain },
   { name: "Skills", path: "/skills", icon: Cpu },
   { name: "Providers", path: "/providers", icon: Server },

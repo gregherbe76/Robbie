@@ -1,0 +1,316 @@
+Build the Cross-Agent Cognitive Layer for the Recruiting Intelligence Framework.
+
+IMPORTANT:
+The system must evolve from:
+- parallel agent execution
+
+into:
+- interactive recruiting cognition.
+
+Agents must now influence each other through:
+- confidence propagation,
+- contradiction pressure,
+- uncertainty fusion,
+- evidence reinforcement,
+- disagreement reconciliation.
+
+This is NOT a workflow engine upgrade.
+This is a cognition-layer upgrade.
+
+--------------------------------------------------
+Core Goal
+--------------------------------------------------
+
+Build a system where agents:
+- reason independently,
+- then revise confidence and interpretations
+based on the outputs of other agents.
+
+The system should resemble:
+- probabilistic intelligence synthesis,
+not:
+- independent scoring modules.
+
+--------------------------------------------------
+Build These Core Components
+--------------------------------------------------
+
+1. CognitiveGraph
+2. InfluenceEngine
+3. ConfidencePropagationEngine
+4. DisagreementAnalyzer
+5. UncertaintyFusionEngine
+6. ReasoningReconciliationEngine
+7. CrossAgentMemoryLayer
+
+--------------------------------------------------
+1. CognitiveGraph
+--------------------------------------------------
+
+Create a graph representing:
+- agents
+- reasoning dependencies
+- evidence influence
+- confidence influence
+- contradiction pressure
+
+Example:
+BayesianScoringAgent
+    ↓ confidence influenced by
+ContradictionAgent
+
+TrajectoryAgent
+    ↓ amplified by
+strong evidence diversity
+
+Implement:
+- weighted directional edges
+- influence strength
+- confidence propagation rules
+- contradiction propagation rules
+- uncertainty relationships
+
+The graph must remain:
+- deterministic
+- auditable
+- explainable
+
+--------------------------------------------------
+2. InfluenceEngine
+--------------------------------------------------
+
+Agents must influence each other.
+
+Examples:
+
+IF:
+Contradiction severity is high
+
+THEN:
+Bayesian confidence decreases.
+
+IF:
+Trajectory momentum is extremely strong
+
+THEN:
+unsupported seniority claims may be partially softened.
+
+IF:
+Evidence diversity is weak
+
+THEN:
+overall certainty decreases globally.
+
+Implement:
+- influence rules
+- influence weighting
+- deterministic propagation
+- explainable adjustments
+
+Every propagated adjustment must expose:
+- source agent
+- target agent
+- influence reason
+- adjustment amount
+- derived evidence
+
+--------------------------------------------------
+3. ConfidencePropagationEngine
+--------------------------------------------------
+
+Build a probabilistic confidence propagation system.
+
+Requirements:
+- global confidence estimation
+- local confidence adjustments
+- uncertainty decay
+- confidence amplification
+- contradiction penalties
+
+Implement:
+- confidence normalization
+- bounded propagation
+- saturation protection
+- deterministic propagation order
+
+Output:
+{
+  globalConfidence,
+  localAdjustments,
+  propagatedInfluences,
+  uncertaintyMap
+}
+
+--------------------------------------------------
+4. DisagreementAnalyzer
+--------------------------------------------------
+
+Build explicit disagreement analysis.
+
+The system must detect:
+- agent conflicts
+- contradictory interpretations
+- confidence divergence
+- evidence disagreement
+- unresolved uncertainty
+
+Examples:
+BayesianScoringAgent:
+"Strong Hire"
+
+ContradictionAgent:
+"High Narrative Inflation"
+
+=> disagreement surfaced explicitly.
+
+Implement:
+- disagreement scoring
+- disagreement clustering
+- unresolved ambiguity detection
+- confidence conflict analysis
+
+Output:
+{
+  disagreementScore,
+  disagreements,
+  unresolvedQuestions,
+  ambiguityLevel,
+  confidenceTension
+}
+
+--------------------------------------------------
+5. UncertaintyFusionEngine
+--------------------------------------------------
+
+Build a system that merges:
+- uncertainty,
+- evidence quality,
+- contradiction severity,
+- signal density,
+- confidence levels
+
+into:
+- a global uncertainty model.
+
+The system must distinguish:
+- high confidence positive
+- high confidence negative
+- uncertain positive
+- uncertain negative
+- ambiguous profiles
+
+Implement:
+- probabilistic fusion
+- uncertainty weighting
+- ambiguity estimation
+- evidence reliability scoring
+
+Output:
+{
+  certaintyCategory,
+  uncertaintyLevel,
+  ambiguityScore,
+  evidenceReliability,
+  confidenceDistribution
+}
+
+--------------------------------------------------
+6. ReasoningReconciliationEngine
+--------------------------------------------------
+
+Build the reasoning synthesis engine.
+
+Goal:
+Generate a final recruiting intelligence synthesis
+from interacting agent cognition.
+
+The synthesis must:
+- reconcile disagreements
+- preserve uncertainty
+- expose unresolved ambiguity
+- avoid fake certainty
+- remain explainable
+
+Output sections:
+- synthesized recommendation
+- major tensions
+- strongest evidence
+- unresolved concerns
+- trajectory outlook
+- confidence narrative
+- recommended next investigation areas
+
+IMPORTANT:
+Do NOT flatten disagreement into a fake single truth.
+
+--------------------------------------------------
+7. CrossAgentMemoryLayer
+--------------------------------------------------
+
+Build persistent memory for:
+- historical disagreements
+- successful reconciliations
+- recurring contradiction patterns
+- organizational reasoning patterns
+- confidence evolution over time
+
+The system should remember:
+- what disagreements historically predicted failure
+- what tensions predicted upside
+- recurring trajectory archetypes
+
+This memory must support:
+- future organizational intelligence
+- longitudinal hiring cognition
+- institutional learning
+
+--------------------------------------------------
+Frontend Requirements
+--------------------------------------------------
+
+Update the Intelligence Console.
+
+Add:
+- Cognitive Graph visualization
+- Influence propagation view
+- Confidence propagation timeline
+- Disagreement heatmap
+- Uncertainty map
+- Agent influence tracing
+- Reconciliation summary panel
+
+The UI should feel like:
+- an intelligence synthesis system,
+not:
+- recruiting software.
+
+--------------------------------------------------
+Critical Constraints
+--------------------------------------------------
+
+Maintain:
+- deterministic execution
+- provenance-first architecture
+- full auditability
+- explainability
+- evidence attribution
+- open-source compatibility
+
+Do NOT:
+- introduce ATS concepts
+- introduce opaque scoring
+- collapse uncertainty into fake precision
+- use hidden black-box adjustments
+
+Every adjustment must remain inspectable.
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+The framework should evolve from:
+"multiple recruiting agents"
+
+into:
+"a coherent recruiting cognition system
+that reasons under uncertainty."
