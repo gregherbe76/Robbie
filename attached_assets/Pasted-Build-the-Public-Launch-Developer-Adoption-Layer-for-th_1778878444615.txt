@@ -1,0 +1,365 @@
+Build the Public Launch & Developer Adoption Layer for the Recruiting Intelligence Framework.
+
+IMPORTANT:
+The framework is now:
+- architecturally coherent
+- benchmarked
+- deterministic
+- provenance-first
+- replayable
+- publicly deployable
+- OSS-ready
+
+The next phase is NOT:
+- more cognition
+- more agents
+- deeper infrastructure
+
+The next phase is:
+- developer adoption
+- public comprehension
+- ecosystem gravity
+- onboarding
+- design partner readiness
+- benchmark visibility
+- OSS discoverability
+
+This phase should turn the project from:
+"a technically serious repo"
+
+into:
+"a recognizable OSS infrastructure project."
+
+--------------------------------------------------
+Core Goal
+--------------------------------------------------
+
+A developer should be able to:
+- discover the repo
+- understand the thesis in <60 seconds
+- replay a cognition trace
+- run benchmarks
+- inspect provenance
+- understand determinism
+- contribute safely
+
+without needing:
+- sales calls
+- architecture walkthroughs
+- private explanations
+
+--------------------------------------------------
+Build These Components
+--------------------------------------------------
+
+Create:
+
+1. Public Landing Layer
+2. Guided Demo Narrative
+3. Interactive Replay Walkthrough
+4. Benchmark Visibility Layer
+5. Developer Onboarding Experience
+6. Public API Explorer
+7. OSS Ecosystem Hooks
+8. Design Partner Toolkit
+9. Technical Publishing Assets
+10. Adoption Analytics Layer
+
+--------------------------------------------------
+1. Public Landing Layer
+--------------------------------------------------
+
+Create a public landing experience.
+
+Routes:
+/
+ /why
+ /demo
+ /benchmarks-public
+ /architecture
+ /docs
+
+The homepage must communicate within 15 seconds:
+
+- deterministic cognition
+- provenance-first reasoning
+- disagreement preservation
+- calibration-aware intelligence
+- recruiting as organizational reasoning
+
+Do NOT:
+- use ATS language
+- use HR SaaS language
+- use "AI recruiter" language
+
+Hero positioning:
+"Deterministic recruiting intelligence infrastructure."
+
+Add:
+- screenshots
+- replay GIFs
+- disagreement visuals
+- provenance graphs
+- benchmark status
+- architecture diagram
+
+--------------------------------------------------
+2. Guided Demo Narrative
+--------------------------------------------------
+
+Build a guided replay story mode.
+
+The replay should explain:
+- why the candidate initially looked strong
+- what contradictions emerged
+- how confidence propagated
+- why escalation occurred
+- how calibration critiqued overconfidence
+- why uncertainty was preserved
+
+Support:
+- autoplay narration
+- step explanations
+- architecture annotations
+- provenance highlights
+
+Goal:
+make the framework understandable to:
+- engineers
+- founders
+- governance teams
+- AI infra people
+
+without needing internal context.
+
+--------------------------------------------------
+3. Interactive Replay Walkthrough
+--------------------------------------------------
+
+Add:
+- clickable cognition timeline
+- expandable propagation graph
+- evidence drill-down
+- disagreement explorer
+- escalation replay
+- provenance drill-down
+- calibration overlays
+
+Users should be able to:
+- inspect every cognition step
+- replay every propagation
+- diff before/after confidence
+- inspect unresolved tensions
+
+This should feel like:
+- a cognition debugger.
+
+--------------------------------------------------
+4. Benchmark Visibility Layer
+--------------------------------------------------
+
+Expose benchmark rigor publicly.
+
+Add:
+- benchmark health banner
+- determinism status
+- mutation guard status
+- calibration status
+- provenance completeness
+- replay hash verification
+
+Show:
+- intentional calibration failures
+- disagreement preservation
+- mutation guard explanations
+
+Goal:
+demonstrate:
+- scientific rigor
+- not AI marketing.
+
+--------------------------------------------------
+5. Developer Onboarding Experience
+--------------------------------------------------
+
+Build elite OSS onboarding.
+
+Add:
+- copy-paste quickstart
+- architecture orientation
+- replay walkthrough
+- benchmark walkthrough
+- first contribution guide
+- deterministic debugging guide
+- provenance debugging guide
+
+Add:
+- "First 30 minutes"
+- "Understanding cognition replay"
+- "How benchmarks work"
+- "How to add a cognition module"
+
+--------------------------------------------------
+6. Public API Explorer
+--------------------------------------------------
+
+Build an interactive API explorer.
+
+Requirements:
+- OpenAPI-driven
+- runnable examples
+- provenance examples
+- benchmark examples
+- ingestion examples
+- collaboration examples
+
+Add:
+- generated curl
+- JSON schemas
+- response lineage explanations
+
+Goal:
+make the repo feel:
+- infrastructure-grade.
+
+--------------------------------------------------
+7. OSS Ecosystem Hooks
+--------------------------------------------------
+
+Prepare ecosystem extensibility.
+
+Create:
+- plugin manifests
+- benchmark pack manifests
+- ingestion adapter manifests
+- cognition module manifests
+- organization policy manifests
+
+Add:
+- extension loading contracts
+- version compatibility
+- provenance compatibility rules
+- benchmark compatibility rules
+
+Goal:
+prepare for external ecosystem growth.
+
+--------------------------------------------------
+8. Design Partner Toolkit
+--------------------------------------------------
+
+Create:
+docs/design-partners/
+
+Include:
+- architecture overview deck
+- replay walkthrough guide
+- benchmark explanation
+- governance explanation
+- deployment expectations
+- roadmap transparency
+- known limitations
+
+Important:
+Be brutally honest about:
+- current maturity
+- missing persistence
+- missing production hardening
+- early-stage operational ergonomics
+
+--------------------------------------------------
+9. Technical Publishing Assets
+--------------------------------------------------
+
+Generate:
+- architecture diagrams
+- replay screenshots
+- provenance graphs
+- disagreement heatmaps
+- calibration screenshots
+- benchmark screenshots
+- social preview assets
+
+Create:
+docs/publishing/
+
+Include:
+- launch post draft
+- HN post draft
+- X thread draft
+- "Determinism is the New Explainability" article
+- benchmark philosophy article
+
+--------------------------------------------------
+10. Adoption Analytics Layer
+--------------------------------------------------
+
+Add lightweight public analytics.
+
+Track:
+- replay starts
+- benchmark views
+- replay completions
+- docs visits
+- API explorer usage
+
+IMPORTANT:
+- privacy-safe
+- aggregate only
+- no candidate data
+- no invasive tracking
+
+Goal:
+understand:
+- what people actually engage with.
+
+--------------------------------------------------
+Deployment Requirements
+--------------------------------------------------
+
+Deploy:
+- public Replit deployment
+- OpenGraph previews
+- replay share URLs
+- benchmark share URLs
+
+Ensure:
+- fast first paint
+- replay stability
+- deterministic responses
+- no hydration issues
+- mobile readability
+
+--------------------------------------------------
+Critical Constraints
+--------------------------------------------------
+
+Maintain:
+- deterministic replay
+- provenance-first architecture
+- explicit uncertainty
+- disagreement preservation
+- benchmark integrity
+- no fake claims
+
+Do NOT:
+- market "AI hiring automation"
+- imply autonomous hiring
+- hide benchmark failures
+- hide uncertainty
+- flatten disagreement
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+The project should evolve from:
+"a technically impressive OSS repo"
+
+into:
+
+"a recognizable open-source intelligence infrastructure project
+with a clear thesis,
+memorable replay experience,
+benchmark credibility,
+and ecosystem gravity."
