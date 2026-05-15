@@ -223,6 +223,65 @@ paths:
                 $ref: "#/components/schemas/CognitiveSynthesis"
         "404":
           description: Not found
+  /organization-intelligence/context:
+    get:
+      operationId: listOrganizationContexts
+      tags: [organization-intelligence]
+      summary: List organisation contexts
+      responses:
+        "200":
+          description: Contexts
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/OrganizationContext" }
+  /organization-intelligence/context/{organizationId}:
+    get:
+      operationId: getOrganizationContext
+      tags: [organization-intelligence]
+      parameters:
+        - in: path
+          name: organizationId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Context
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OrganizationContext" }
+        "404": { description: Not found }
+  /organization-intelligence/fit/{organizationId}/{candidateId}:
+    get:
+      operationId: getCandidateOrganizationFit
+      tags: [organization-intelligence]
+      parameters:
+        - { in: path, name: organizationId, required: true, schema: { type: string } }
+        - { in: path, name: candidateId, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Fit result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateOrganizationFitResult"
+        "404": { description: Not found }
+  /organization-intelligence/reports/{organizationId}/{candidateId}:
+    get:
+      operationId: getOrganizationIntelligenceReport
+      tags: [organization-intelligence]
+      parameters:
+        - { in: path, name: organizationId, required: true, schema: { type: string } }
+        - { in: path, name: candidateId, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrganizationIntelligenceReport"
+        "404": { description: Not found }
   /reports:
     get:
       operationId: listReports
@@ -938,3 +997,162 @@ components:
           $ref: "#/components/schemas/ReconciliationSynthesis"
         memory:
           $ref: "#/components/schemas/CrossAgentMemoryView"
+    ContextField:
+      type: object
+      required: [value, confidence, derivedFrom]
+      properties:
+        value: { type: string }
+        confidence: { type: number }
+        derivedFrom:
+          type: array
+          items: { type: string }
+        note: { type: string }
+    OrgEvidence:
+      type: object
+      required: [id, source, summary, weight]
+      properties:
+        id: { type: string }
+        source: { type: string }
+        summary: { type: string }
+        weight: { type: number }
+    OrganizationContext:
+      type: object
+      required: [id, name, description, generatedAt, founderEvidence, teamEvidence, fields]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        generatedAt: { type: string, format: date-time }
+        founderEvidence:
+          type: array
+          items: { $ref: "#/components/schemas/OrgEvidence" }
+        teamEvidence:
+          type: array
+          items: { $ref: "#/components/schemas/OrgEvidence" }
+        fields:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ContextField"
+    OrgReasoningEnvelope:
+      type: object
+      required: [agentId, candidateId, result, reasoning, evidenceChain, confidence, provenance]
+      properties:
+        agentId: { type: string }
+        candidateId: { type: string }
+        result:
+          type: object
+          additionalProperties: true
+        reasoning:
+          type: array
+          items:
+            type: object
+            required: [step, detail]
+            properties:
+              step: { type: string }
+              detail: { type: string }
+              value: { type: number }
+        evidenceChain:
+          type: array
+          items: { type: string }
+        confidence: { type: number }
+        provenance:
+          type: object
+          required: [producedBy, producedAt, rationale, derivedFrom]
+          properties:
+            producedBy: { type: string }
+            producedAt: { type: string, format: date-time }
+            rationale: { type: string }
+            derivedFrom:
+              type: array
+              items: { type: string }
+    CandidateOrganizationFitResult:
+      type: object
+      required:
+        [
+          candidateId,
+          organizationId,
+          fitRecommendation,
+          fitConfidence,
+          contextCompleteness,
+          successConditions,
+          failureModes,
+          onboardingRisks,
+          managementImplications,
+          interviewFocusAreas,
+          finalRationale,
+        ]
+      properties:
+        candidateId: { type: string }
+        organizationId: { type: string }
+        fitRecommendation:
+          type: string
+          enum:
+            [
+              strong_fit,
+              conditional_fit,
+              high_upside_high_risk,
+              poor_context_fit,
+              insufficient_context,
+            ]
+        fitConfidence: { type: number }
+        contextCompleteness: { type: number }
+        successConditions: { type: array, items: { type: string } }
+        failureModes: { type: array, items: { type: string } }
+        onboardingRisks: { type: array, items: { type: string } }
+        managementImplications: { type: array, items: { type: string } }
+        interviewFocusAreas: { type: array, items: { type: string } }
+        finalRationale: { type: string }
+    OrganizationIntelligenceReport:
+      type: object
+      required:
+        [
+          candidateId,
+          organizationId,
+          generatedAt,
+          fitSummary,
+          contextConfidence,
+          founderFit,
+          teamChemistry,
+          chaosFit,
+          roleEnvironment,
+          hiringRisk,
+          successConditions,
+          failureModes,
+          interviewFocusAreas,
+          finalRecommendation,
+        ]
+      properties:
+        candidateId: { type: string }
+        organizationId: { type: string }
+        generatedAt: { type: string, format: date-time }
+        fitSummary:
+          type: object
+          required: [recommendation, confidence, headline]
+          properties:
+            recommendation: { type: string }
+            confidence: { type: number }
+            headline: { type: string }
+        contextConfidence:
+          type: object
+          required: [averageFieldConfidence, knownFields, unknownFields]
+          properties:
+            averageFieldConfidence: { type: number }
+            knownFields: { type: number }
+            unknownFields:
+              type: array
+              items: { type: string }
+        founderFit: { $ref: "#/components/schemas/OrgReasoningEnvelope" }
+        teamChemistry: { $ref: "#/components/schemas/OrgReasoningEnvelope" }
+        chaosFit: { $ref: "#/components/schemas/OrgReasoningEnvelope" }
+        roleEnvironment: { $ref: "#/components/schemas/OrgReasoningEnvelope" }
+        hiringRisk: { $ref: "#/components/schemas/OrgReasoningEnvelope" }
+        successConditions: { type: array, items: { type: string } }
+        failureModes: { type: array, items: { type: string } }
+        interviewFocusAreas: { type: array, items: { type: string } }
+        finalRecommendation:
+          type: object
+          required: [category, narrative, confidence]
+          properties:
+            category: { type: string }
+            narrative: { type: string }
+            confidence: { type: number }

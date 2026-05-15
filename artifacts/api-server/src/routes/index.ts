@@ -6,6 +6,7 @@ import memoryRouter from "./memory";
 import graphRouter from "./graph";
 import reportsRouter from "./reports";
 import intelligenceRouter from "./intelligence";
+import organizationIntelligenceRouter from "./organization-intelligence";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(memoryRouter);
 router.use(graphRouter);
 router.use(reportsRouter);
 router.use(intelligenceRouter);
+router.use(organizationIntelligenceRouter);
 
 export default router;

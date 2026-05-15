@@ -649,6 +649,206 @@ export const GetCognitiveSynthesisResponse = zod.object({
 
 
 /**
+ * @summary List organisation contexts
+ */
+export const ListOrganizationContextsResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string(),
+  "generatedAt": zod.coerce.date(),
+  "founderEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "source": zod.string(),
+  "summary": zod.string(),
+  "weight": zod.number()
+})),
+  "teamEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "source": zod.string(),
+  "summary": zod.string(),
+  "weight": zod.number()
+})),
+  "fields": zod.record(zod.string(), zod.object({
+  "value": zod.string(),
+  "confidence": zod.number(),
+  "derivedFrom": zod.array(zod.string()),
+  "note": zod.string().optional()
+}))
+})
+export const ListOrganizationContextsResponse = zod.array(ListOrganizationContextsResponseItem)
+
+
+export const GetOrganizationContextParams = zod.object({
+  "organizationId": zod.coerce.string()
+})
+
+export const GetOrganizationContextResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string(),
+  "generatedAt": zod.coerce.date(),
+  "founderEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "source": zod.string(),
+  "summary": zod.string(),
+  "weight": zod.number()
+})),
+  "teamEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "source": zod.string(),
+  "summary": zod.string(),
+  "weight": zod.number()
+})),
+  "fields": zod.record(zod.string(), zod.object({
+  "value": zod.string(),
+  "confidence": zod.number(),
+  "derivedFrom": zod.array(zod.string()),
+  "note": zod.string().optional()
+}))
+})
+
+
+export const GetCandidateOrganizationFitParams = zod.object({
+  "organizationId": zod.coerce.string(),
+  "candidateId": zod.coerce.string()
+})
+
+export const GetCandidateOrganizationFitResponse = zod.object({
+  "candidateId": zod.string(),
+  "organizationId": zod.string(),
+  "fitRecommendation": zod.enum(['strong_fit', 'conditional_fit', 'high_upside_high_risk', 'poor_context_fit', 'insufficient_context']),
+  "fitConfidence": zod.number(),
+  "contextCompleteness": zod.number(),
+  "successConditions": zod.array(zod.string()),
+  "failureModes": zod.array(zod.string()),
+  "onboardingRisks": zod.array(zod.string()),
+  "managementImplications": zod.array(zod.string()),
+  "interviewFocusAreas": zod.array(zod.string()),
+  "finalRationale": zod.string()
+})
+
+
+export const GetOrganizationIntelligenceReportParams = zod.object({
+  "organizationId": zod.coerce.string(),
+  "candidateId": zod.coerce.string()
+})
+
+export const GetOrganizationIntelligenceReportResponse = zod.object({
+  "candidateId": zod.string(),
+  "organizationId": zod.string(),
+  "generatedAt": zod.coerce.date(),
+  "fitSummary": zod.object({
+  "recommendation": zod.string(),
+  "confidence": zod.number(),
+  "headline": zod.string()
+}),
+  "contextConfidence": zod.object({
+  "averageFieldConfidence": zod.number(),
+  "knownFields": zod.number(),
+  "unknownFields": zod.array(zod.string())
+}),
+  "founderFit": zod.object({
+  "agentId": zod.string(),
+  "candidateId": zod.string(),
+  "result": zod.record(zod.string(), zod.unknown()),
+  "reasoning": zod.array(zod.object({
+  "step": zod.string(),
+  "detail": zod.string(),
+  "value": zod.number().optional()
+})),
+  "evidenceChain": zod.array(zod.string()),
+  "confidence": zod.number(),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string(),
+  "derivedFrom": zod.array(zod.string())
+})
+}),
+  "teamChemistry": zod.object({
+  "agentId": zod.string(),
+  "candidateId": zod.string(),
+  "result": zod.record(zod.string(), zod.unknown()),
+  "reasoning": zod.array(zod.object({
+  "step": zod.string(),
+  "detail": zod.string(),
+  "value": zod.number().optional()
+})),
+  "evidenceChain": zod.array(zod.string()),
+  "confidence": zod.number(),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string(),
+  "derivedFrom": zod.array(zod.string())
+})
+}),
+  "chaosFit": zod.object({
+  "agentId": zod.string(),
+  "candidateId": zod.string(),
+  "result": zod.record(zod.string(), zod.unknown()),
+  "reasoning": zod.array(zod.object({
+  "step": zod.string(),
+  "detail": zod.string(),
+  "value": zod.number().optional()
+})),
+  "evidenceChain": zod.array(zod.string()),
+  "confidence": zod.number(),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string(),
+  "derivedFrom": zod.array(zod.string())
+})
+}),
+  "roleEnvironment": zod.object({
+  "agentId": zod.string(),
+  "candidateId": zod.string(),
+  "result": zod.record(zod.string(), zod.unknown()),
+  "reasoning": zod.array(zod.object({
+  "step": zod.string(),
+  "detail": zod.string(),
+  "value": zod.number().optional()
+})),
+  "evidenceChain": zod.array(zod.string()),
+  "confidence": zod.number(),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string(),
+  "derivedFrom": zod.array(zod.string())
+})
+}),
+  "hiringRisk": zod.object({
+  "agentId": zod.string(),
+  "candidateId": zod.string(),
+  "result": zod.record(zod.string(), zod.unknown()),
+  "reasoning": zod.array(zod.object({
+  "step": zod.string(),
+  "detail": zod.string(),
+  "value": zod.number().optional()
+})),
+  "evidenceChain": zod.array(zod.string()),
+  "confidence": zod.number(),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string(),
+  "derivedFrom": zod.array(zod.string())
+})
+}),
+  "successConditions": zod.array(zod.string()),
+  "failureModes": zod.array(zod.string()),
+  "interviewFocusAreas": zod.array(zod.string()),
+  "finalRecommendation": zod.object({
+  "category": zod.string(),
+  "narrative": zod.string(),
+  "confidence": zod.number()
+})
+})
+
+
+/**
  * @summary List generated reports
  */
 export const ListReportsResponseItem = zod.object({

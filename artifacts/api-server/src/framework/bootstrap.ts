@@ -32,6 +32,17 @@ import {
   summarizeArchetypeFrequency,
   type CognitiveSynthesis,
 } from "@workspace/framework/cognition";
+import {
+  SAMPLE_ORG,
+  listOrganizations,
+  getOrganization as lookupOrganization,
+  runOrganizationIntelligence,
+  buildOrgContextMemory,
+  buildFitMemory,
+  buildOrgArchetypeMemory,
+  type CandidateOrganizationFitResult,
+  type OrganizationIntelligenceReport,
+} from "@workspace/framework/organization-intelligence";
 
 const startedAt = Date.now();
 
@@ -52,6 +63,12 @@ const trajectory = new TrajectoryAgent();
 const analyses = new Map<string, CandidateAnalysis>();
 const cognitions = new Map<string, CognitiveSynthesis>();
 const dossiers = new Map<string, CandidateDossier>();
+// keyed by `${orgId}::${candidateId}`
+const orgFits = new Map<string, CandidateOrganizationFitResult>();
+const orgReports = new Map<string, OrganizationIntelligenceReport>();
+function orgKey(orgId: string, candidateId: string): string {
+  return `${orgId}::${candidateId}`;
+}
 
 function seedAgents(registry: FrameworkRegistry): void {
   registry.agents.register(bayesian);
@@ -493,6 +510,44 @@ async function seedAnalyses(registry: FrameworkRegistry): Promise<void> {
       trajectory: a.trajectory,
     })),
   );
+  // ============================================================
+  // Organization Intelligence Layer — candidate × organization fit
+  // ============================================================
+  const fixedClock = { now: () => new Date(now) };
+  await registry.memory.put({
+    ...buildOrgContextMemory(SAMPLE_ORG, now),
+  });
+  const fitRecs: Array<{
+    organizationId: string;
+    recommendation: CandidateOrganizationFitResult["fitRecommendation"];
+  }> = [];
+  for (const analysis of analyses.values()) {
+    const cognition = cognitions.get(analysis.candidateId);
+    if (!cognition) continue;
+    const result = runOrganizationIntelligence(
+      {
+        candidateId: analysis.candidateId,
+        bayesian: analysis.bayesian,
+        contradiction: analysis.contradiction,
+        trajectory: analysis.trajectory,
+      },
+      cognition,
+      SAMPLE_ORG,
+      fixedClock,
+    );
+    const key = orgKey(SAMPLE_ORG.id, analysis.candidateId);
+    orgFits.set(key, result.fit);
+    orgReports.set(key, result.report);
+    fitRecs.push({
+      organizationId: SAMPLE_ORG.id,
+      recommendation: result.fit.fitRecommendation,
+    });
+    await registry.memory.put(buildFitMemory(result.fit, result.report, now));
+  }
+  await registry.memory.put(
+    buildOrgArchetypeMemory(SAMPLE_ORG.id, fitRecs, now),
+  );
+
   for (const f of archetypeFreq) {
     await registry.memory.put({
       id: `mem:org:archetype:${f.archetypeId}`,
@@ -560,6 +615,28 @@ export function getCognition(candidateId: string): CognitiveSynthesis | null {
 
 export function getDossier(candidateId: string): CandidateDossier | null {
   return dossiers.get(candidateId) ?? null;
+}
+
+export function getOrganizations() {
+  return listOrganizations();
+}
+
+export function getOrganization(id: string) {
+  return lookupOrganization(id);
+}
+
+export function getOrgFit(
+  organizationId: string,
+  candidateId: string,
+): CandidateOrganizationFitResult | null {
+  return orgFits.get(orgKey(organizationId, candidateId)) ?? null;
+}
+
+export function getOrgReport(
+  organizationId: string,
+  candidateId: string,
+): OrganizationIntelligenceReport | null {
+  return orgReports.get(orgKey(organizationId, candidateId)) ?? null;
 }
 
 export function getUptimeSeconds(): number {

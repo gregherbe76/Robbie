@@ -527,3 +527,114 @@ export interface CognitiveSynthesis {
   memory: CrossAgentMemoryView;
 }
 
+export interface ContextField {
+  value: string;
+  confidence: number;
+  derivedFrom: string[];
+  note?: string;
+}
+
+export interface OrgEvidence {
+  id: string;
+  source: string;
+  summary: string;
+  weight: number;
+}
+
+export type OrganizationContextFields = {[key: string]: ContextField};
+
+export interface OrganizationContext {
+  id: string;
+  name: string;
+  description: string;
+  generatedAt: string;
+  founderEvidence: OrgEvidence[];
+  teamEvidence: OrgEvidence[];
+  fields: OrganizationContextFields;
+}
+
+export type OrgReasoningEnvelopeResult = { [key: string]: unknown };
+
+export type OrgReasoningEnvelopeReasoningItem = {
+  step: string;
+  detail: string;
+  value?: number;
+};
+
+export type OrgReasoningEnvelopeProvenance = {
+  producedBy: string;
+  producedAt: string;
+  rationale: string;
+  derivedFrom: string[];
+};
+
+export interface OrgReasoningEnvelope {
+  agentId: string;
+  candidateId: string;
+  result: OrgReasoningEnvelopeResult;
+  reasoning: OrgReasoningEnvelopeReasoningItem[];
+  evidenceChain: string[];
+  confidence: number;
+  provenance: OrgReasoningEnvelopeProvenance;
+}
+
+export type CandidateOrganizationFitResultFitRecommendation = typeof CandidateOrganizationFitResultFitRecommendation[keyof typeof CandidateOrganizationFitResultFitRecommendation];
+
+
+export const CandidateOrganizationFitResultFitRecommendation = {
+  strong_fit: 'strong_fit',
+  conditional_fit: 'conditional_fit',
+  high_upside_high_risk: 'high_upside_high_risk',
+  poor_context_fit: 'poor_context_fit',
+  insufficient_context: 'insufficient_context',
+} as const;
+
+export interface CandidateOrganizationFitResult {
+  candidateId: string;
+  organizationId: string;
+  fitRecommendation: CandidateOrganizationFitResultFitRecommendation;
+  fitConfidence: number;
+  contextCompleteness: number;
+  successConditions: string[];
+  failureModes: string[];
+  onboardingRisks: string[];
+  managementImplications: string[];
+  interviewFocusAreas: string[];
+  finalRationale: string;
+}
+
+export type OrganizationIntelligenceReportFitSummary = {
+  recommendation: string;
+  confidence: number;
+  headline: string;
+};
+
+export type OrganizationIntelligenceReportContextConfidence = {
+  averageFieldConfidence: number;
+  knownFields: number;
+  unknownFields: string[];
+};
+
+export type OrganizationIntelligenceReportFinalRecommendation = {
+  category: string;
+  narrative: string;
+  confidence: number;
+};
+
+export interface OrganizationIntelligenceReport {
+  candidateId: string;
+  organizationId: string;
+  generatedAt: string;
+  fitSummary: OrganizationIntelligenceReportFitSummary;
+  contextConfidence: OrganizationIntelligenceReportContextConfidence;
+  founderFit: OrgReasoningEnvelope;
+  teamChemistry: OrgReasoningEnvelope;
+  chaosFit: OrgReasoningEnvelope;
+  roleEnvironment: OrgReasoningEnvelope;
+  hiringRisk: OrgReasoningEnvelope;
+  successConditions: string[];
+  failureModes: string[];
+  interviewFocusAreas: string[];
+  finalRecommendation: OrganizationIntelligenceReportFinalRecommendation;
+}
+

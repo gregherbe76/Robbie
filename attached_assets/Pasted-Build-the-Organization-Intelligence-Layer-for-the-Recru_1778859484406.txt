@@ -1,0 +1,406 @@
+Build the Organization Intelligence Layer for the Recruiting Intelligence Framework.
+
+Current state:
+- flagship candidate agents exist
+- cross-agent cognition exists
+- provenance and deterministic execution are in place
+- memory, reports, graph, OpenAPI and console surfaces are working
+
+Now build the company-side intelligence layer.
+
+Goal:
+The system must not only evaluate candidates.
+It must evaluate candidate × organization fit.
+
+This is NOT ATS functionality.
+This is organizational recruiting intelligence.
+
+--------------------------------------------------
+Core Thesis
+--------------------------------------------------
+
+A hiring decision is not only:
+"Is this candidate strong?"
+
+It is:
+"Will this candidate succeed in THIS organization,
+with THIS founder/team,
+at THIS stage,
+under THIS operating constraints?"
+
+Build the layer that models:
+- company context
+- founder style
+- team structure
+- operating pace
+- ambiguity level
+- technical maturity
+- hiring risk
+- culture/working-style fit
+
+--------------------------------------------------
+Build These Components
+--------------------------------------------------
+
+Create lib/framework/src/organization_intelligence/
+
+Required components:
+
+1. OrganizationContextModel
+2. FounderStyleAgent
+3. TeamChemistryAgent
+4. ChaosToleranceAgent
+5. HiringRiskAgent
+6. RoleEnvironmentAgent
+7. CandidateOrganizationFitEngine
+8. OrganizationMemoryIntegrator
+9. OrganizationIntelligenceReportEngine
+
+--------------------------------------------------
+1. OrganizationContextModel
+--------------------------------------------------
+
+Model the organization as structured context.
+
+Fields:
+- company_stage
+- team_size
+- technical_maturity
+- process_maturity
+- ambiguity_level
+- execution_speed
+- founder_involvement
+- decision_style
+- communication_style
+- autonomy_expectation
+- feedback_culture
+- risk_tolerance
+- management_density
+- product_maturity
+- hiring_bar
+- role_criticality
+
+Support:
+- deterministic defaults
+- explicit unknown values
+- evidence attribution
+- confidence per field
+
+Do NOT infer unknown facts silently.
+Unknown must remain unknown.
+
+--------------------------------------------------
+2. FounderStyleAgent
+--------------------------------------------------
+
+Analyze founder/leadership working style.
+
+Detect:
+- high-speed operator
+- deep technical founder
+- chaotic visionary
+- structured operator
+- high-control founder
+- autonomous-builder-friendly leader
+- low-context/high-context communicator
+
+Output:
+{
+  founderStyle,
+  strengthsForCandidateTypes,
+  risksForCandidateTypes,
+  communicationImplications,
+  evidence,
+  confidence,
+  reasoning
+}
+
+--------------------------------------------------
+3. TeamChemistryAgent
+--------------------------------------------------
+
+Analyze candidate fit with current team shape.
+
+Inputs:
+- candidate intelligence result
+- organization context
+- team profile
+- role context
+
+Detect:
+- complementarity
+- duplication risk
+- ego collision risk
+- skill-gap coverage
+- communication fit
+- operating style fit
+
+Output:
+{
+  chemistryScore,
+  complementaritySignals,
+  collisionRisks,
+  missingTeamContext,
+  confidence,
+  reasoning
+}
+
+--------------------------------------------------
+4. ChaosToleranceAgent
+--------------------------------------------------
+
+Analyze whether candidate can succeed in the company’s ambiguity level.
+
+Compare:
+- candidate trajectory
+- ownership signals
+- contradiction/stability signals
+- organization ambiguity level
+- process maturity
+- autonomy expectation
+
+Detect:
+- thrives in chaos
+- needs structure
+- can operate with partial information
+- likely to stall
+- likely to over-process
+
+Output:
+{
+  chaosFitScore,
+  toleranceLevel,
+  riskLevel,
+  strongestEvidence,
+  missingEvidence,
+  reasoning
+}
+
+--------------------------------------------------
+5. HiringRiskAgent
+--------------------------------------------------
+
+Estimate risk of hiring failure for this specific candidate × organization pairing.
+
+Risk categories:
+- execution risk
+- autonomy risk
+- culture risk
+- manager fit risk
+- ramp risk
+- retention risk
+- communication risk
+- seniority calibration risk
+
+Output:
+{
+  overallHiringRisk,
+  riskBreakdown,
+  strongestRiskDrivers,
+  mitigatingFactors,
+  confidence,
+  nextInvestigations,
+  reasoning
+}
+
+--------------------------------------------------
+6. RoleEnvironmentAgent
+--------------------------------------------------
+
+Model the role environment.
+
+Fields:
+- role_ambiguity
+- expected_output_speed
+- technical_depth_required
+- collaboration_intensity
+- stakeholder_complexity
+- ownership_level
+- tolerance_for_learning_curve
+- need_for_immediate_impact
+
+Output:
+{
+  roleEnvironmentProfile,
+  candidateFitAgainstRoleEnvironment,
+  mismatchAreas,
+  investigationAreas,
+  confidence,
+  reasoning
+}
+
+--------------------------------------------------
+7. CandidateOrganizationFitEngine
+--------------------------------------------------
+
+Synthesize:
+- candidate intelligence
+- cross-agent cognition
+- organization context
+- founder style
+- team chemistry
+- chaos tolerance
+- hiring risk
+- role environment
+
+Produce:
+{
+  fitRecommendation,
+  fitConfidence,
+  successConditions,
+  failureModes,
+  onboardingRisks,
+  managementImplications,
+  interviewFocusAreas,
+  finalRationale
+}
+
+Recommendation categories:
+- strong_fit
+- conditional_fit
+- high_upside_high_risk
+- poor_context_fit
+- insufficient_context
+
+IMPORTANT:
+Do not collapse uncertainty.
+If organization context is weak, output insufficient_context.
+
+--------------------------------------------------
+8. OrganizationMemoryIntegrator
+--------------------------------------------------
+
+Persist:
+- organization context
+- founder style patterns
+- role environment patterns
+- successful candidate archetypes
+- failed hire archetypes
+- repeated risk patterns
+- candidate × organization fit outcomes
+
+Every memory item must include:
+- producedBy
+- producedAt
+- rationale
+- derivedFrom
+- confidence
+- organizationId
+
+Support:
+- longitudinal company learning
+- future calibration
+- archetype evolution
+- hiring-bar drift detection
+
+--------------------------------------------------
+9. OrganizationIntelligenceReportEngine
+--------------------------------------------------
+
+Create a report that answers:
+
+"Should this candidate be hired into this organization,
+under these conditions?"
+
+Report sections:
+1. Candidate × Organization Fit Summary
+2. Organization Context Confidence
+3. Founder / Leadership Fit
+4. Team Chemistry
+5. Chaos & Ambiguity Fit
+6. Role Environment Fit
+7. Hiring Risk Breakdown
+8. Success Conditions
+9. Failure Modes
+10. Interview Focus Areas
+11. Final Recommendation
+
+The report must be:
+- concise
+- evidence-backed
+- uncertainty-aware
+- founder-readable
+- audit-friendly
+
+--------------------------------------------------
+API Requirements
+--------------------------------------------------
+
+Add endpoints:
+
+GET /organization-intelligence/context/{organizationId}
+GET /organization-intelligence/fit/{organizationId}/{candidateId}
+GET /organization-intelligence/reports/{organizationId}/{candidateId}
+
+Add OpenAPI schemas for:
+- OrganizationContext
+- FounderStyleResult
+- TeamChemistryResult
+- ChaosToleranceResult
+- HiringRiskResult
+- RoleEnvironmentResult
+- CandidateOrganizationFitResult
+- OrganizationIntelligenceReport
+
+Run codegen and wire generated hooks in frontend.
+
+--------------------------------------------------
+Console Requirements
+--------------------------------------------------
+
+Add /organization-intelligence page.
+
+UI sections:
+- Organization context panel
+- Candidate × Organization fit matrix
+- Founder style card
+- Team chemistry card
+- Chaos tolerance card
+- Hiring risk breakdown
+- Success conditions / failure modes
+- Organization memory timeline
+- Final recommendation panel
+
+The UI must remain:
+- intelligence-oriented
+- analytical
+- audit-friendly
+
+Do NOT build:
+- ATS pipeline
+- hiring stages
+- CRM screens
+- Kanban boards
+
+--------------------------------------------------
+Determinism + Auditability
+--------------------------------------------------
+
+All organization intelligence outputs must include:
+- evidenceChain
+- provenance
+- reasoning steps
+- confidence
+- unknown fields explicitly represented
+
+No hidden inference.
+No silent assumptions.
+No fake precision.
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+The framework should evolve from:
+
+"candidate intelligence system"
+
+into:
+
+"candidate × organization recruiting intelligence system"
+
+capable of explaining not only:
+"Is this person good?"
+
+but:
+"Will this person work here?"

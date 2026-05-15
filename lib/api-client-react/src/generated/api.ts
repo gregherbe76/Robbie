@@ -21,10 +21,13 @@ import type {
 import type {
   Agent,
   CandidateAnalysis,
+  CandidateOrganizationFitResult,
   CognitiveSynthesis,
   GraphSnapshot,
   HealthStatus,
   MemoryEntry,
+  OrganizationContext,
+  OrganizationIntelligenceReport,
   Provider,
   Report,
   Skill,
@@ -1044,6 +1047,306 @@ export function useGetCognitiveSynthesis<TData = Awaited<ReturnType<typeof getCo
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetCognitiveSynthesisQueryOptions(candidateId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListOrganizationContextsUrl = () => {
+
+
+
+
+  return `/api/organization-intelligence/context`
+}
+
+/**
+ * @summary List organisation contexts
+ */
+export const listOrganizationContexts = async ( options?: RequestInit): Promise<OrganizationContext[]> => {
+
+  return customFetch<OrganizationContext[]>(getListOrganizationContextsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListOrganizationContextsQueryKey = () => {
+    return [
+    `/api/organization-intelligence/context`
+    ] as const;
+    }
+
+
+export const getListOrganizationContextsQueryOptions = <TData = Awaited<ReturnType<typeof listOrganizationContexts>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listOrganizationContexts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListOrganizationContextsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listOrganizationContexts>>> = ({ signal }) => listOrganizationContexts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listOrganizationContexts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListOrganizationContextsQueryResult = NonNullable<Awaited<ReturnType<typeof listOrganizationContexts>>>
+export type ListOrganizationContextsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List organisation contexts
+ */
+
+export function useListOrganizationContexts<TData = Awaited<ReturnType<typeof listOrganizationContexts>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listOrganizationContexts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListOrganizationContextsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetOrganizationContextUrl = (organizationId: string,) => {
+
+
+
+
+  return `/api/organization-intelligence/context/${organizationId}`
+}
+
+export const getOrganizationContext = async (organizationId: string, options?: RequestInit): Promise<OrganizationContext> => {
+
+  return customFetch<OrganizationContext>(getGetOrganizationContextUrl(organizationId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetOrganizationContextQueryKey = (organizationId: string,) => {
+    return [
+    `/api/organization-intelligence/context/${organizationId}`
+    ] as const;
+    }
+
+
+export const getGetOrganizationContextQueryOptions = <TData = Awaited<ReturnType<typeof getOrganizationContext>>, TError = ErrorType<void>>(organizationId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOrganizationContext>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOrganizationContextQueryKey(organizationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationContext>>> = ({ signal }) => getOrganizationContext(organizationId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(organizationId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOrganizationContext>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetOrganizationContextQueryResult = NonNullable<Awaited<ReturnType<typeof getOrganizationContext>>>
+export type GetOrganizationContextQueryError = ErrorType<void>
+
+
+
+export function useGetOrganizationContext<TData = Awaited<ReturnType<typeof getOrganizationContext>>, TError = ErrorType<void>>(
+ organizationId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOrganizationContext>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetOrganizationContextQueryOptions(organizationId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetCandidateOrganizationFitUrl = (organizationId: string,
+    candidateId: string,) => {
+
+
+
+
+  return `/api/organization-intelligence/fit/${organizationId}/${candidateId}`
+}
+
+export const getCandidateOrganizationFit = async (organizationId: string,
+    candidateId: string, options?: RequestInit): Promise<CandidateOrganizationFitResult> => {
+
+  return customFetch<CandidateOrganizationFitResult>(getGetCandidateOrganizationFitUrl(organizationId,candidateId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCandidateOrganizationFitQueryKey = (organizationId: string,
+    candidateId: string,) => {
+    return [
+    `/api/organization-intelligence/fit/${organizationId}/${candidateId}`
+    ] as const;
+    }
+
+
+export const getGetCandidateOrganizationFitQueryOptions = <TData = Awaited<ReturnType<typeof getCandidateOrganizationFit>>, TError = ErrorType<void>>(organizationId: string,
+    candidateId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCandidateOrganizationFit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCandidateOrganizationFitQueryKey(organizationId,candidateId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCandidateOrganizationFit>>> = ({ signal }) => getCandidateOrganizationFit(organizationId,candidateId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(organizationId && candidateId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCandidateOrganizationFit>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCandidateOrganizationFitQueryResult = NonNullable<Awaited<ReturnType<typeof getCandidateOrganizationFit>>>
+export type GetCandidateOrganizationFitQueryError = ErrorType<void>
+
+
+
+export function useGetCandidateOrganizationFit<TData = Awaited<ReturnType<typeof getCandidateOrganizationFit>>, TError = ErrorType<void>>(
+ organizationId: string,
+    candidateId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCandidateOrganizationFit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCandidateOrganizationFitQueryOptions(organizationId,candidateId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetOrganizationIntelligenceReportUrl = (organizationId: string,
+    candidateId: string,) => {
+
+
+
+
+  return `/api/organization-intelligence/reports/${organizationId}/${candidateId}`
+}
+
+export const getOrganizationIntelligenceReport = async (organizationId: string,
+    candidateId: string, options?: RequestInit): Promise<OrganizationIntelligenceReport> => {
+
+  return customFetch<OrganizationIntelligenceReport>(getGetOrganizationIntelligenceReportUrl(organizationId,candidateId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetOrganizationIntelligenceReportQueryKey = (organizationId: string,
+    candidateId: string,) => {
+    return [
+    `/api/organization-intelligence/reports/${organizationId}/${candidateId}`
+    ] as const;
+    }
+
+
+export const getGetOrganizationIntelligenceReportQueryOptions = <TData = Awaited<ReturnType<typeof getOrganizationIntelligenceReport>>, TError = ErrorType<void>>(organizationId: string,
+    candidateId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOrganizationIntelligenceReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOrganizationIntelligenceReportQueryKey(organizationId,candidateId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationIntelligenceReport>>> = ({ signal }) => getOrganizationIntelligenceReport(organizationId,candidateId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(organizationId && candidateId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOrganizationIntelligenceReport>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetOrganizationIntelligenceReportQueryResult = NonNullable<Awaited<ReturnType<typeof getOrganizationIntelligenceReport>>>
+export type GetOrganizationIntelligenceReportQueryError = ErrorType<void>
+
+
+
+export function useGetOrganizationIntelligenceReport<TData = Awaited<ReturnType<typeof getOrganizationIntelligenceReport>>, TError = ErrorType<void>>(
+ organizationId: string,
+    candidateId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOrganizationIntelligenceReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetOrganizationIntelligenceReportQueryOptions(organizationId,candidateId,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
