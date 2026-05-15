@@ -82,6 +82,10 @@
       "types": "./dist/ingestion/index.d.ts",
       "import": "./dist/ingestion/index.js"
     },
+    "./security": {
+      "types": "./dist/security/index.d.ts",
+      "import": "./dist/security/index.js"
+    },
     "./collaboration": {
       "types": "./dist/collaboration/index.d.ts",
       "import": "./dist/collaboration/index.js"

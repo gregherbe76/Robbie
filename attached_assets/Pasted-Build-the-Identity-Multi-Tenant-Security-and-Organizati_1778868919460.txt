@@ -1,0 +1,389 @@
+Build the Identity, Multi-Tenant Security, and Organizational Boundary Layer for the Recruiting Intelligence Framework.
+
+IMPORTANT:
+The framework already has:
+- ingestion
+- cognition
+- organization intelligence
+- calibration/evaluation
+- intelligence operations
+- collaborative reasoning
+- deterministic benchmarks
+- provenance-first architecture
+
+Now build the operational boundary layer.
+
+This phase is NOT:
+- generic SaaS auth
+- HR admin tooling
+- ATS permissions
+
+This phase IS:
+- organizational cognition isolation
+- audit-safe reviewer identity
+- deterministic access boundaries
+- intelligence visibility control
+- operational security foundations
+
+--------------------------------------------------
+Core Thesis
+--------------------------------------------------
+
+A recruiting intelligence system must:
+- isolate organizational cognition,
+- preserve auditability,
+- preserve provenance,
+- prevent invisible access,
+- make all reviewer actions attributable,
+- enforce explicit visibility boundaries.
+
+This layer must protect:
+- organizational memory
+- investigations
+- reviewer reasoning
+- evidence provenance
+- calibration data
+- longitudinal intelligence
+
+--------------------------------------------------
+Build These Components
+--------------------------------------------------
+
+Create:
+
+lib/framework/src/security/
+
+Required components:
+
+1. OrganizationBoundaryEngine
+2. ReviewerIdentityProvider
+3. MultiTenantIsolationLayer
+4. IntelligenceVisibilityEngine
+5. RoleCapabilitySystem
+6. SecureAuditTrail
+7. AccessDecisionEngine
+8. SensitiveEvidenceGuard
+9. SessionAndActionIntegrityLayer
+10. SecurityBenchmarkSuite
+
+--------------------------------------------------
+1. OrganizationBoundaryEngine
+--------------------------------------------------
+
+Build strict organization boundaries.
+
+Every:
+- candidate
+- case
+- evidence item
+- audit log
+- cognition result
+- memory artifact
+- benchmark result
+- reviewer annotation
+
+must belong to:
+- exactly one organization scope
+OR
+- explicit global/demo scope.
+
+Requirements:
+- no implicit cross-org access
+- no shared memory leakage
+- deterministic org resolution
+- replayable access checks
+
+Every entity must expose:
+{
+  organizationId,
+  visibilityScope,
+  provenance,
+  createdBy,
+  createdAt
+}
+
+--------------------------------------------------
+2. ReviewerIdentityProvider
+--------------------------------------------------
+
+Build reviewer identity primitives.
+
+Support:
+- deterministic reviewer identity
+- reviewer fingerprinting
+- reviewer provenance
+- reviewer capability profiles
+- reviewer calibration identity
+
+Reviewer types:
+- founder
+- recruiter
+- hiring_manager
+- technical_reviewer
+- executive
+- external_reviewer
+- system_agent
+
+IMPORTANT:
+No anonymous operational actions allowed.
+
+--------------------------------------------------
+3. MultiTenantIsolationLayer
+--------------------------------------------------
+
+Build hard tenant isolation.
+
+Isolation rules:
+- memory isolation
+- evidence isolation
+- case isolation
+- audit isolation
+- calibration isolation
+- benchmark isolation
+- collaboration isolation
+
+Support:
+- explicit shared demo datasets
+- explicit public benchmark datasets
+
+Prevent:
+- accidental cross-org cognition
+- calibration contamination
+- benchmark leakage
+- evidence leakage
+
+--------------------------------------------------
+4. IntelligenceVisibilityEngine
+--------------------------------------------------
+
+Build visibility rules for intelligence artifacts.
+
+Visibility levels:
+- organization_private
+- investigation_private
+- reviewer_private
+- escalation_only
+- benchmark_public
+- demo_public
+
+Support:
+- evidence-level visibility
+- review-level visibility
+- audit-level visibility
+- override visibility
+- escalation visibility
+
+IMPORTANT:
+Visibility changes must themselves be auditable.
+
+--------------------------------------------------
+5. RoleCapabilitySystem
+--------------------------------------------------
+
+Build capability-based operations.
+
+NOT generic RBAC.
+
+Capabilities examples:
+- review_evidence
+- escalate_case
+- override_recommendation
+- view_sensitive_evidence
+- run_benchmarks
+- manage_org_memory
+- view_calibration
+- create_public_benchmark
+
+Every operation must explicitly check:
+- reviewer identity
+- organization scope
+- capability
+- visibility rules
+
+--------------------------------------------------
+6. SecureAuditTrail
+--------------------------------------------------
+
+Build immutable security-aware audit trails.
+
+Track:
+- access attempts
+- visibility changes
+- override actions
+- escalation access
+- evidence access
+- sensitive evidence views
+- calibration access
+- benchmark modifications
+
+Requirements:
+- append-only
+- deterministic ordering
+- provenance-complete
+- replayable
+
+No silent reads of sensitive artifacts.
+
+--------------------------------------------------
+7. AccessDecisionEngine
+--------------------------------------------------
+
+Centralize access decisions.
+
+Every protected read/write operation must pass through:
+- organization boundary checks
+- capability checks
+- visibility checks
+- escalation restrictions
+- reviewer identity validation
+
+Every access decision must produce:
+{
+  allowed,
+  reason,
+  evaluatedRules,
+  reviewerId,
+  organizationId,
+  targetResource,
+  timestamp
+}
+
+--------------------------------------------------
+8. SensitiveEvidenceGuard
+--------------------------------------------------
+
+Protect sensitive evidence.
+
+Sensitive examples:
+- reference checks
+- compensation notes
+- escalation reviews
+- founder-only annotations
+- confidential investigations
+- external reviewer comments
+
+Support:
+- redaction
+- partial visibility
+- escalation-only access
+- audit-triggered access logging
+
+IMPORTANT:
+The framework must preserve provenance even when redacted.
+
+--------------------------------------------------
+9. SessionAndActionIntegrityLayer
+--------------------------------------------------
+
+Build deterministic operational integrity.
+
+Requirements:
+- action signing
+- deterministic session tracing
+- replayable reviewer sessions
+- action lineage
+- anti-duplication protections
+- idempotent operations
+
+Prevent:
+- duplicate overrides
+- replay inconsistencies
+- conflicting concurrent actions
+- hidden reviewer state mutations
+
+--------------------------------------------------
+10. SecurityBenchmarkSuite
+--------------------------------------------------
+
+Build deterministic security smoke tests.
+
+Create benchmark scenarios:
+- cross-org access attempt
+- unauthorized escalation access
+- override without capability
+- visibility leakage
+- benchmark contamination
+- reviewer impersonation
+- sensitive evidence access
+- hidden audit mutation
+
+Verify:
+- access denied correctly
+- audit logs generated
+- provenance preserved
+- org isolation maintained
+- deterministic replay preserved
+
+--------------------------------------------------
+API Requirements
+--------------------------------------------------
+
+Add endpoints:
+
+GET /security/access-log/{organizationId}
+GET /security/reviewer/{reviewerId}
+POST /security/check-access
+GET /security/visibility/{resourceId}
+POST /security/change-visibility
+GET /security/audit/{organizationId}
+
+OpenAPI-first.
+Generate hooks + Zod validators.
+
+--------------------------------------------------
+Console Requirements
+--------------------------------------------------
+
+Add:
+/security
+
+Sections:
+- organization boundaries
+- reviewer identities
+- capability explorer
+- visibility graph
+- access decision inspector
+- sensitive evidence viewer
+- security audit timeline
+- benchmark security panel
+
+UI philosophy:
+- operational intelligence security console
+- audit-first
+- provenance-visible
+- deterministic operations
+
+NOT:
+- generic admin dashboard
+- HR admin panel
+
+--------------------------------------------------
+Critical Constraints
+--------------------------------------------------
+
+Maintain:
+- deterministic execution
+- provenance-first architecture
+- explicit organization scoping
+- replayability
+- auditability
+- explicit reviewer attribution
+
+Do NOT:
+- allow silent cross-org access
+- hide access decisions
+- hide visibility mutations
+- allow anonymous overrides
+- silently share memory across tenants
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+The framework should evolve from:
+"a collaborative recruiting intelligence system"
+
+into:
+
+"a secure multi-tenant organizational intelligence operating system
+for hiring decisions under uncertainty."

@@ -61,6 +61,15 @@ import type {
   PredictionRecord,
   Provider,
   Report,
+  SecurityAccessDecision,
+  SecurityAccessLog,
+  SecurityAuditBundle,
+  SecurityChangeVisibilityRequest,
+  SecurityChangeVisibilityResult,
+  SecurityCheckAccessRequest,
+  SecurityReviewerDetail,
+  SecuritySnapshot,
+  SecurityVisibilityDetail,
   Skill,
   SystemOverview,
   Workflow
@@ -3033,6 +3042,533 @@ export function useGetCollaborationAudit<TData = Awaited<ReturnType<typeof getCo
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetCollaborationAuditQueryOptions(caseId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetSecurityAccessLogUrl = (organizationId: string,) => {
+
+
+
+
+  return `/api/security/access-log/${organizationId}`
+}
+
+/**
+ * @summary Recent access decisions for an organization (audit-first view)
+ */
+export const getSecurityAccessLog = async (organizationId: string, options?: RequestInit): Promise<SecurityAccessLog> => {
+
+  return customFetch<SecurityAccessLog>(getGetSecurityAccessLogUrl(organizationId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSecurityAccessLogQueryKey = (organizationId: string,) => {
+    return [
+    `/api/security/access-log/${organizationId}`
+    ] as const;
+    }
+
+
+export const getGetSecurityAccessLogQueryOptions = <TData = Awaited<ReturnType<typeof getSecurityAccessLog>>, TError = ErrorType<void>>(organizationId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSecurityAccessLog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSecurityAccessLogQueryKey(organizationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSecurityAccessLog>>> = ({ signal }) => getSecurityAccessLog(organizationId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(organizationId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSecurityAccessLog>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSecurityAccessLogQueryResult = NonNullable<Awaited<ReturnType<typeof getSecurityAccessLog>>>
+export type GetSecurityAccessLogQueryError = ErrorType<void>
+
+
+/**
+ * @summary Recent access decisions for an organization (audit-first view)
+ */
+
+export function useGetSecurityAccessLog<TData = Awaited<ReturnType<typeof getSecurityAccessLog>>, TError = ErrorType<void>>(
+ organizationId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSecurityAccessLog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSecurityAccessLogQueryOptions(organizationId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetSecurityReviewerUrl = (reviewerId: string,) => {
+
+
+
+
+  return `/api/security/reviewer/${reviewerId}`
+}
+
+/**
+ * @summary Reviewer identity, capabilities, and recent decisions
+ */
+export const getSecurityReviewer = async (reviewerId: string, options?: RequestInit): Promise<SecurityReviewerDetail> => {
+
+  return customFetch<SecurityReviewerDetail>(getGetSecurityReviewerUrl(reviewerId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSecurityReviewerQueryKey = (reviewerId: string,) => {
+    return [
+    `/api/security/reviewer/${reviewerId}`
+    ] as const;
+    }
+
+
+export const getGetSecurityReviewerQueryOptions = <TData = Awaited<ReturnType<typeof getSecurityReviewer>>, TError = ErrorType<void>>(reviewerId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSecurityReviewer>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSecurityReviewerQueryKey(reviewerId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSecurityReviewer>>> = ({ signal }) => getSecurityReviewer(reviewerId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(reviewerId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSecurityReviewer>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSecurityReviewerQueryResult = NonNullable<Awaited<ReturnType<typeof getSecurityReviewer>>>
+export type GetSecurityReviewerQueryError = ErrorType<void>
+
+
+/**
+ * @summary Reviewer identity, capabilities, and recent decisions
+ */
+
+export function useGetSecurityReviewer<TData = Awaited<ReturnType<typeof getSecurityReviewer>>, TError = ErrorType<void>>(
+ reviewerId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSecurityReviewer>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSecurityReviewerQueryOptions(reviewerId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCheckSecurityAccessUrl = () => {
+
+
+
+
+  return `/api/security/check-access`
+}
+
+/**
+ * @summary Probe the central access decision engine
+ */
+export const checkSecurityAccess = async (securityCheckAccessRequest: SecurityCheckAccessRequest, options?: RequestInit): Promise<SecurityAccessDecision> => {
+
+  return customFetch<SecurityAccessDecision>(getCheckSecurityAccessUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      securityCheckAccessRequest,)
+  }
+);}
+
+
+
+
+export const getCheckSecurityAccessMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkSecurityAccess>>, TError,{data: BodyType<SecurityCheckAccessRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof checkSecurityAccess>>, TError,{data: BodyType<SecurityCheckAccessRequest>}, TContext> => {
+
+const mutationKey = ['checkSecurityAccess'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof checkSecurityAccess>>, {data: BodyType<SecurityCheckAccessRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  checkSecurityAccess(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CheckSecurityAccessMutationResult = NonNullable<Awaited<ReturnType<typeof checkSecurityAccess>>>
+    export type CheckSecurityAccessMutationBody = BodyType<SecurityCheckAccessRequest>
+    export type CheckSecurityAccessMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Probe the central access decision engine
+ */
+export const useCheckSecurityAccess = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkSecurityAccess>>, TError,{data: BodyType<SecurityCheckAccessRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof checkSecurityAccess>>,
+        TError,
+        {data: BodyType<SecurityCheckAccessRequest>},
+        TContext
+      > => {
+      return useMutation(getCheckSecurityAccessMutationOptions(options));
+    }
+
+export const getGetSecurityVisibilityUrl = (resourceId: string,) => {
+
+
+
+
+  return `/api/security/visibility/${resourceId}`
+}
+
+/**
+ * @summary Current visibility level + full append-only history
+ */
+export const getSecurityVisibility = async (resourceId: string, options?: RequestInit): Promise<SecurityVisibilityDetail> => {
+
+  return customFetch<SecurityVisibilityDetail>(getGetSecurityVisibilityUrl(resourceId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSecurityVisibilityQueryKey = (resourceId: string,) => {
+    return [
+    `/api/security/visibility/${resourceId}`
+    ] as const;
+    }
+
+
+export const getGetSecurityVisibilityQueryOptions = <TData = Awaited<ReturnType<typeof getSecurityVisibility>>, TError = ErrorType<void>>(resourceId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSecurityVisibility>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSecurityVisibilityQueryKey(resourceId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSecurityVisibility>>> = ({ signal }) => getSecurityVisibility(resourceId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(resourceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSecurityVisibility>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSecurityVisibilityQueryResult = NonNullable<Awaited<ReturnType<typeof getSecurityVisibility>>>
+export type GetSecurityVisibilityQueryError = ErrorType<void>
+
+
+/**
+ * @summary Current visibility level + full append-only history
+ */
+
+export function useGetSecurityVisibility<TData = Awaited<ReturnType<typeof getSecurityVisibility>>, TError = ErrorType<void>>(
+ resourceId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSecurityVisibility>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSecurityVisibilityQueryOptions(resourceId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getChangeSecurityVisibilityUrl = () => {
+
+
+
+
+  return `/api/security/change-visibility`
+}
+
+/**
+ * @summary Change a resource's visibility level (auditable)
+ */
+export const changeSecurityVisibility = async (securityChangeVisibilityRequest: SecurityChangeVisibilityRequest, options?: RequestInit): Promise<SecurityChangeVisibilityResult> => {
+
+  return customFetch<SecurityChangeVisibilityResult>(getChangeSecurityVisibilityUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      securityChangeVisibilityRequest,)
+  }
+);}
+
+
+
+
+export const getChangeSecurityVisibilityMutationOptions = <TError = ErrorType<SecurityAccessDecision>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof changeSecurityVisibility>>, TError,{data: BodyType<SecurityChangeVisibilityRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof changeSecurityVisibility>>, TError,{data: BodyType<SecurityChangeVisibilityRequest>}, TContext> => {
+
+const mutationKey = ['changeSecurityVisibility'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof changeSecurityVisibility>>, {data: BodyType<SecurityChangeVisibilityRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  changeSecurityVisibility(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChangeSecurityVisibilityMutationResult = NonNullable<Awaited<ReturnType<typeof changeSecurityVisibility>>>
+    export type ChangeSecurityVisibilityMutationBody = BodyType<SecurityChangeVisibilityRequest>
+    export type ChangeSecurityVisibilityMutationError = ErrorType<SecurityAccessDecision>
+
+    /**
+ * @summary Change a resource's visibility level (auditable)
+ */
+export const useChangeSecurityVisibility = <TError = ErrorType<SecurityAccessDecision>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof changeSecurityVisibility>>, TError,{data: BodyType<SecurityChangeVisibilityRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof changeSecurityVisibility>>,
+        TError,
+        {data: BodyType<SecurityChangeVisibilityRequest>},
+        TContext
+      > => {
+      return useMutation(getChangeSecurityVisibilityMutationOptions(options));
+    }
+
+export const getGetSecurityAuditUrl = (organizationId: string,) => {
+
+
+
+
+  return `/api/security/audit/${organizationId}`
+}
+
+/**
+ * @summary Append-only security audit for an organization
+ */
+export const getSecurityAudit = async (organizationId: string, options?: RequestInit): Promise<SecurityAuditBundle> => {
+
+  return customFetch<SecurityAuditBundle>(getGetSecurityAuditUrl(organizationId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSecurityAuditQueryKey = (organizationId: string,) => {
+    return [
+    `/api/security/audit/${organizationId}`
+    ] as const;
+    }
+
+
+export const getGetSecurityAuditQueryOptions = <TData = Awaited<ReturnType<typeof getSecurityAudit>>, TError = ErrorType<void>>(organizationId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSecurityAudit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSecurityAuditQueryKey(organizationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSecurityAudit>>> = ({ signal }) => getSecurityAudit(organizationId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(organizationId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSecurityAudit>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSecurityAuditQueryResult = NonNullable<Awaited<ReturnType<typeof getSecurityAudit>>>
+export type GetSecurityAuditQueryError = ErrorType<void>
+
+
+/**
+ * @summary Append-only security audit for an organization
+ */
+
+export function useGetSecurityAudit<TData = Awaited<ReturnType<typeof getSecurityAudit>>, TError = ErrorType<void>>(
+ organizationId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSecurityAudit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSecurityAuditQueryOptions(organizationId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetSecuritySnapshotUrl = (organizationId: string,) => {
+
+
+
+
+  return `/api/security/snapshot/${organizationId}`
+}
+
+/**
+ * @summary Operator-facing security snapshot (orgs, reviewers, visibility, decisions, audit, sensitive, benchmarks)
+ */
+export const getSecuritySnapshot = async (organizationId: string, options?: RequestInit): Promise<SecuritySnapshot> => {
+
+  return customFetch<SecuritySnapshot>(getGetSecuritySnapshotUrl(organizationId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSecuritySnapshotQueryKey = (organizationId: string,) => {
+    return [
+    `/api/security/snapshot/${organizationId}`
+    ] as const;
+    }
+
+
+export const getGetSecuritySnapshotQueryOptions = <TData = Awaited<ReturnType<typeof getSecuritySnapshot>>, TError = ErrorType<void>>(organizationId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSecuritySnapshot>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSecuritySnapshotQueryKey(organizationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSecuritySnapshot>>> = ({ signal }) => getSecuritySnapshot(organizationId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(organizationId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSecuritySnapshot>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSecuritySnapshotQueryResult = NonNullable<Awaited<ReturnType<typeof getSecuritySnapshot>>>
+export type GetSecuritySnapshotQueryError = ErrorType<void>
+
+
+/**
+ * @summary Operator-facing security snapshot (orgs, reviewers, visibility, decisions, audit, sensitive, benchmarks)
+ */
+
+export function useGetSecuritySnapshot<TData = Awaited<ReturnType<typeof getSecuritySnapshot>>, TError = ErrorType<void>>(
+ organizationId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSecuritySnapshot>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSecuritySnapshotQueryOptions(organizationId,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

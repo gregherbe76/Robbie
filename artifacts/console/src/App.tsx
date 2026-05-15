@@ -22,6 +22,7 @@ import { Operations } from "@/pages/operations";
 import { Benchmarks } from "@/pages/benchmarks";
 import { Ingestion } from "@/pages/ingestion";
 import { Collaboration } from "@/pages/collaboration";
+import { Security } from "@/pages/security";
 import { CandidateGraph } from "@/pages/graph/candidate";
 import { OrganizationGraph } from "@/pages/graph/organization";
 
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/benchmarks" component={Benchmarks} />
       <Route path="/ingestion" component={Ingestion} />
       <Route path="/collaboration" component={Collaboration} />
+      <Route path="/security" component={Security} />
       <Route path="/agents" component={Agents} />
       <Route path="/skills" component={Skills} />
       <Route path="/providers" component={Providers} />

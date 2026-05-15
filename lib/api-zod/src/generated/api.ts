@@ -3073,3 +3073,339 @@ export const GetCollaborationAuditResponse = zod.object({
 })
 
 
+/**
+ * @summary Recent access decisions for an organization (audit-first view)
+ */
+export const GetSecurityAccessLogParams = zod.object({
+  "organizationId": zod.coerce.string()
+})
+
+export const GetSecurityAccessLogResponse = zod.object({
+  "organizationId": zod.string(),
+  "decisions": zod.array(zod.object({
+  "decisionId": zod.string(),
+  "allowed": zod.boolean(),
+  "reason": zod.string(),
+  "evaluatedRules": zod.array(zod.object({
+  "rule": zod.enum(['organization_boundary', 'capability', 'visibility', 'escalation_restriction', 'reviewer_identity', 'session_integrity']),
+  "passed": zod.boolean(),
+  "detail": zod.string()
+})),
+  "reviewerId": zod.string(),
+  "organizationId": zod.string(),
+  "targetResource": zod.string(),
+  "action": zod.enum(['read', 'write', 'override', 'escalate', 'view_sensitive', 'modify_visibility', 'modify_benchmark', 'manage_memory']),
+  "timestamp": zod.coerce.date()
+}))
+})
+
+
+/**
+ * @summary Reviewer identity, capabilities, and recent decisions
+ */
+export const GetSecurityReviewerParams = zod.object({
+  "reviewerId": zod.coerce.string()
+})
+
+export const GetSecurityReviewerResponse = zod.object({
+  "reviewer": zod.object({
+  "reviewerId": zod.string(),
+  "organizationId": zod.string(),
+  "reviewerType": zod.enum(['founder', 'recruiter', 'hiring_manager', 'technical_reviewer', 'executive', 'external_reviewer', 'system_agent']),
+  "displayName": zod.string(),
+  "fingerprint": zod.string(),
+  "capabilities": zod.array(zod.enum(['review_evidence', 'escalate_case', 'override_recommendation', 'view_sensitive_evidence', 'run_benchmarks', 'manage_org_memory', 'view_calibration', 'create_public_benchmark'])),
+  "calibrationIdentityKey": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "scopedToInvestigationId": zod.string().nullable()
+}),
+  "recentDecisions": zod.array(zod.object({
+  "decisionId": zod.string(),
+  "allowed": zod.boolean(),
+  "reason": zod.string(),
+  "evaluatedRules": zod.array(zod.object({
+  "rule": zod.enum(['organization_boundary', 'capability', 'visibility', 'escalation_restriction', 'reviewer_identity', 'session_integrity']),
+  "passed": zod.boolean(),
+  "detail": zod.string()
+})),
+  "reviewerId": zod.string(),
+  "organizationId": zod.string(),
+  "targetResource": zod.string(),
+  "action": zod.enum(['read', 'write', 'override', 'escalate', 'view_sensitive', 'modify_visibility', 'modify_benchmark', 'manage_memory']),
+  "timestamp": zod.coerce.date()
+})),
+  "recentAudit": zod.array(zod.object({
+  "entryId": zod.string(),
+  "sequence": zod.number(),
+  "organizationId": zod.string(),
+  "reviewerId": zod.string().nullable(),
+  "kind": zod.enum(['access_attempt', 'access_denied', 'visibility_change', 'override_action', 'escalation_access', 'evidence_access', 'sensitive_evidence_view', 'calibration_access', 'benchmark_modification', 'session_opened', 'session_closed', 'action_signed', 'reviewer_registered']),
+  "targetResource": zod.string(),
+  "detail": zod.record(zod.string(), zod.unknown()),
+  "timestamp": zod.coerce.date()
+}))
+})
+
+
+/**
+ * @summary Probe the central access decision engine
+ */
+export const CheckSecurityAccessBody = zod.object({
+  "reviewerId": zod.string(),
+  "organizationId": zod.string(),
+  "targetResourceId": zod.string(),
+  "targetOrganizationId": zod.string(),
+  "targetVisibility": zod.enum(['organization_private', 'investigation_private', 'reviewer_private', 'escalation_only', 'benchmark_public', 'demo_public']),
+  "targetInvestigationId": zod.string().nullish(),
+  "action": zod.enum(['read', 'write', 'override', 'escalate', 'view_sensitive', 'modify_visibility', 'modify_benchmark', 'manage_memory']),
+  "requiredCapability": zod.enum(['review_evidence', 'escalate_case', 'override_recommendation', 'view_sensitive_evidence', 'run_benchmarks', 'manage_org_memory', 'view_calibration', 'create_public_benchmark']),
+  "sessionId": zod.string().nullish(),
+  "now": zod.coerce.date().optional()
+})
+
+export const CheckSecurityAccessResponse = zod.object({
+  "decisionId": zod.string(),
+  "allowed": zod.boolean(),
+  "reason": zod.string(),
+  "evaluatedRules": zod.array(zod.object({
+  "rule": zod.enum(['organization_boundary', 'capability', 'visibility', 'escalation_restriction', 'reviewer_identity', 'session_integrity']),
+  "passed": zod.boolean(),
+  "detail": zod.string()
+})),
+  "reviewerId": zod.string(),
+  "organizationId": zod.string(),
+  "targetResource": zod.string(),
+  "action": zod.enum(['read', 'write', 'override', 'escalate', 'view_sensitive', 'modify_visibility', 'modify_benchmark', 'manage_memory']),
+  "timestamp": zod.coerce.date()
+})
+
+
+/**
+ * @summary Current visibility level + full append-only history
+ */
+export const GetSecurityVisibilityParams = zod.object({
+  "resourceId": zod.coerce.string()
+})
+
+export const GetSecurityVisibilityResponse = zod.object({
+  "resourceId": zod.string(),
+  "current": zod.object({
+  "resourceId": zod.string(),
+  "resourceKind": zod.enum(['case', 'evidence', 'audit', 'override', 'escalation', 'review', 'memory', 'benchmark']),
+  "organizationId": zod.string(),
+  "level": zod.enum(['organization_private', 'investigation_private', 'reviewer_private', 'escalation_only', 'benchmark_public', 'demo_public']),
+  "scopedInvestigationId": zod.string().nullable(),
+  "scopedReviewerId": zod.string().nullable(),
+  "changedBy": zod.string(),
+  "changedAt": zod.coerce.date(),
+  "reason": zod.string(),
+  "previousLevel": zod.enum(['organization_private', 'investigation_private', 'reviewer_private', 'escalation_only', 'benchmark_public', 'demo_public']).nullable()
+}).nullable(),
+  "history": zod.array(zod.object({
+  "resourceId": zod.string(),
+  "resourceKind": zod.enum(['case', 'evidence', 'audit', 'override', 'escalation', 'review', 'memory', 'benchmark']),
+  "organizationId": zod.string(),
+  "level": zod.enum(['organization_private', 'investigation_private', 'reviewer_private', 'escalation_only', 'benchmark_public', 'demo_public']),
+  "scopedInvestigationId": zod.string().nullable(),
+  "scopedReviewerId": zod.string().nullable(),
+  "changedBy": zod.string(),
+  "changedAt": zod.coerce.date(),
+  "reason": zod.string(),
+  "previousLevel": zod.enum(['organization_private', 'investigation_private', 'reviewer_private', 'escalation_only', 'benchmark_public', 'demo_public']).nullable()
+}))
+})
+
+
+/**
+ * @summary Change a resource's visibility level (auditable)
+ */
+
+
+
+export const ChangeSecurityVisibilityBody = zod.object({
+  "resourceId": zod.string(),
+  "organizationId": zod.string(),
+  "reviewerId": zod.string(),
+  "newLevel": zod.enum(['organization_private', 'investigation_private', 'reviewer_private', 'escalation_only', 'benchmark_public', 'demo_public']),
+  "scopedInvestigationId": zod.string().nullish(),
+  "scopedReviewerId": zod.string().nullish(),
+  "reason": zod.string().min(1),
+  "sessionId": zod.string(),
+  "now": zod.coerce.date().optional()
+})
+
+export const ChangeSecurityVisibilityResponse = zod.object({
+  "decision": zod.object({
+  "decisionId": zod.string(),
+  "allowed": zod.boolean(),
+  "reason": zod.string(),
+  "evaluatedRules": zod.array(zod.object({
+  "rule": zod.enum(['organization_boundary', 'capability', 'visibility', 'escalation_restriction', 'reviewer_identity', 'session_integrity']),
+  "passed": zod.boolean(),
+  "detail": zod.string()
+})),
+  "reviewerId": zod.string(),
+  "organizationId": zod.string(),
+  "targetResource": zod.string(),
+  "action": zod.enum(['read', 'write', 'override', 'escalate', 'view_sensitive', 'modify_visibility', 'modify_benchmark', 'manage_memory']),
+  "timestamp": zod.coerce.date()
+}),
+  "record": zod.object({
+  "resourceId": zod.string(),
+  "resourceKind": zod.enum(['case', 'evidence', 'audit', 'override', 'escalation', 'review', 'memory', 'benchmark']),
+  "organizationId": zod.string(),
+  "level": zod.enum(['organization_private', 'investigation_private', 'reviewer_private', 'escalation_only', 'benchmark_public', 'demo_public']),
+  "scopedInvestigationId": zod.string().nullable(),
+  "scopedReviewerId": zod.string().nullable(),
+  "changedBy": zod.string(),
+  "changedAt": zod.coerce.date(),
+  "reason": zod.string(),
+  "previousLevel": zod.enum(['organization_private', 'investigation_private', 'reviewer_private', 'escalation_only', 'benchmark_public', 'demo_public']).nullable()
+}).optional(),
+  "auditEntryId": zod.string().optional()
+})
+
+
+/**
+ * @summary Append-only security audit for an organization
+ */
+export const GetSecurityAuditParams = zod.object({
+  "organizationId": zod.coerce.string()
+})
+
+export const GetSecurityAuditResponse = zod.object({
+  "organizationId": zod.string(),
+  "entries": zod.array(zod.object({
+  "entryId": zod.string(),
+  "sequence": zod.number(),
+  "organizationId": zod.string(),
+  "reviewerId": zod.string().nullable(),
+  "kind": zod.enum(['access_attempt', 'access_denied', 'visibility_change', 'override_action', 'escalation_access', 'evidence_access', 'sensitive_evidence_view', 'calibration_access', 'benchmark_modification', 'session_opened', 'session_closed', 'action_signed', 'reviewer_registered']),
+  "targetResource": zod.string(),
+  "detail": zod.record(zod.string(), zod.unknown()),
+  "timestamp": zod.coerce.date()
+}))
+})
+
+
+/**
+ * @summary Operator-facing security snapshot (orgs, reviewers, visibility, decisions, audit, sensitive, benchmarks)
+ */
+export const GetSecuritySnapshotParams = zod.object({
+  "organizationId": zod.coerce.string()
+})
+
+export const GetSecuritySnapshotResponse = zod.object({
+  "organizationId": zod.string(),
+  "organizations": zod.array(zod.object({
+  "organizationId": zod.string(),
+  "displayName": zod.string(),
+  "tier": zod.enum(['founder', 'growth', 'enterprise', 'demo']),
+  "createdAt": zod.coerce.date(),
+  "calibrationNamespace": zod.string()
+})),
+  "reviewers": zod.array(zod.object({
+  "reviewerId": zod.string(),
+  "organizationId": zod.string(),
+  "reviewerType": zod.enum(['founder', 'recruiter', 'hiring_manager', 'technical_reviewer', 'executive', 'external_reviewer', 'system_agent']),
+  "displayName": zod.string(),
+  "fingerprint": zod.string(),
+  "capabilities": zod.array(zod.enum(['review_evidence', 'escalate_case', 'override_recommendation', 'view_sensitive_evidence', 'run_benchmarks', 'manage_org_memory', 'view_calibration', 'create_public_benchmark'])),
+  "calibrationIdentityKey": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "scopedToInvestigationId": zod.string().nullable()
+})),
+  "visibility": zod.array(zod.object({
+  "resourceId": zod.string(),
+  "resourceKind": zod.enum(['case', 'evidence', 'audit', 'override', 'escalation', 'review', 'memory', 'benchmark']),
+  "organizationId": zod.string(),
+  "level": zod.enum(['organization_private', 'investigation_private', 'reviewer_private', 'escalation_only', 'benchmark_public', 'demo_public']),
+  "scopedInvestigationId": zod.string().nullable(),
+  "scopedReviewerId": zod.string().nullable(),
+  "changedBy": zod.string(),
+  "changedAt": zod.coerce.date(),
+  "reason": zod.string(),
+  "previousLevel": zod.enum(['organization_private', 'investigation_private', 'reviewer_private', 'escalation_only', 'benchmark_public', 'demo_public']).nullable()
+})),
+  "recentDecisions": zod.array(zod.object({
+  "decisionId": zod.string(),
+  "allowed": zod.boolean(),
+  "reason": zod.string(),
+  "evaluatedRules": zod.array(zod.object({
+  "rule": zod.enum(['organization_boundary', 'capability', 'visibility', 'escalation_restriction', 'reviewer_identity', 'session_integrity']),
+  "passed": zod.boolean(),
+  "detail": zod.string()
+})),
+  "reviewerId": zod.string(),
+  "organizationId": zod.string(),
+  "targetResource": zod.string(),
+  "action": zod.enum(['read', 'write', 'override', 'escalate', 'view_sensitive', 'modify_visibility', 'modify_benchmark', 'manage_memory']),
+  "timestamp": zod.coerce.date()
+})),
+  "recentAudit": zod.array(zod.object({
+  "entryId": zod.string(),
+  "sequence": zod.number(),
+  "organizationId": zod.string(),
+  "reviewerId": zod.string().nullable(),
+  "kind": zod.enum(['access_attempt', 'access_denied', 'visibility_change', 'override_action', 'escalation_access', 'evidence_access', 'sensitive_evidence_view', 'calibration_access', 'benchmark_modification', 'session_opened', 'session_closed', 'action_signed', 'reviewer_registered']),
+  "targetResource": zod.string(),
+  "detail": zod.record(zod.string(), zod.unknown()),
+  "timestamp": zod.coerce.date()
+})),
+  "sensitive": zod.array(zod.object({
+  "evidenceId": zod.string(),
+  "organizationId": zod.string(),
+  "sensitivity": zod.enum(['public', 'internal', 'founder_only', 'escalation_only', 'confidential_investigation']),
+  "redactedSummary": zod.string(),
+  "fullSummary": zod.string(),
+  "provenance": zod.object({
+  "sourceKind": zod.enum(['ingestion', 'cognition', 'reviewer', 'agent', 'benchmark', 'system']),
+  "sourceId": zod.string(),
+  "createdBy": zod.string(),
+  "createdAt": zod.coerce.date()
+}),
+  "accessAuditIds": zod.array(zod.string())
+})),
+  "sessions": zod.array(zod.object({
+  "sessionId": zod.string(),
+  "reviewerId": zod.string(),
+  "organizationId": zod.string(),
+  "openedAt": zod.coerce.date(),
+  "closedAt": zod.coerce.date().nullable(),
+  "actionChainHead": zod.string(),
+  "signedActionCount": zod.number()
+})),
+  "benchmarkResults": zod.array(zod.object({
+  "scenarioId": zod.enum(['cross_org_access_attempt', 'unauthorized_escalation_access', 'override_without_capability', 'visibility_leakage', 'benchmark_contamination', 'reviewer_impersonation', 'sensitive_evidence_access', 'hidden_audit_mutation']),
+  "displayName": zod.string(),
+  "description": zod.string(),
+  "expectedOutcome": zod.enum(['access_denied', 'access_allowed']),
+  "actualOutcome": zod.enum(['access_denied', 'access_allowed']),
+  "passed": zod.boolean(),
+  "decision": zod.object({
+  "decisionId": zod.string(),
+  "allowed": zod.boolean(),
+  "reason": zod.string(),
+  "evaluatedRules": zod.array(zod.object({
+  "rule": zod.enum(['organization_boundary', 'capability', 'visibility', 'escalation_restriction', 'reviewer_identity', 'session_integrity']),
+  "passed": zod.boolean(),
+  "detail": zod.string()
+})),
+  "reviewerId": zod.string(),
+  "organizationId": zod.string(),
+  "targetResource": zod.string(),
+  "action": zod.enum(['read', 'write', 'override', 'escalate', 'view_sensitive', 'modify_visibility', 'modify_benchmark', 'manage_memory']),
+  "timestamp": zod.coerce.date()
+}),
+  "auditEntryIds": zod.array(zod.string()),
+  "ranAt": zod.coerce.date()
+})),
+  "capabilities": zod.array(zod.enum(['review_evidence', 'escalate_case', 'override_recommendation', 'view_sensitive_evidence', 'run_benchmarks', 'manage_org_memory', 'view_calibration', 'create_public_benchmark'])),
+  "scenarios": zod.array(zod.object({
+  "id": zod.enum(['cross_org_access_attempt', 'unauthorized_escalation_access', 'override_without_capability', 'visibility_leakage', 'benchmark_contamination', 'reviewer_impersonation', 'sensitive_evidence_access', 'hidden_audit_mutation']),
+  "displayName": zod.string(),
+  "description": zod.string()
+}))
+})
+
+

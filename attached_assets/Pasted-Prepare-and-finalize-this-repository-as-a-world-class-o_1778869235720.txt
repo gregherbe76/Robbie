@@ -1,0 +1,511 @@
+Prepare and finalize this repository as a world-class open-source GitHub project.
+
+IMPORTANT:
+This is NOT a toy repo.
+This is NOT a startup landing page repo.
+This is NOT a generic AI wrapper.
+
+This repository is:
+- an open-source recruiting intelligence framework
+- a provenance-first cognition system
+- an auditable organizational reasoning infrastructure
+- a deterministic intelligence operations platform
+
+The goal is:
+- production-grade OSS presentation
+- exceptional developer onboarding
+- architectural credibility
+- trustworthiness
+- contributor readiness
+- benchmark reproducibility
+- ecosystem positioning
+
+Do NOT add new cognition features.
+Focus entirely on:
+- repository quality
+- OSS excellence
+- engineering credibility
+- maintainability
+- discoverability
+- reproducibility
+
+--------------------------------------------------
+Core Positioning
+--------------------------------------------------
+
+The repo must clearly communicate:
+
+"Recruiting is not document management.
+It is probabilistic organizational intelligence under uncertainty."
+
+This project is NOT:
+- ATS software
+- recruiting CRM
+- AI recruiter
+- chatbot hiring assistant
+- automated hiring system
+
+This project IS:
+- recruiting intelligence infrastructure
+- organizational cognition tooling
+- provenance-aware reasoning framework
+- collaborative intelligence operations system
+
+Tone:
+- technical
+- rigorous
+- calm
+- credible
+- founder/engineer/researcher oriented
+- no hype
+- no HR SaaS language
+
+--------------------------------------------------
+Repository Deliverables
+--------------------------------------------------
+
+Build or finalize ALL of the following:
+
+1. README.md
+2. ARCHITECTURE.md
+3. QUICKSTART.md
+4. CONTRIBUTING.md
+5. ROADMAP.md
+6. SECURITY.md
+7. CODE_OF_CONDUCT.md
+8. GOVERNANCE.md
+9. LICENSE
+10. CHANGELOG.md
+11. docs/
+12. examples/
+13. benchmarks/
+14. .github/
+15. release infrastructure
+16. CI/CD
+17. issue templates
+18. PR templates
+19. badges
+20. screenshots
+21. diagrams
+22. demo datasets
+23. benchmark reproducibility docs
+24. deterministic guarantees docs
+25. provenance philosophy docs
+26. repo metadata polish
+27. package hygiene
+28. developer experience polish
+29. API documentation polish
+30. OSS ecosystem readiness
+
+--------------------------------------------------
+1. README.md
+--------------------------------------------------
+
+Rewrite README completely.
+
+Sections:
+- What this project is
+- Why it exists
+- Core philosophy
+- What makes it different
+- Architecture overview
+- Feature overview
+- Deterministic cognition
+- Provenance-first reasoning
+- Benchmark philosophy
+- Example intelligence flow
+- Example outputs
+- Screenshots
+- Quickstart
+- Benchmark commands
+- Repository structure
+- Security/privacy philosophy
+- Contribution guide
+- Roadmap
+- License
+
+README must:
+- look world-class
+- be skimmable
+- be technically serious
+- avoid marketing fluff
+- avoid buzzword soup
+
+--------------------------------------------------
+2. ARCHITECTURE.md
+--------------------------------------------------
+
+Create deep architecture documentation.
+
+Include:
+- full module map
+- ingestion flow
+- cognition flow
+- org intelligence flow
+- evaluation/calibration flow
+- operations flow
+- collaboration flow
+- security boundaries
+- benchmark infrastructure
+- provenance model
+- deterministic execution model
+- replayability philosophy
+- memory model
+- OpenAPI architecture
+
+Add diagrams:
+- cognition graph
+- evidence lineage
+- investigation flow
+- organization intelligence flow
+- benchmark flow
+
+--------------------------------------------------
+3. QUICKSTART.md
+--------------------------------------------------
+
+Create an elite onboarding experience.
+
+Must support:
+- fresh clone
+- install
+- run
+- benchmarks
+- screenshots
+- first cognition walkthrough
+
+Commands:
+pnpm install
+pnpm dev
+pnpm run typecheck
+pnpm benchmark:cognition
+pnpm test:cognitive-smoke
+
+Explain:
+- expected outputs
+- benchmark behavior
+- intentional calibration failures
+- demo datasets
+
+--------------------------------------------------
+4. CONTRIBUTING.md
+--------------------------------------------------
+
+Create strict contributor standards.
+
+Rules:
+- deterministic execution required
+- provenance mandatory
+- explicit uncertainty required
+- no hidden inference
+- no ATS concepts
+- no black-box scoring
+- benchmark coverage required
+- mutation guards required
+- replayability preserved
+
+Explain:
+- adding agents
+- adding skills
+- adding benchmarks
+- adding ingestion adapters
+- adding cognition modules
+- adding collaboration flows
+
+--------------------------------------------------
+5. ROADMAP.md
+--------------------------------------------------
+
+Professional roadmap.
+
+Sections:
+- current architecture
+- short-term priorities
+- ecosystem plans
+- integrations
+- hosted memory layer
+- graph intelligence
+- organizational learning
+- reviewer calibration
+- benchmark expansion
+
+Mark:
+- completed
+- in progress
+- exploratory
+
+--------------------------------------------------
+6. SECURITY.md
+--------------------------------------------------
+
+Professional security posture.
+
+Include:
+- responsible disclosure
+- privacy posture
+- local-first demo philosophy
+- candidate-data caution
+- provenance guarantees
+- auditability guarantees
+- future enterprise hardening plans
+
+Explicitly state:
+demo datasets are synthetic.
+
+--------------------------------------------------
+7. GOVERNANCE.md
+--------------------------------------------------
+
+Create OSS governance model.
+
+Include:
+- maintainer expectations
+- benchmark integrity rules
+- provenance standards
+- deterministic guarantees
+- architectural principles
+- review expectations
+
+--------------------------------------------------
+8. CHANGELOG.md
+--------------------------------------------------
+
+Initialize semantic changelog.
+
+Document:
+- cognition milestones
+- ingestion milestones
+- collaboration milestones
+- benchmark milestones
+- security milestones
+
+--------------------------------------------------
+9. docs/
+--------------------------------------------------
+
+Create high-quality documentation structure:
+
+docs/
+ ├── architecture/
+ ├── cognition/
+ ├── provenance/
+ ├── benchmarks/
+ ├── ingestion/
+ ├── organization-intelligence/
+ ├── collaboration/
+ ├── evaluation/
+ ├── security/
+ ├── examples/
+ └── philosophy/
+
+--------------------------------------------------
+10. examples/
+--------------------------------------------------
+
+Create polished example datasets.
+
+Examples:
+- founder-builder
+- inflated-senior
+- ambiguous-generalist
+- elite-IC
+- chaos-thriver
+- org-mismatch
+- high-upside-high-risk
+
+Each includes:
+- input evidence
+- org context
+- cognition output
+- disagreements
+- escalation examples
+- benchmark expectations
+
+--------------------------------------------------
+11. benchmarks/
+--------------------------------------------------
+
+Polish benchmark suite.
+
+Add:
+- benchmark manifest
+- scenario descriptions
+- expected cognition behaviors
+- deterministic guarantees
+- mutation-guard rationale
+
+--------------------------------------------------
+12. .github/
+--------------------------------------------------
+
+Create professional GitHub automation.
+
+Include:
+- issue templates
+- bug reports
+- benchmark regressions
+- cognition proposals
+- ingestion adapters
+- agent proposals
+- PR template
+- CODEOWNERS
+- funding.yml (optional)
+- discussion categories
+
+--------------------------------------------------
+13. CI/CD
+--------------------------------------------------
+
+Production-grade CI.
+
+Required:
+- typecheck
+- benchmark suite
+- cognitive smoke tests
+- provenance integrity checks
+- snapshot verification
+- deterministic replay verification
+- lint
+- OpenAPI generation validation
+
+CI must fail on:
+- benchmark drift
+- provenance gaps
+- nondeterminism
+- snapshot mismatch
+- calibration regression
+
+--------------------------------------------------
+14. Repo Metadata
+--------------------------------------------------
+
+Polish:
+- repo description
+- topics/tags
+- social preview
+- OpenGraph image
+- screenshots
+- diagrams
+- badges
+
+Suggested topics:
+- recruiting
+- ai
+- cognition
+- provenance
+- deterministic-ai
+- openapi
+- intelligence-systems
+- multi-agent
+- calibration
+- organizational-intelligence
+
+--------------------------------------------------
+15. Developer Experience
+--------------------------------------------------
+
+Polish:
+- scripts
+- errors
+- startup logs
+- benchmark output
+- local setup
+- env validation
+- deterministic warnings
+- snapshot guidance
+
+Add:
+- clear startup messages
+- benchmark summaries
+- architecture hints
+
+--------------------------------------------------
+16. API Documentation
+--------------------------------------------------
+
+Polish OpenAPI docs.
+
+Add:
+- endpoint descriptions
+- example payloads
+- provenance examples
+- benchmark examples
+- collaboration examples
+- security semantics
+
+Generate:
+- beautiful API reference docs
+
+--------------------------------------------------
+17. Philosophy Documentation
+--------------------------------------------------
+
+Create docs/PHILOSOPHY.md.
+
+Explain:
+- why uncertainty matters
+- why provenance matters
+- why disagreement is preserved
+- why deterministic cognition matters
+- why recruiting is organizational intelligence
+- why the framework avoids ATS abstractions
+
+This is important.
+
+--------------------------------------------------
+18. Final Verification
+--------------------------------------------------
+
+Run and verify:
+
+pnpm install
+pnpm run typecheck
+pnpm benchmark:cognition
+pnpm test:cognitive-smoke
+
+Verify:
+- all docs linked correctly
+- screenshots render
+- examples work
+- benchmarks reproducible
+- deterministic replay preserved
+- no private data
+- no broken links
+- no fake claims
+- no ATS positioning
+- no hype language
+
+--------------------------------------------------
+19. GitHub Release Preparation
+--------------------------------------------------
+
+Prepare:
+- v0.1.0 release notes
+- first public release checklist
+- release announcement draft
+- architecture screenshots
+- benchmark screenshots
+- cognition screenshots
+
+--------------------------------------------------
+20. Target Outcome
+--------------------------------------------------
+
+The repository should feel like:
+
+- a serious OSS infrastructure project
+- a technically rigorous cognition framework
+- a provenance-first intelligence system
+- a benchmarked reasoning platform
+
+Comparable in presentation quality to:
+- PostHog
+- Supabase
+- LangGraph
+- OpenTelemetry
+- n8n
+- Temporal
+- Airflow
+
+But clearly positioned as:
+"Open-source recruiting intelligence infrastructure."

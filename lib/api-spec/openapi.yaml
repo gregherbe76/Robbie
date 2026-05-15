@@ -650,8 +650,585 @@ paths:
                 $ref: "#/components/schemas/CollaborationAuditBundle"
         "404":
           description: Not found
+  /security/access-log/{organizationId}:
+    get:
+      operationId: getSecurityAccessLog
+      tags: [security]
+      summary: Recent access decisions for an organization (audit-first view)
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Access log bundle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecurityAccessLog"
+        "404":
+          description: Organization not found
+  /security/reviewer/{reviewerId}:
+    get:
+      operationId: getSecurityReviewer
+      tags: [security]
+      summary: Reviewer identity, capabilities, and recent decisions
+      parameters:
+        - name: reviewerId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Reviewer detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecurityReviewerDetail"
+        "404":
+          description: Reviewer not found
+  /security/check-access:
+    post:
+      operationId: checkSecurityAccess
+      tags: [security]
+      summary: Probe the central access decision engine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SecurityCheckAccessRequest"
+      responses:
+        "200":
+          description: Access decision (allowed or denied with rule trace)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecurityAccessDecision"
+  /security/visibility/{resourceId}:
+    get:
+      operationId: getSecurityVisibility
+      tags: [security]
+      summary: Current visibility level + full append-only history
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Visibility detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecurityVisibilityDetail"
+        "404":
+          description: Resource not found
+  /security/change-visibility:
+    post:
+      operationId: changeSecurityVisibility
+      tags: [security]
+      summary: Change a resource's visibility level (auditable)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SecurityChangeVisibilityRequest"
+      responses:
+        "200":
+          description: Change applied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecurityChangeVisibilityResult"
+        "403":
+          description: Denied by access decision engine
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecurityAccessDecision"
+  /security/audit/{organizationId}:
+    get:
+      operationId: getSecurityAudit
+      tags: [security]
+      summary: Append-only security audit for an organization
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Audit bundle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecurityAuditBundle"
+        "404":
+          description: Organization not found
+  /security/snapshot/{organizationId}:
+    get:
+      operationId: getSecuritySnapshot
+      tags: [security]
+      summary: Operator-facing security snapshot (orgs, reviewers, visibility, decisions, audit, sensitive, benchmarks)
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Security snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecuritySnapshot"
+        "404":
+          description: Organization not found
 components:
   schemas:
+    SecurityOrganizationTier:
+      type: string
+      enum: [founder, growth, enterprise, demo]
+    SecurityVisibilityScope:
+      type: string
+      enum: [organization, global_demo, global_benchmark]
+    SecurityReviewerType:
+      type: string
+      enum:
+        - founder
+        - recruiter
+        - hiring_manager
+        - technical_reviewer
+        - executive
+        - external_reviewer
+        - system_agent
+    SecurityCapability:
+      type: string
+      enum:
+        - review_evidence
+        - escalate_case
+        - override_recommendation
+        - view_sensitive_evidence
+        - run_benchmarks
+        - manage_org_memory
+        - view_calibration
+        - create_public_benchmark
+    SecurityVisibilityLevel:
+      type: string
+      enum:
+        - organization_private
+        - investigation_private
+        - reviewer_private
+        - escalation_only
+        - benchmark_public
+        - demo_public
+    SecurityAccessAction:
+      type: string
+      enum:
+        - read
+        - write
+        - override
+        - escalate
+        - view_sensitive
+        - modify_visibility
+        - modify_benchmark
+        - manage_memory
+    SecurityAccessRuleKind:
+      type: string
+      enum:
+        - organization_boundary
+        - capability
+        - visibility
+        - escalation_restriction
+        - reviewer_identity
+        - session_integrity
+    SecurityAuditKind:
+      type: string
+      enum:
+        - access_attempt
+        - access_denied
+        - visibility_change
+        - override_action
+        - escalation_access
+        - evidence_access
+        - sensitive_evidence_view
+        - calibration_access
+        - benchmark_modification
+        - session_opened
+        - session_closed
+        - action_signed
+        - reviewer_registered
+    SecurityEvidenceSensitivity:
+      type: string
+      enum:
+        - public
+        - internal
+        - founder_only
+        - escalation_only
+        - confidential_investigation
+    SecurityBenchmarkScenarioId:
+      type: string
+      enum:
+        - cross_org_access_attempt
+        - unauthorized_escalation_access
+        - override_without_capability
+        - visibility_leakage
+        - benchmark_contamination
+        - reviewer_impersonation
+        - sensitive_evidence_access
+        - hidden_audit_mutation
+    SecurityProvenance:
+      type: object
+      required: [sourceKind, sourceId, createdBy, createdAt]
+      properties:
+        sourceKind:
+          type: string
+          enum: [ingestion, cognition, reviewer, agent, benchmark, system]
+        sourceId: { type: string }
+        createdBy: { type: string }
+        createdAt: { type: string, format: date-time }
+    SecurityOrganization:
+      type: object
+      required: [organizationId, displayName, tier, createdAt, calibrationNamespace]
+      properties:
+        organizationId: { type: string }
+        displayName: { type: string }
+        tier: { $ref: "#/components/schemas/SecurityOrganizationTier" }
+        createdAt: { type: string, format: date-time }
+        calibrationNamespace: { type: string }
+    SecurityReviewerIdentity:
+      type: object
+      required:
+        - reviewerId
+        - organizationId
+        - reviewerType
+        - displayName
+        - fingerprint
+        - capabilities
+        - calibrationIdentityKey
+        - createdAt
+        - scopedToInvestigationId
+      properties:
+        reviewerId: { type: string }
+        organizationId: { type: string }
+        reviewerType: { $ref: "#/components/schemas/SecurityReviewerType" }
+        displayName: { type: string }
+        fingerprint: { type: string }
+        capabilities:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityCapability" }
+        calibrationIdentityKey: { type: string }
+        createdAt: { type: string, format: date-time }
+        scopedToInvestigationId:
+          type: string
+          nullable: true
+    SecurityVisibilityRecord:
+      type: object
+      required:
+        - resourceId
+        - resourceKind
+        - organizationId
+        - level
+        - scopedInvestigationId
+        - scopedReviewerId
+        - changedBy
+        - changedAt
+        - reason
+        - previousLevel
+      properties:
+        resourceId: { type: string }
+        resourceKind:
+          type: string
+          enum: [case, evidence, audit, override, escalation, review, memory, benchmark]
+        organizationId: { type: string }
+        level: { $ref: "#/components/schemas/SecurityVisibilityLevel" }
+        scopedInvestigationId:
+          type: string
+          nullable: true
+        scopedReviewerId:
+          type: string
+          nullable: true
+        changedBy: { type: string }
+        changedAt: { type: string, format: date-time }
+        reason: { type: string }
+        previousLevel:
+          allOf:
+            - $ref: "#/components/schemas/SecurityVisibilityLevel"
+          nullable: true
+    SecurityEvaluatedRule:
+      type: object
+      required: [rule, passed, detail]
+      properties:
+        rule: { $ref: "#/components/schemas/SecurityAccessRuleKind" }
+        passed: { type: boolean }
+        detail: { type: string }
+    SecurityAccessDecision:
+      type: object
+      required:
+        - decisionId
+        - allowed
+        - reason
+        - evaluatedRules
+        - reviewerId
+        - organizationId
+        - targetResource
+        - action
+        - timestamp
+      properties:
+        decisionId: { type: string }
+        allowed: { type: boolean }
+        reason: { type: string }
+        evaluatedRules:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityEvaluatedRule" }
+        reviewerId: { type: string }
+        organizationId: { type: string }
+        targetResource: { type: string }
+        action: { $ref: "#/components/schemas/SecurityAccessAction" }
+        timestamp: { type: string, format: date-time }
+    SecurityAuditEntry:
+      type: object
+      required:
+        - entryId
+        - sequence
+        - organizationId
+        - reviewerId
+        - kind
+        - targetResource
+        - detail
+        - timestamp
+      properties:
+        entryId: { type: string }
+        sequence: { type: integer }
+        organizationId: { type: string }
+        reviewerId:
+          type: string
+          nullable: true
+        kind: { $ref: "#/components/schemas/SecurityAuditKind" }
+        targetResource: { type: string }
+        detail:
+          type: object
+          additionalProperties: true
+        timestamp: { type: string, format: date-time }
+    SecuritySensitiveEvidence:
+      type: object
+      required:
+        - evidenceId
+        - organizationId
+        - sensitivity
+        - redactedSummary
+        - fullSummary
+        - provenance
+        - accessAuditIds
+      properties:
+        evidenceId: { type: string }
+        organizationId: { type: string }
+        sensitivity: { $ref: "#/components/schemas/SecurityEvidenceSensitivity" }
+        redactedSummary: { type: string }
+        fullSummary: { type: string }
+        provenance: { $ref: "#/components/schemas/SecurityProvenance" }
+        accessAuditIds:
+          type: array
+          items: { type: string }
+    SecurityReviewerSession:
+      type: object
+      required:
+        - sessionId
+        - reviewerId
+        - organizationId
+        - openedAt
+        - closedAt
+        - actionChainHead
+        - signedActionCount
+      properties:
+        sessionId: { type: string }
+        reviewerId: { type: string }
+        organizationId: { type: string }
+        openedAt: { type: string, format: date-time }
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+        actionChainHead: { type: string }
+        signedActionCount: { type: integer }
+    SecurityBenchmarkResult:
+      type: object
+      required:
+        - scenarioId
+        - displayName
+        - description
+        - expectedOutcome
+        - actualOutcome
+        - passed
+        - decision
+        - auditEntryIds
+        - ranAt
+      properties:
+        scenarioId: { $ref: "#/components/schemas/SecurityBenchmarkScenarioId" }
+        displayName: { type: string }
+        description: { type: string }
+        expectedOutcome:
+          type: string
+          enum: [access_denied, access_allowed]
+        actualOutcome:
+          type: string
+          enum: [access_denied, access_allowed]
+        passed: { type: boolean }
+        decision: { $ref: "#/components/schemas/SecurityAccessDecision" }
+        auditEntryIds:
+          type: array
+          items: { type: string }
+        ranAt: { type: string, format: date-time }
+    SecurityAccessLog:
+      type: object
+      required: [organizationId, decisions]
+      properties:
+        organizationId: { type: string }
+        decisions:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityAccessDecision" }
+    SecurityAuditBundle:
+      type: object
+      required: [organizationId, entries]
+      properties:
+        organizationId: { type: string }
+        entries:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityAuditEntry" }
+    SecurityReviewerDetail:
+      type: object
+      required: [reviewer, recentDecisions, recentAudit]
+      properties:
+        reviewer: { $ref: "#/components/schemas/SecurityReviewerIdentity" }
+        recentDecisions:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityAccessDecision" }
+        recentAudit:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityAuditEntry" }
+    SecurityCheckAccessRequest:
+      type: object
+      required:
+        - reviewerId
+        - organizationId
+        - targetResourceId
+        - targetOrganizationId
+        - targetVisibility
+        - action
+        - requiredCapability
+      properties:
+        reviewerId: { type: string }
+        organizationId: { type: string }
+        targetResourceId: { type: string }
+        targetOrganizationId: { type: string }
+        targetVisibility: { $ref: "#/components/schemas/SecurityVisibilityLevel" }
+        targetInvestigationId:
+          type: string
+          nullable: true
+        action: { $ref: "#/components/schemas/SecurityAccessAction" }
+        requiredCapability: { $ref: "#/components/schemas/SecurityCapability" }
+        sessionId:
+          type: string
+          nullable: true
+        now: { type: string, format: date-time }
+    SecurityVisibilityDetail:
+      type: object
+      required: [resourceId, current, history]
+      properties:
+        resourceId: { type: string }
+        current:
+          allOf:
+            - $ref: "#/components/schemas/SecurityVisibilityRecord"
+          nullable: true
+        history:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityVisibilityRecord" }
+    SecurityChangeVisibilityRequest:
+      type: object
+      required:
+        - resourceId
+        - organizationId
+        - reviewerId
+        - newLevel
+        - reason
+        - sessionId
+      properties:
+        resourceId: { type: string }
+        organizationId: { type: string }
+        reviewerId: { type: string }
+        newLevel: { $ref: "#/components/schemas/SecurityVisibilityLevel" }
+        scopedInvestigationId:
+          type: string
+          nullable: true
+        scopedReviewerId:
+          type: string
+          nullable: true
+        reason: { type: string, minLength: 1 }
+        sessionId: { type: string }
+        now: { type: string, format: date-time }
+    SecurityChangeVisibilityResult:
+      type: object
+      required: [decision]
+      properties:
+        decision: { $ref: "#/components/schemas/SecurityAccessDecision" }
+        record:
+          $ref: "#/components/schemas/SecurityVisibilityRecord"
+        auditEntryId: { type: string }
+    SecuritySnapshot:
+      type: object
+      required:
+        - organizationId
+        - organizations
+        - reviewers
+        - visibility
+        - recentDecisions
+        - recentAudit
+        - sensitive
+        - sessions
+        - benchmarkResults
+        - capabilities
+        - scenarios
+      properties:
+        organizationId: { type: string }
+        organizations:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityOrganization" }
+        reviewers:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityReviewerIdentity" }
+        visibility:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityVisibilityRecord" }
+        recentDecisions:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityAccessDecision" }
+        recentAudit:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityAuditEntry" }
+        sensitive:
+          type: array
+          items: { $ref: "#/components/schemas/SecuritySensitiveEvidence" }
+        sessions:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityReviewerSession" }
+        benchmarkResults:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityBenchmarkResult" }
+        capabilities:
+          type: array
+          items: { $ref: "#/components/schemas/SecurityCapability" }
+        scenarios:
+          type: array
+          items:
+            type: object
+            required: [id, displayName, description]
+            properties:
+              id: { $ref: "#/components/schemas/SecurityBenchmarkScenarioId" }
+              displayName: { type: string }
+              description: { type: string }
     HealthStatus:
       type: object
       required: [status]

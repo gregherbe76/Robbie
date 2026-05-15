@@ -6,6 +6,7 @@ const navItems = [
   { name: "Overview", path: "/", icon: Activity },
   { name: "Ingestion", path: "/ingestion", icon: Inbox },
   { name: "Collaboration", path: "/collaboration", icon: Users },
+  { name: "Security", path: "/security", icon: Shield },
   { name: "Intelligence", path: "/intelligence", icon: Sparkles },
   { name: "Cognition", path: "/cognition", icon: GitBranch },
   { name: "Organization", path: "/organization-intelligence", icon: Building2 },

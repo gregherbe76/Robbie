@@ -8,6 +8,353 @@ graph snapshots, reports and the system overview used by the console.
 
  * OpenAPI spec version: 0.1.0
  */
+export type SecurityOrganizationTier = typeof SecurityOrganizationTier[keyof typeof SecurityOrganizationTier];
+
+
+export const SecurityOrganizationTier = {
+  founder: 'founder',
+  growth: 'growth',
+  enterprise: 'enterprise',
+  demo: 'demo',
+} as const;
+
+export type SecurityVisibilityScope = typeof SecurityVisibilityScope[keyof typeof SecurityVisibilityScope];
+
+
+export const SecurityVisibilityScope = {
+  organization: 'organization',
+  global_demo: 'global_demo',
+  global_benchmark: 'global_benchmark',
+} as const;
+
+export type SecurityReviewerType = typeof SecurityReviewerType[keyof typeof SecurityReviewerType];
+
+
+export const SecurityReviewerType = {
+  founder: 'founder',
+  recruiter: 'recruiter',
+  hiring_manager: 'hiring_manager',
+  technical_reviewer: 'technical_reviewer',
+  executive: 'executive',
+  external_reviewer: 'external_reviewer',
+  system_agent: 'system_agent',
+} as const;
+
+export type SecurityCapability = typeof SecurityCapability[keyof typeof SecurityCapability];
+
+
+export const SecurityCapability = {
+  review_evidence: 'review_evidence',
+  escalate_case: 'escalate_case',
+  override_recommendation: 'override_recommendation',
+  view_sensitive_evidence: 'view_sensitive_evidence',
+  run_benchmarks: 'run_benchmarks',
+  manage_org_memory: 'manage_org_memory',
+  view_calibration: 'view_calibration',
+  create_public_benchmark: 'create_public_benchmark',
+} as const;
+
+export type SecurityVisibilityLevel = typeof SecurityVisibilityLevel[keyof typeof SecurityVisibilityLevel];
+
+
+export const SecurityVisibilityLevel = {
+  organization_private: 'organization_private',
+  investigation_private: 'investigation_private',
+  reviewer_private: 'reviewer_private',
+  escalation_only: 'escalation_only',
+  benchmark_public: 'benchmark_public',
+  demo_public: 'demo_public',
+} as const;
+
+export type SecurityAccessAction = typeof SecurityAccessAction[keyof typeof SecurityAccessAction];
+
+
+export const SecurityAccessAction = {
+  read: 'read',
+  write: 'write',
+  override: 'override',
+  escalate: 'escalate',
+  view_sensitive: 'view_sensitive',
+  modify_visibility: 'modify_visibility',
+  modify_benchmark: 'modify_benchmark',
+  manage_memory: 'manage_memory',
+} as const;
+
+export type SecurityAccessRuleKind = typeof SecurityAccessRuleKind[keyof typeof SecurityAccessRuleKind];
+
+
+export const SecurityAccessRuleKind = {
+  organization_boundary: 'organization_boundary',
+  capability: 'capability',
+  visibility: 'visibility',
+  escalation_restriction: 'escalation_restriction',
+  reviewer_identity: 'reviewer_identity',
+  session_integrity: 'session_integrity',
+} as const;
+
+export type SecurityAuditKind = typeof SecurityAuditKind[keyof typeof SecurityAuditKind];
+
+
+export const SecurityAuditKind = {
+  access_attempt: 'access_attempt',
+  access_denied: 'access_denied',
+  visibility_change: 'visibility_change',
+  override_action: 'override_action',
+  escalation_access: 'escalation_access',
+  evidence_access: 'evidence_access',
+  sensitive_evidence_view: 'sensitive_evidence_view',
+  calibration_access: 'calibration_access',
+  benchmark_modification: 'benchmark_modification',
+  session_opened: 'session_opened',
+  session_closed: 'session_closed',
+  action_signed: 'action_signed',
+  reviewer_registered: 'reviewer_registered',
+} as const;
+
+export type SecurityEvidenceSensitivity = typeof SecurityEvidenceSensitivity[keyof typeof SecurityEvidenceSensitivity];
+
+
+export const SecurityEvidenceSensitivity = {
+  public: 'public',
+  internal: 'internal',
+  founder_only: 'founder_only',
+  escalation_only: 'escalation_only',
+  confidential_investigation: 'confidential_investigation',
+} as const;
+
+export type SecurityBenchmarkScenarioId = typeof SecurityBenchmarkScenarioId[keyof typeof SecurityBenchmarkScenarioId];
+
+
+export const SecurityBenchmarkScenarioId = {
+  cross_org_access_attempt: 'cross_org_access_attempt',
+  unauthorized_escalation_access: 'unauthorized_escalation_access',
+  override_without_capability: 'override_without_capability',
+  visibility_leakage: 'visibility_leakage',
+  benchmark_contamination: 'benchmark_contamination',
+  reviewer_impersonation: 'reviewer_impersonation',
+  sensitive_evidence_access: 'sensitive_evidence_access',
+  hidden_audit_mutation: 'hidden_audit_mutation',
+} as const;
+
+export type SecurityProvenanceSourceKind = typeof SecurityProvenanceSourceKind[keyof typeof SecurityProvenanceSourceKind];
+
+
+export const SecurityProvenanceSourceKind = {
+  ingestion: 'ingestion',
+  cognition: 'cognition',
+  reviewer: 'reviewer',
+  agent: 'agent',
+  benchmark: 'benchmark',
+  system: 'system',
+} as const;
+
+export interface SecurityProvenance {
+  sourceKind: SecurityProvenanceSourceKind;
+  sourceId: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface SecurityOrganization {
+  organizationId: string;
+  displayName: string;
+  tier: SecurityOrganizationTier;
+  createdAt: string;
+  calibrationNamespace: string;
+}
+
+export interface SecurityReviewerIdentity {
+  reviewerId: string;
+  organizationId: string;
+  reviewerType: SecurityReviewerType;
+  displayName: string;
+  fingerprint: string;
+  capabilities: SecurityCapability[];
+  calibrationIdentityKey: string;
+  createdAt: string;
+  scopedToInvestigationId: string | null;
+}
+
+export type SecurityVisibilityRecordResourceKind = typeof SecurityVisibilityRecordResourceKind[keyof typeof SecurityVisibilityRecordResourceKind];
+
+
+export const SecurityVisibilityRecordResourceKind = {
+  case: 'case',
+  evidence: 'evidence',
+  audit: 'audit',
+  override: 'override',
+  escalation: 'escalation',
+  review: 'review',
+  memory: 'memory',
+  benchmark: 'benchmark',
+} as const;
+
+export interface SecurityVisibilityRecord {
+  resourceId: string;
+  resourceKind: SecurityVisibilityRecordResourceKind;
+  organizationId: string;
+  level: SecurityVisibilityLevel;
+  scopedInvestigationId: string | null;
+  scopedReviewerId: string | null;
+  changedBy: string;
+  changedAt: string;
+  reason: string;
+  previousLevel: SecurityVisibilityLevel | null;
+}
+
+export interface SecurityEvaluatedRule {
+  rule: SecurityAccessRuleKind;
+  passed: boolean;
+  detail: string;
+}
+
+export interface SecurityAccessDecision {
+  decisionId: string;
+  allowed: boolean;
+  reason: string;
+  evaluatedRules: SecurityEvaluatedRule[];
+  reviewerId: string;
+  organizationId: string;
+  targetResource: string;
+  action: SecurityAccessAction;
+  timestamp: string;
+}
+
+export type SecurityAuditEntryDetail = { [key: string]: unknown };
+
+export interface SecurityAuditEntry {
+  entryId: string;
+  sequence: number;
+  organizationId: string;
+  reviewerId: string | null;
+  kind: SecurityAuditKind;
+  targetResource: string;
+  detail: SecurityAuditEntryDetail;
+  timestamp: string;
+}
+
+export interface SecuritySensitiveEvidence {
+  evidenceId: string;
+  organizationId: string;
+  sensitivity: SecurityEvidenceSensitivity;
+  redactedSummary: string;
+  fullSummary: string;
+  provenance: SecurityProvenance;
+  accessAuditIds: string[];
+}
+
+export interface SecurityReviewerSession {
+  sessionId: string;
+  reviewerId: string;
+  organizationId: string;
+  openedAt: string;
+  closedAt: string | null;
+  actionChainHead: string;
+  signedActionCount: number;
+}
+
+export type SecurityBenchmarkResultExpectedOutcome = typeof SecurityBenchmarkResultExpectedOutcome[keyof typeof SecurityBenchmarkResultExpectedOutcome];
+
+
+export const SecurityBenchmarkResultExpectedOutcome = {
+  access_denied: 'access_denied',
+  access_allowed: 'access_allowed',
+} as const;
+
+export type SecurityBenchmarkResultActualOutcome = typeof SecurityBenchmarkResultActualOutcome[keyof typeof SecurityBenchmarkResultActualOutcome];
+
+
+export const SecurityBenchmarkResultActualOutcome = {
+  access_denied: 'access_denied',
+  access_allowed: 'access_allowed',
+} as const;
+
+export interface SecurityBenchmarkResult {
+  scenarioId: SecurityBenchmarkScenarioId;
+  displayName: string;
+  description: string;
+  expectedOutcome: SecurityBenchmarkResultExpectedOutcome;
+  actualOutcome: SecurityBenchmarkResultActualOutcome;
+  passed: boolean;
+  decision: SecurityAccessDecision;
+  auditEntryIds: string[];
+  ranAt: string;
+}
+
+export interface SecurityAccessLog {
+  organizationId: string;
+  decisions: SecurityAccessDecision[];
+}
+
+export interface SecurityAuditBundle {
+  organizationId: string;
+  entries: SecurityAuditEntry[];
+}
+
+export interface SecurityReviewerDetail {
+  reviewer: SecurityReviewerIdentity;
+  recentDecisions: SecurityAccessDecision[];
+  recentAudit: SecurityAuditEntry[];
+}
+
+export interface SecurityCheckAccessRequest {
+  reviewerId: string;
+  organizationId: string;
+  targetResourceId: string;
+  targetOrganizationId: string;
+  targetVisibility: SecurityVisibilityLevel;
+  targetInvestigationId?: string | null;
+  action: SecurityAccessAction;
+  requiredCapability: SecurityCapability;
+  sessionId?: string | null;
+  now?: string;
+}
+
+export interface SecurityVisibilityDetail {
+  resourceId: string;
+  current: SecurityVisibilityRecord | null;
+  history: SecurityVisibilityRecord[];
+}
+
+export interface SecurityChangeVisibilityRequest {
+  resourceId: string;
+  organizationId: string;
+  reviewerId: string;
+  newLevel: SecurityVisibilityLevel;
+  scopedInvestigationId?: string | null;
+  scopedReviewerId?: string | null;
+  /** @minLength 1 */
+  reason: string;
+  sessionId: string;
+  now?: string;
+}
+
+export interface SecurityChangeVisibilityResult {
+  decision: SecurityAccessDecision;
+  record?: SecurityVisibilityRecord;
+  auditEntryId?: string;
+}
+
+export type SecuritySnapshotScenariosItem = {
+  id: SecurityBenchmarkScenarioId;
+  displayName: string;
+  description: string;
+};
+
+export interface SecuritySnapshot {
+  organizationId: string;
+  organizations: SecurityOrganization[];
+  reviewers: SecurityReviewerIdentity[];
+  visibility: SecurityVisibilityRecord[];
+  recentDecisions: SecurityAccessDecision[];
+  recentAudit: SecurityAuditEntry[];
+  sensitive: SecuritySensitiveEvidence[];
+  sessions: SecurityReviewerSession[];
+  benchmarkResults: SecurityBenchmarkResult[];
+  capabilities: SecurityCapability[];
+  scenarios: SecuritySnapshotScenariosItem[];
+}
+
 export interface HealthStatus {
   status: string;
 }
