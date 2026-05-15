@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Activity, Brain, Server, Shield, Workflow, Cpu, Network, FileText, Database, Sparkles, GitBranch, Building2 } from "lucide-react";
+import { Activity, Brain, Server, Shield, Workflow, Cpu, Network, FileText, Database, Sparkles, GitBranch, Building2, Gauge } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -7,6 +7,7 @@ const navItems = [
   { name: "Intelligence", path: "/intelligence", icon: Sparkles },
   { name: "Cognition", path: "/cognition", icon: GitBranch },
   { name: "Organization", path: "/organization-intelligence", icon: Building2 },
+  { name: "Evaluation", path: "/evaluation", icon: Gauge },
   { name: "Agents", path: "/agents", icon: Brain },
   { name: "Skills", path: "/skills", icon: Cpu },
   { name: "Providers", path: "/providers", icon: Server },

@@ -17,6 +17,7 @@ import { Reports } from "@/pages/reports";
 import { Intelligence } from "@/pages/intelligence";
 import { Cognition } from "@/pages/cognition";
 import { OrganizationIntelligence } from "@/pages/organization-intelligence";
+import { Evaluation } from "@/pages/evaluation";
 import { CandidateGraph } from "@/pages/graph/candidate";
 import { OrganizationGraph } from "@/pages/graph/organization";
 
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/intelligence" component={Intelligence} />
       <Route path="/cognition" component={Cognition} />
       <Route path="/organization-intelligence" component={OrganizationIntelligence} />
+      <Route path="/evaluation" component={Evaluation} />
       <Route path="/agents" component={Agents} />
       <Route path="/skills" component={Skills} />
       <Route path="/providers" component={Providers} />

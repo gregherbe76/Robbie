@@ -873,3 +873,223 @@ export const ListReportsResponseItem = zod.object({
 export const ListReportsResponse = zod.array(ListReportsResponseItem)
 
 
+/**
+ * @summary Full evaluation, calibration, drift, and longitudinal-learning report
+ */
+export const GetEvaluationReportResponse = zod.object({
+  "generatedAt": zod.coerce.date(),
+  "generatedBy": zod.string(),
+  "predictionsEvaluated": zod.number(),
+  "outcomesObserved": zod.number(),
+  "systemCalibration": zod.object({
+  "scope": zod.enum(['global', 'per-agent', 'per-organization', 'per-archetype']),
+  "scopeKey": zod.string(),
+  "buckets": zod.array(zod.object({
+  "lower": zod.number(),
+  "upper": zod.number(),
+  "midpoint": zod.number(),
+  "predictions": zod.number(),
+  "observedPositiveRate": zod.number(),
+  "expectedPositiveRate": zod.number(),
+  "gap": zod.number()
+})),
+  "expectedCalibrationError": zod.number(),
+  "predictionsEvaluated": zod.number(),
+  "systematicBias": zod.number()
+}),
+  "perAgentCalibration": zod.array(zod.object({
+  "scope": zod.enum(['global', 'per-agent', 'per-organization', 'per-archetype']),
+  "scopeKey": zod.string(),
+  "buckets": zod.array(zod.object({
+  "lower": zod.number(),
+  "upper": zod.number(),
+  "midpoint": zod.number(),
+  "predictions": zod.number(),
+  "observedPositiveRate": zod.number(),
+  "expectedPositiveRate": zod.number(),
+  "gap": zod.number()
+})),
+  "expectedCalibrationError": zod.number(),
+  "predictionsEvaluated": zod.number(),
+  "systematicBias": zod.number()
+})),
+  "perOrgCalibration": zod.array(zod.object({
+  "scope": zod.enum(['global', 'per-agent', 'per-organization', 'per-archetype']),
+  "scopeKey": zod.string(),
+  "buckets": zod.array(zod.object({
+  "lower": zod.number(),
+  "upper": zod.number(),
+  "midpoint": zod.number(),
+  "predictions": zod.number(),
+  "observedPositiveRate": zod.number(),
+  "expectedPositiveRate": zod.number(),
+  "gap": zod.number()
+})),
+  "expectedCalibrationError": zod.number(),
+  "predictionsEvaluated": zod.number(),
+  "systematicBias": zod.number()
+})),
+  "perArchetypeCalibration": zod.array(zod.object({
+  "scope": zod.enum(['global', 'per-agent', 'per-organization', 'per-archetype']),
+  "scopeKey": zod.string(),
+  "buckets": zod.array(zod.object({
+  "lower": zod.number(),
+  "upper": zod.number(),
+  "midpoint": zod.number(),
+  "predictions": zod.number(),
+  "observedPositiveRate": zod.number(),
+  "expectedPositiveRate": zod.number(),
+  "gap": zod.number()
+})),
+  "expectedCalibrationError": zod.number(),
+  "predictionsEvaluated": zod.number(),
+  "systematicBias": zod.number()
+})),
+  "reliability": zod.object({
+  "reliabilityScore": zod.number(),
+  "overconfidenceRisk": zod.enum(['low', 'medium', 'high']),
+  "uncertaintyAccuracy": zod.number(),
+  "disagreementPredictiveness": zod.number(),
+  "bucketClassifications": zod.array(zod.object({
+  "bucket": zod.string(),
+  "classification": zod.enum(['justified', 'fragile', 'overconfident', 'underconfident', 'unstable']),
+  "note": zod.string()
+})),
+  "calibrationNarrative": zod.string()
+}),
+  "predictionEvaluation": zod.object({
+  "kindReports": zod.array(zod.object({
+  "predictionKind": zod.string(),
+  "evaluated": zod.number(),
+  "truePositives": zod.number(),
+  "falsePositives": zod.number(),
+  "trueNegatives": zod.number(),
+  "falseNegatives": zod.number(),
+  "precision": zod.number(),
+  "recall": zod.number(),
+  "f1": zod.number(),
+  "brierScore": zod.number(),
+  "averageConfidence": zod.number(),
+  "observedAccuracy": zod.number(),
+  "calibrationGap": zod.number()
+})),
+  "predictionQuality": zod.number(),
+  "calibrationQuality": zod.number(),
+  "strongestSignals": zod.array(zod.string()),
+  "weakestSignals": zod.array(zod.string()),
+  "recurringFailureModes": zod.array(zod.string()),
+  "confidenceReliability": zod.number()
+}),
+  "archetypePerformance": zod.array(zod.object({
+  "archetype": zod.string(),
+  "sampleSize": zod.number(),
+  "successRate": zod.number(),
+  "failureRate": zod.number(),
+  "retentionRate": zod.number(),
+  "promotionRate": zod.number(),
+  "averagePredictedConfidence": zod.number(),
+  "realisedAccuracy": zod.number(),
+  "failurePatterns": zod.array(zod.string()),
+  "environmentSensitivity": zod.number(),
+  "confidence": zod.number()
+})),
+  "organizationalLearning": zod.array(zod.object({
+  "organizationId": zod.string(),
+  "successCorrelates": zod.array(zod.object({
+  "attribute": zod.string(),
+  "weight": zod.number(),
+  "sampleSize": zod.number(),
+  "rationale": zod.string()
+})),
+  "failureCorrelates": zod.array(zod.object({
+  "attribute": zod.string(),
+  "weight": zod.number(),
+  "sampleSize": zod.number(),
+  "rationale": zod.string()
+})),
+  "hiringBarShift": zod.number(),
+  "founderStyleStability": zod.number(),
+  "recommendedWeightAdjustments": zod.array(zod.object({
+  "agent": zod.string(),
+  "adjustment": zod.number(),
+  "rationale": zod.string()
+})),
+  "confidence": zod.number()
+})),
+  "drift": zod.object({
+  "detectedDrifts": zod.array(zod.object({
+  "driftType": zod.enum(['calibration', 'hiring-bar', 'organization-context', 'founder-style', 'confidence-inflation', 'archetype']),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "detail": zod.string(),
+  "impactedAgents": zod.array(zod.string()),
+  "confidence": zod.number(),
+  "recommendedRecalibration": zod.string()
+})),
+  "driftScore": zod.number()
+}),
+  "trajectory": zod.array(zod.object({
+  "candidateId": zod.string(),
+  "organizationId": zod.string(),
+  "predictedTrajectory": zod.number(),
+  "realisedVelocity": zod.number(),
+  "ownershipGrowth": zod.number(),
+  "roleEvolution": zod.string(),
+  "organizationalImpact": zod.number(),
+  "matchesPrediction": zod.boolean(),
+  "evidence": zod.array(zod.string())
+})),
+  "benchmarks": zod.array(zod.object({
+  "scenarioId": zod.string(),
+  "passed": zod.boolean(),
+  "assertionResults": zod.array(zod.object({
+  "path": zod.string(),
+  "comparator": zod.enum(['lte', 'gte', 'eq', 'approx']),
+  "expected": zod.number(),
+  "actual": zod.number(),
+  "passed": zod.boolean()
+}))
+})),
+  "longitudinalInsights": zod.array(zod.string()),
+  "recommendations": zod.array(zod.string())
+})
+
+
+/**
+ * @summary List the append-only outcome events used to evaluate predictions
+ */
+export const ListEvaluationOutcomesResponseItem = zod.object({
+  "id": zod.string(),
+  "timestamp": zod.coerce.date(),
+  "organizationId": zod.string(),
+  "candidateId": zod.string(),
+  "outcomeType": zod.enum(['hired', 'rejected', 'withdrew', 'failed_process', 'successful_hire', 'poor_performance', 'promotion', 'retention', 'rapid_exit', 'founder_success', 'org_mismatch', 'team_failure', 'exceptional_growth']),
+  "evidence": zod.array(zod.string()),
+  "confidence": zod.number(),
+  "provenance": zod.object({
+  "observedBy": zod.string(),
+  "observedAt": zod.coerce.date(),
+  "rationale": zod.string(),
+  "evidence": zod.array(zod.string())
+})
+})
+export const ListEvaluationOutcomesResponse = zod.array(ListEvaluationOutcomesResponseItem)
+
+
+/**
+ * @summary List the prediction records that were evaluated against outcomes
+ */
+export const ListEvaluationPredictionsResponseItem = zod.object({
+  "id": zod.string(),
+  "predictionKind": zod.enum(['candidate-fit', 'hiring-risk', 'trajectory', 'contradiction', 'chaos-fit', 'org-fit', 'retention']),
+  "organizationId": zod.string(),
+  "candidateId": zod.string(),
+  "score": zod.number(),
+  "confidence": zod.number(),
+  "archetype": zod.string().optional(),
+  "producedBy": zod.string(),
+  "predictedAt": zod.coerce.date(),
+  "rationale": zod.string()
+})
+export const ListEvaluationPredictionsResponse = zod.array(ListEvaluationPredictionsResponseItem)
+
+

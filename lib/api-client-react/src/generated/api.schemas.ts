@@ -638,3 +638,291 @@ export interface OrganizationIntelligenceReport {
   finalRecommendation: OrganizationIntelligenceReportFinalRecommendation;
 }
 
+export type OutcomeEventOutcomeType = typeof OutcomeEventOutcomeType[keyof typeof OutcomeEventOutcomeType];
+
+
+export const OutcomeEventOutcomeType = {
+  hired: 'hired',
+  rejected: 'rejected',
+  withdrew: 'withdrew',
+  failed_process: 'failed_process',
+  successful_hire: 'successful_hire',
+  poor_performance: 'poor_performance',
+  promotion: 'promotion',
+  retention: 'retention',
+  rapid_exit: 'rapid_exit',
+  founder_success: 'founder_success',
+  org_mismatch: 'org_mismatch',
+  team_failure: 'team_failure',
+  exceptional_growth: 'exceptional_growth',
+} as const;
+
+export type OutcomeEventProvenance = {
+  observedBy: string;
+  observedAt: string;
+  rationale: string;
+  evidence: string[];
+};
+
+export interface OutcomeEvent {
+  id: string;
+  timestamp: string;
+  organizationId: string;
+  candidateId: string;
+  outcomeType: OutcomeEventOutcomeType;
+  evidence: string[];
+  confidence: number;
+  provenance: OutcomeEventProvenance;
+}
+
+export type PredictionRecordPredictionKind = typeof PredictionRecordPredictionKind[keyof typeof PredictionRecordPredictionKind];
+
+
+export const PredictionRecordPredictionKind = {
+  'candidate-fit': 'candidate-fit',
+  'hiring-risk': 'hiring-risk',
+  trajectory: 'trajectory',
+  contradiction: 'contradiction',
+  'chaos-fit': 'chaos-fit',
+  'org-fit': 'org-fit',
+  retention: 'retention',
+} as const;
+
+export interface PredictionRecord {
+  id: string;
+  predictionKind: PredictionRecordPredictionKind;
+  organizationId: string;
+  candidateId: string;
+  score: number;
+  confidence: number;
+  archetype?: string;
+  producedBy: string;
+  predictedAt: string;
+  rationale: string;
+}
+
+export interface CalibrationBucket {
+  lower: number;
+  upper: number;
+  midpoint: number;
+  predictions: number;
+  observedPositiveRate: number;
+  expectedPositiveRate: number;
+  gap: number;
+}
+
+export type CalibrationCurveScope = typeof CalibrationCurveScope[keyof typeof CalibrationCurveScope];
+
+
+export const CalibrationCurveScope = {
+  global: 'global',
+  'per-agent': 'per-agent',
+  'per-organization': 'per-organization',
+  'per-archetype': 'per-archetype',
+} as const;
+
+export interface CalibrationCurve {
+  scope: CalibrationCurveScope;
+  scopeKey: string;
+  buckets: CalibrationBucket[];
+  expectedCalibrationError: number;
+  predictionsEvaluated: number;
+  systematicBias: number;
+}
+
+export interface PredictionEvaluation {
+  predictionKind: string;
+  evaluated: number;
+  truePositives: number;
+  falsePositives: number;
+  trueNegatives: number;
+  falseNegatives: number;
+  precision: number;
+  recall: number;
+  f1: number;
+  brierScore: number;
+  averageConfidence: number;
+  observedAccuracy: number;
+  calibrationGap: number;
+}
+
+export interface PredictionEvaluationReport {
+  kindReports: PredictionEvaluation[];
+  predictionQuality: number;
+  calibrationQuality: number;
+  strongestSignals: string[];
+  weakestSignals: string[];
+  recurringFailureModes: string[];
+  confidenceReliability: number;
+}
+
+export type ConfidenceReliabilityReportOverconfidenceRisk = typeof ConfidenceReliabilityReportOverconfidenceRisk[keyof typeof ConfidenceReliabilityReportOverconfidenceRisk];
+
+
+export const ConfidenceReliabilityReportOverconfidenceRisk = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+export type ConfidenceReliabilityReportBucketClassificationsItemClassification = typeof ConfidenceReliabilityReportBucketClassificationsItemClassification[keyof typeof ConfidenceReliabilityReportBucketClassificationsItemClassification];
+
+
+export const ConfidenceReliabilityReportBucketClassificationsItemClassification = {
+  justified: 'justified',
+  fragile: 'fragile',
+  overconfident: 'overconfident',
+  underconfident: 'underconfident',
+  unstable: 'unstable',
+} as const;
+
+export type ConfidenceReliabilityReportBucketClassificationsItem = {
+  bucket: string;
+  classification: ConfidenceReliabilityReportBucketClassificationsItemClassification;
+  note: string;
+};
+
+export interface ConfidenceReliabilityReport {
+  reliabilityScore: number;
+  overconfidenceRisk: ConfidenceReliabilityReportOverconfidenceRisk;
+  uncertaintyAccuracy: number;
+  disagreementPredictiveness: number;
+  bucketClassifications: ConfidenceReliabilityReportBucketClassificationsItem[];
+  calibrationNarrative: string;
+}
+
+export interface ArchetypePerformance {
+  archetype: string;
+  sampleSize: number;
+  successRate: number;
+  failureRate: number;
+  retentionRate: number;
+  promotionRate: number;
+  averagePredictedConfidence: number;
+  realisedAccuracy: number;
+  failurePatterns: string[];
+  environmentSensitivity: number;
+  confidence: number;
+}
+
+export type DriftSignalDriftType = typeof DriftSignalDriftType[keyof typeof DriftSignalDriftType];
+
+
+export const DriftSignalDriftType = {
+  calibration: 'calibration',
+  'hiring-bar': 'hiring-bar',
+  'organization-context': 'organization-context',
+  'founder-style': 'founder-style',
+  'confidence-inflation': 'confidence-inflation',
+  archetype: 'archetype',
+} as const;
+
+export type DriftSignalSeverity = typeof DriftSignalSeverity[keyof typeof DriftSignalSeverity];
+
+
+export const DriftSignalSeverity = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+export interface DriftSignal {
+  driftType: DriftSignalDriftType;
+  severity: DriftSignalSeverity;
+  detail: string;
+  impactedAgents: string[];
+  confidence: number;
+  recommendedRecalibration: string;
+}
+
+export interface DriftReport {
+  detectedDrifts: DriftSignal[];
+  driftScore: number;
+}
+
+export interface TrajectoryObservation {
+  candidateId: string;
+  organizationId: string;
+  predictedTrajectory: number;
+  realisedVelocity: number;
+  ownershipGrowth: number;
+  roleEvolution: string;
+  organizationalImpact: number;
+  matchesPrediction: boolean;
+  evidence: string[];
+}
+
+export type OrganizationalLearningSignalSuccessCorrelatesItem = {
+  attribute: string;
+  weight: number;
+  sampleSize: number;
+  rationale: string;
+};
+
+export type OrganizationalLearningSignalFailureCorrelatesItem = {
+  attribute: string;
+  weight: number;
+  sampleSize: number;
+  rationale: string;
+};
+
+export type OrganizationalLearningSignalRecommendedWeightAdjustmentsItem = {
+  agent: string;
+  adjustment: number;
+  rationale: string;
+};
+
+export interface OrganizationalLearningSignal {
+  organizationId: string;
+  successCorrelates: OrganizationalLearningSignalSuccessCorrelatesItem[];
+  failureCorrelates: OrganizationalLearningSignalFailureCorrelatesItem[];
+  hiringBarShift: number;
+  founderStyleStability: number;
+  recommendedWeightAdjustments: OrganizationalLearningSignalRecommendedWeightAdjustmentsItem[];
+  confidence: number;
+}
+
+export type BenchmarkResultAssertionResultsItemComparator = typeof BenchmarkResultAssertionResultsItemComparator[keyof typeof BenchmarkResultAssertionResultsItemComparator];
+
+
+export const BenchmarkResultAssertionResultsItemComparator = {
+  lte: 'lte',
+  gte: 'gte',
+  eq: 'eq',
+  approx: 'approx',
+} as const;
+
+export type BenchmarkResultAssertionResultsItem = {
+  path: string;
+  comparator: BenchmarkResultAssertionResultsItemComparator;
+  expected: number;
+  actual: number;
+  passed: boolean;
+};
+
+export interface BenchmarkResult {
+  scenarioId: string;
+  passed: boolean;
+  assertionResults: BenchmarkResultAssertionResultsItem[];
+}
+
+export interface EvaluationReport {
+  generatedAt: string;
+  generatedBy: string;
+  predictionsEvaluated: number;
+  outcomesObserved: number;
+  systemCalibration: CalibrationCurve;
+  perAgentCalibration: CalibrationCurve[];
+  perOrgCalibration: CalibrationCurve[];
+  perArchetypeCalibration: CalibrationCurve[];
+  reliability: ConfidenceReliabilityReport;
+  predictionEvaluation: PredictionEvaluationReport;
+  archetypePerformance: ArchetypePerformance[];
+  organizationalLearning: OrganizationalLearningSignal[];
+  drift: DriftReport;
+  trajectory: TrajectoryObservation[];
+  benchmarks: BenchmarkResult[];
+  longitudinalInsights: string[];
+  recommendations: string[];
+}
+

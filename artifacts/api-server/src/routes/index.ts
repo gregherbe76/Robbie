@@ -7,6 +7,7 @@ import graphRouter from "./graph";
 import reportsRouter from "./reports";
 import intelligenceRouter from "./intelligence";
 import organizationIntelligenceRouter from "./organization-intelligence";
+import evaluationRouter from "./evaluation";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(graphRouter);
 router.use(reportsRouter);
 router.use(intelligenceRouter);
 router.use(organizationIntelligenceRouter);
+router.use(evaluationRouter);
 
 export default router;

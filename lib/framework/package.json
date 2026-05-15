@@ -26,6 +26,10 @@
       "types": "./dist/organization_intelligence/index.d.ts",
       "import": "./dist/organization_intelligence/index.js"
     },
+    "./evaluation": {
+      "types": "./dist/evaluation/index.d.ts",
+      "import": "./dist/evaluation/index.js"
+    },
     "./skills": {
       "types": "./dist/skills/index.d.ts",
       "import": "./dist/skills/index.js"

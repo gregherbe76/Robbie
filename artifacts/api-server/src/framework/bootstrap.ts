@@ -43,6 +43,12 @@ import {
   type CandidateOrganizationFitResult,
   type OrganizationIntelligenceReport,
 } from "@workspace/framework/organization-intelligence";
+import type {
+  EvaluationReport,
+  OutcomeEvent,
+  PredictionRecord,
+} from "@workspace/framework/evaluation";
+import { buildEvaluationContext } from "./evaluation";
 
 const startedAt = Date.now();
 
@@ -66,6 +72,9 @@ const dossiers = new Map<string, CandidateDossier>();
 // keyed by `${orgId}::${candidateId}`
 const orgFits = new Map<string, CandidateOrganizationFitResult>();
 const orgReports = new Map<string, OrganizationIntelligenceReport>();
+let evaluationReport: EvaluationReport | null = null;
+let evaluationOutcomes: OutcomeEvent[] = [];
+let evaluationPredictions: PredictionRecord[] = [];
 function orgKey(orgId: string, candidateId: string): string {
   return `${orgId}::${candidateId}`;
 }
@@ -548,6 +557,45 @@ async function seedAnalyses(registry: FrameworkRegistry): Promise<void> {
     buildOrgArchetypeMemory(SAMPLE_ORG.id, fitRecs, now),
   );
 
+  // ============================================================
+  // Evaluation, Calibration, and Longitudinal Learning Layer
+  // ============================================================
+  const evalCtx = buildEvaluationContext({
+    analyses: Array.from(analyses.values()),
+    cognitions,
+    orgFits,
+    orgReports,
+    organizationId: SAMPLE_ORG.id,
+    generatedAt: now,
+  });
+  evaluationReport = evalCtx.report;
+  evaluationOutcomes = evalCtx.outcomes;
+  evaluationPredictions = evalCtx.predictions;
+  await registry.memory.put({
+    id: `mem:eval:report`,
+    scope: "organization",
+    subjectId: SAMPLE_ORG.id,
+    key: "evaluation.report",
+    value: {
+      predictionsEvaluated: evalCtx.report.predictionsEvaluated,
+      outcomesObserved: evalCtx.report.outcomesObserved,
+      ece: evalCtx.report.systemCalibration.expectedCalibrationError,
+      systematicBias: evalCtx.report.systemCalibration.systematicBias,
+      overconfidenceRisk: evalCtx.report.reliability.overconfidenceRisk,
+      predictionQuality: evalCtx.report.predictionEvaluation.predictionQuality,
+    },
+    summary: `ECE ${evalCtx.report.systemCalibration.expectedCalibrationError.toFixed(2)} on ${evalCtx.report.predictionsEvaluated} predictions; overconfidence risk ${evalCtx.report.reliability.overconfidenceRisk}.`,
+    confidence: evalCtx.report.reliability.reliabilityScore,
+    provenance: {
+      producedBy: "evaluation-report-engine",
+      producedAt: now,
+      rationale: evalCtx.report.reliability.calibrationNarrative,
+      derivedFrom: evalCtx.predictions.map((p) => p.id),
+    },
+    createdAt: now,
+    tags: ["evaluation", "calibration", "longitudinal"],
+  });
+
   for (const f of archetypeFreq) {
     await registry.memory.put({
       id: `mem:org:archetype:${f.archetypeId}`,
@@ -637,6 +685,18 @@ export function getOrgReport(
   candidateId: string,
 ): OrganizationIntelligenceReport | null {
   return orgReports.get(orgKey(organizationId, candidateId)) ?? null;
+}
+
+export function getEvaluationReport(): EvaluationReport | null {
+  return evaluationReport;
+}
+
+export function getEvaluationOutcomes(): OutcomeEvent[] {
+  return evaluationOutcomes;
+}
+
+export function getEvaluationPredictions(): PredictionRecord[] {
+  return evaluationPredictions;
 }
 
 export function getUptimeSeconds(): number {

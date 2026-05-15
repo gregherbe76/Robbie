@@ -1,0 +1,389 @@
+Build the Evaluation, Calibration, and Longitudinal Learning Layer for the Recruiting Intelligence Framework.
+
+IMPORTANT:
+The framework now has:
+- candidate intelligence
+- cross-agent cognition
+- organization intelligence
+- deterministic orchestration
+- provenance-first reasoning
+- auditability
+
+The next step is NOT more agents.
+
+The next step is:
+- measuring predictive quality,
+- calibrating reasoning,
+- learning from outcomes,
+- longitudinal intelligence evolution.
+
+The system must evolve from:
+"reasoning system"
+
+into:
+"self-calibrating recruiting cognition system."
+
+--------------------------------------------------
+Core Thesis
+--------------------------------------------------
+
+A recruiting intelligence system must:
+- remember outcomes,
+- compare predictions to reality,
+- detect calibration drift,
+- refine confidence over time,
+- measure reasoning quality,
+- track archetype success/failure longitudinally.
+
+This layer introduces:
+- evaluation,
+- calibration,
+- feedback loops,
+- longitudinal organizational learning.
+
+--------------------------------------------------
+Build These Components
+--------------------------------------------------
+
+Create:
+lib/framework/src/evaluation/
+
+Required components:
+
+1. OutcomeTrackingEngine
+2. PredictionEvaluationEngine
+3. CalibrationEngine
+4. ConfidenceReliabilityAnalyzer
+5. ArchetypePerformanceTracker
+6. OrganizationalLearningEngine
+7. DriftDetectionEngine
+8. LongitudinalTrajectoryTracker
+9. RecruitingIntelligenceBenchmarkEngine
+10. EvaluationReportEngine
+
+--------------------------------------------------
+1. OutcomeTrackingEngine
+--------------------------------------------------
+
+Track real-world outcomes after hiring decisions.
+
+Supported outcomes:
+- hired
+- rejected
+- withdrew
+- failed_process
+- successful_hire
+- poor_performance
+- promotion
+- retention
+- rapid_exit
+- founder_success
+- org_mismatch
+- team_failure
+- exceptional_growth
+
+Every outcome must include:
+- timestamp
+- organizationId
+- candidateId
+- outcomeType
+- evidence
+- confidence
+- observedBy
+- provenance
+
+Support:
+- deterministic event ingestion
+- append-only history
+- temporal updates
+- auditability
+
+--------------------------------------------------
+2. PredictionEvaluationEngine
+--------------------------------------------------
+
+Compare predictions against outcomes.
+
+Evaluate:
+- fit predictions
+- hiring-risk predictions
+- trajectory predictions
+- contradiction predictions
+- chaos-fit predictions
+- retention predictions
+
+Metrics:
+- precision
+- recall
+- false positives
+- false negatives
+- calibration error
+- confidence accuracy
+
+Output:
+{
+  predictionQuality,
+  calibrationQuality,
+  strongestSignals,
+  weakestSignals,
+  recurringFailureModes,
+  confidenceReliability
+}
+
+--------------------------------------------------
+3. CalibrationEngine
+--------------------------------------------------
+
+Measure whether system confidence matches reality.
+
+Example:
+If:
+- 90% confidence predictions succeed only 55% of the time
+
+=> confidence inflation exists.
+
+Implement:
+- confidence calibration curves
+- reliability diagrams
+- confidence bucketing
+- expected calibration error
+- calibration drift detection
+
+Support:
+- per-agent calibration
+- global calibration
+- organization-specific calibration
+- archetype-specific calibration
+
+--------------------------------------------------
+4. ConfidenceReliabilityAnalyzer
+--------------------------------------------------
+
+Analyze confidence reliability longitudinally.
+
+The system must distinguish:
+- justified confidence
+- fragile confidence
+- overconfidence
+- underconfidence
+- unstable confidence
+
+Track:
+- confidence collapse patterns
+- uncertainty underestimation
+- disagreement predictive value
+- evidence-density predictive quality
+
+Output:
+{
+  reliabilityScore,
+  overconfidenceRisk,
+  uncertaintyAccuracy,
+  disagreementPredictiveness,
+  calibrationNarrative
+}
+
+--------------------------------------------------
+5. ArchetypePerformanceTracker
+--------------------------------------------------
+
+Track long-term performance of recruiting archetypes.
+
+Examples:
+- accelerating-builder
+- inflated-narrative
+- plateaued-senior
+- elite-fit-low-friction
+- founder-shaped
+
+Track:
+- hiring outcomes
+- retention
+- growth velocity
+- organizational success
+- promotion probability
+- failure modes
+
+Output:
+{
+  archetypePerformance,
+  successRate,
+  failurePatterns,
+  environmentSensitivity,
+  confidence
+}
+
+--------------------------------------------------
+6. OrganizationalLearningEngine
+--------------------------------------------------
+
+Build organization-specific learning loops.
+
+The system must learn:
+- what profiles succeed in THIS org
+- what profiles fail in THIS org
+- what contradictions matter most
+- what founder patterns correlate with success
+- what trajectory signals predict upside
+
+Support:
+- organization-specific weighting
+- longitudinal pattern accumulation
+- organizational calibration
+- hiring-bar evolution
+
+IMPORTANT:
+Learning must remain:
+- inspectable
+- deterministic
+- provenance-backed
+
+No hidden RL black boxes.
+
+--------------------------------------------------
+7. DriftDetectionEngine
+--------------------------------------------------
+
+Detect longitudinal drift.
+
+Drift types:
+- calibration drift
+- hiring-bar drift
+- organization-context drift
+- founder-style drift
+- confidence inflation drift
+- archetype drift
+
+Examples:
+- startup becomes process-heavy
+- founder changes operating style
+- hiring-bar weakens
+- contradiction predictive value changes
+
+Output:
+{
+  detectedDrifts,
+  severity,
+  impactedAgents,
+  confidence,
+  recommendedRecalibration
+}
+
+--------------------------------------------------
+8. LongitudinalTrajectoryTracker
+--------------------------------------------------
+
+Track real-world trajectory evolution after hiring.
+
+Questions:
+- did predicted accelerators accelerate?
+- did plateaued candidates plateau?
+- did founder-potential emerge?
+- did chaos-fit predictions hold?
+
+Track:
+- progression velocity
+- role evolution
+- ownership growth
+- technical growth
+- organizational impact
+
+--------------------------------------------------
+9. RecruitingIntelligenceBenchmarkEngine
+--------------------------------------------------
+
+Build benchmarking/evaluation infrastructure.
+
+The framework must support:
+- replayable evaluations
+- deterministic benchmark suites
+- scenario regression testing
+- reasoning-quality benchmarking
+- calibration benchmarking
+
+Create:
+- benchmark datasets
+- evaluation scenarios
+- deterministic replay engine
+- regression suite support
+
+This becomes:
+- the scientific validation layer
+for recruiting cognition.
+
+--------------------------------------------------
+10. EvaluationReportEngine
+--------------------------------------------------
+
+Generate longitudinal intelligence reports.
+
+Reports should answer:
+- How accurate is the system?
+- Where is confidence reliable?
+- What signals predict success?
+- Which archetypes outperform?
+- What organizational drift exists?
+- Which agents are degrading?
+- Where is uncertainty underestimated?
+
+Sections:
+1. System Calibration
+2. Confidence Reliability
+3. Archetype Performance
+4. Organizational Learning
+5. Drift Analysis
+6. Predictive Accuracy
+7. Failure Modes
+8. Calibration Recommendations
+9. Longitudinal Insights
+
+--------------------------------------------------
+Frontend Requirements
+--------------------------------------------------
+
+Add:
+/evaluation
+
+UI sections:
+- calibration curves
+- confidence reliability maps
+- drift detection timeline
+- archetype performance matrix
+- prediction vs outcome analysis
+- organizational learning panel
+- longitudinal trajectory explorer
+- replayable benchmark scenarios
+
+The interface should feel like:
+- an intelligence evaluation lab,
+not:
+- HR analytics software.
+
+--------------------------------------------------
+Critical Constraints
+--------------------------------------------------
+
+Maintain:
+- deterministic execution
+- provenance-first architecture
+- explicit uncertainty
+- auditability
+- inspectable learning
+- no hidden weight mutation
+- no opaque RL loops
+
+Learning must remain:
+- reviewable
+- explainable
+- reproducible
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+The framework should evolve from:
+"auditable recruiting intelligence"
+
+into:
+"a self-calibrating longitudinal recruiting cognition system
+capable of learning from reality over time."

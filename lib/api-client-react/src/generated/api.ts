@@ -23,11 +23,14 @@ import type {
   CandidateAnalysis,
   CandidateOrganizationFitResult,
   CognitiveSynthesis,
+  EvaluationReport,
   GraphSnapshot,
   HealthStatus,
   MemoryEntry,
   OrganizationContext,
   OrganizationIntelligenceReport,
+  OutcomeEvent,
+  PredictionRecord,
   Provider,
   Report,
   Skill,
@@ -1424,6 +1427,237 @@ export function useListReports<TData = Awaited<ReturnType<typeof listReports>>, 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getListReportsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetEvaluationReportUrl = () => {
+
+
+
+
+  return `/api/evaluation/report`
+}
+
+/**
+ * @summary Full evaluation, calibration, drift, and longitudinal-learning report
+ */
+export const getEvaluationReport = async ( options?: RequestInit): Promise<EvaluationReport> => {
+
+  return customFetch<EvaluationReport>(getGetEvaluationReportUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationReportQueryKey = () => {
+    return [
+    `/api/evaluation/report`
+    ] as const;
+    }
+
+
+export const getGetEvaluationReportQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationReport>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEvaluationReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationReportQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationReport>>> = ({ signal }) => getEvaluationReport({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationReport>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetEvaluationReportQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationReport>>>
+export type GetEvaluationReportQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Full evaluation, calibration, drift, and longitudinal-learning report
+ */
+
+export function useGetEvaluationReport<TData = Awaited<ReturnType<typeof getEvaluationReport>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEvaluationReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetEvaluationReportQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListEvaluationOutcomesUrl = () => {
+
+
+
+
+  return `/api/evaluation/outcomes`
+}
+
+/**
+ * @summary List the append-only outcome events used to evaluate predictions
+ */
+export const listEvaluationOutcomes = async ( options?: RequestInit): Promise<OutcomeEvent[]> => {
+
+  return customFetch<OutcomeEvent[]>(getListEvaluationOutcomesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListEvaluationOutcomesQueryKey = () => {
+    return [
+    `/api/evaluation/outcomes`
+    ] as const;
+    }
+
+
+export const getListEvaluationOutcomesQueryOptions = <TData = Awaited<ReturnType<typeof listEvaluationOutcomes>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listEvaluationOutcomes>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListEvaluationOutcomesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listEvaluationOutcomes>>> = ({ signal }) => listEvaluationOutcomes({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listEvaluationOutcomes>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListEvaluationOutcomesQueryResult = NonNullable<Awaited<ReturnType<typeof listEvaluationOutcomes>>>
+export type ListEvaluationOutcomesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List the append-only outcome events used to evaluate predictions
+ */
+
+export function useListEvaluationOutcomes<TData = Awaited<ReturnType<typeof listEvaluationOutcomes>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listEvaluationOutcomes>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListEvaluationOutcomesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListEvaluationPredictionsUrl = () => {
+
+
+
+
+  return `/api/evaluation/predictions`
+}
+
+/**
+ * @summary List the prediction records that were evaluated against outcomes
+ */
+export const listEvaluationPredictions = async ( options?: RequestInit): Promise<PredictionRecord[]> => {
+
+  return customFetch<PredictionRecord[]>(getListEvaluationPredictionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListEvaluationPredictionsQueryKey = () => {
+    return [
+    `/api/evaluation/predictions`
+    ] as const;
+    }
+
+
+export const getListEvaluationPredictionsQueryOptions = <TData = Awaited<ReturnType<typeof listEvaluationPredictions>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listEvaluationPredictions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListEvaluationPredictionsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listEvaluationPredictions>>> = ({ signal }) => listEvaluationPredictions({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listEvaluationPredictions>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListEvaluationPredictionsQueryResult = NonNullable<Awaited<ReturnType<typeof listEvaluationPredictions>>>
+export type ListEvaluationPredictionsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List the prediction records that were evaluated against outcomes
+ */
+
+export function useListEvaluationPredictions<TData = Awaited<ReturnType<typeof listEvaluationPredictions>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listEvaluationPredictions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListEvaluationPredictionsQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

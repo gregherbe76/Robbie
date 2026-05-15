@@ -296,6 +296,46 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Report"
+  /evaluation/report:
+    get:
+      operationId: getEvaluationReport
+      tags: [evaluation]
+      summary: Full evaluation, calibration, drift, and longitudinal-learning report
+      responses:
+        "200":
+          description: Evaluation report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluationReport"
+  /evaluation/outcomes:
+    get:
+      operationId: listEvaluationOutcomes
+      tags: [evaluation]
+      summary: List the append-only outcome events used to evaluate predictions
+      responses:
+        "200":
+          description: Outcome events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OutcomeEvent"
+  /evaluation/predictions:
+    get:
+      operationId: listEvaluationPredictions
+      tags: [evaluation]
+      summary: List the prediction records that were evaluated against outcomes
+      responses:
+        "200":
+          description: Prediction records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PredictionRecord"
 components:
   schemas:
     HealthStatus:
@@ -1156,3 +1196,364 @@ components:
             category: { type: string }
             narrative: { type: string }
             confidence: { type: number }
+    OutcomeEvent:
+      type: object
+      required:
+        [id, timestamp, organizationId, candidateId, outcomeType, evidence, confidence, provenance]
+      properties:
+        id: { type: string }
+        timestamp: { type: string, format: date-time }
+        organizationId: { type: string }
+        candidateId: { type: string }
+        outcomeType:
+          type: string
+          enum:
+            [
+              hired,
+              rejected,
+              withdrew,
+              failed_process,
+              successful_hire,
+              poor_performance,
+              promotion,
+              retention,
+              rapid_exit,
+              founder_success,
+              org_mismatch,
+              team_failure,
+              exceptional_growth,
+            ]
+        evidence: { type: array, items: { type: string } }
+        confidence: { type: number }
+        provenance:
+          type: object
+          required: [observedBy, observedAt, rationale, evidence]
+          properties:
+            observedBy: { type: string }
+            observedAt: { type: string, format: date-time }
+            rationale: { type: string }
+            evidence: { type: array, items: { type: string } }
+    PredictionRecord:
+      type: object
+      required:
+        [id, predictionKind, organizationId, candidateId, score, confidence, producedBy, predictedAt, rationale]
+      properties:
+        id: { type: string }
+        predictionKind:
+          type: string
+          enum:
+            [candidate-fit, hiring-risk, trajectory, contradiction, chaos-fit, org-fit, retention]
+        organizationId: { type: string }
+        candidateId: { type: string }
+        score: { type: number }
+        confidence: { type: number }
+        archetype: { type: string }
+        producedBy: { type: string }
+        predictedAt: { type: string, format: date-time }
+        rationale: { type: string }
+    CalibrationBucket:
+      type: object
+      required:
+        [lower, upper, midpoint, predictions, observedPositiveRate, expectedPositiveRate, gap]
+      properties:
+        lower: { type: number }
+        upper: { type: number }
+        midpoint: { type: number }
+        predictions: { type: integer }
+        observedPositiveRate: { type: number }
+        expectedPositiveRate: { type: number }
+        gap: { type: number }
+    CalibrationCurve:
+      type: object
+      required:
+        [scope, scopeKey, buckets, expectedCalibrationError, predictionsEvaluated, systematicBias]
+      properties:
+        scope:
+          type: string
+          enum: [global, per-agent, per-organization, per-archetype]
+        scopeKey: { type: string }
+        buckets:
+          type: array
+          items: { $ref: "#/components/schemas/CalibrationBucket" }
+        expectedCalibrationError: { type: number }
+        predictionsEvaluated: { type: integer }
+        systematicBias: { type: number }
+    PredictionEvaluation:
+      type: object
+      required:
+        [
+          predictionKind,
+          evaluated,
+          truePositives,
+          falsePositives,
+          trueNegatives,
+          falseNegatives,
+          precision,
+          recall,
+          f1,
+          brierScore,
+          averageConfidence,
+          observedAccuracy,
+          calibrationGap,
+        ]
+      properties:
+        predictionKind: { type: string }
+        evaluated: { type: integer }
+        truePositives: { type: integer }
+        falsePositives: { type: integer }
+        trueNegatives: { type: integer }
+        falseNegatives: { type: integer }
+        precision: { type: number }
+        recall: { type: number }
+        f1: { type: number }
+        brierScore: { type: number }
+        averageConfidence: { type: number }
+        observedAccuracy: { type: number }
+        calibrationGap: { type: number }
+    PredictionEvaluationReport:
+      type: object
+      required:
+        [
+          kindReports,
+          predictionQuality,
+          calibrationQuality,
+          strongestSignals,
+          weakestSignals,
+          recurringFailureModes,
+          confidenceReliability,
+        ]
+      properties:
+        kindReports:
+          type: array
+          items: { $ref: "#/components/schemas/PredictionEvaluation" }
+        predictionQuality: { type: number }
+        calibrationQuality: { type: number }
+        strongestSignals: { type: array, items: { type: string } }
+        weakestSignals: { type: array, items: { type: string } }
+        recurringFailureModes: { type: array, items: { type: string } }
+        confidenceReliability: { type: number }
+    ConfidenceReliabilityReport:
+      type: object
+      required:
+        [
+          reliabilityScore,
+          overconfidenceRisk,
+          uncertaintyAccuracy,
+          disagreementPredictiveness,
+          bucketClassifications,
+          calibrationNarrative,
+        ]
+      properties:
+        reliabilityScore: { type: number }
+        overconfidenceRisk:
+          type: string
+          enum: [low, medium, high]
+        uncertaintyAccuracy: { type: number }
+        disagreementPredictiveness: { type: number }
+        bucketClassifications:
+          type: array
+          items:
+            type: object
+            required: [bucket, classification, note]
+            properties:
+              bucket: { type: string }
+              classification:
+                type: string
+                enum: [justified, fragile, overconfident, underconfident, unstable]
+              note: { type: string }
+        calibrationNarrative: { type: string }
+    ArchetypePerformance:
+      type: object
+      required:
+        [
+          archetype,
+          sampleSize,
+          successRate,
+          failureRate,
+          retentionRate,
+          promotionRate,
+          averagePredictedConfidence,
+          realisedAccuracy,
+          failurePatterns,
+          environmentSensitivity,
+          confidence,
+        ]
+      properties:
+        archetype: { type: string }
+        sampleSize: { type: integer }
+        successRate: { type: number }
+        failureRate: { type: number }
+        retentionRate: { type: number }
+        promotionRate: { type: number }
+        averagePredictedConfidence: { type: number }
+        realisedAccuracy: { type: number }
+        failurePatterns: { type: array, items: { type: string } }
+        environmentSensitivity: { type: number }
+        confidence: { type: number }
+    DriftSignal:
+      type: object
+      required:
+        [driftType, severity, detail, impactedAgents, confidence, recommendedRecalibration]
+      properties:
+        driftType:
+          type: string
+          enum:
+            [calibration, hiring-bar, organization-context, founder-style, confidence-inflation, archetype]
+        severity:
+          type: string
+          enum: [low, medium, high]
+        detail: { type: string }
+        impactedAgents: { type: array, items: { type: string } }
+        confidence: { type: number }
+        recommendedRecalibration: { type: string }
+    DriftReport:
+      type: object
+      required: [detectedDrifts, driftScore]
+      properties:
+        detectedDrifts:
+          type: array
+          items: { $ref: "#/components/schemas/DriftSignal" }
+        driftScore: { type: number }
+    TrajectoryObservation:
+      type: object
+      required:
+        [
+          candidateId,
+          organizationId,
+          predictedTrajectory,
+          realisedVelocity,
+          ownershipGrowth,
+          roleEvolution,
+          organizationalImpact,
+          matchesPrediction,
+          evidence,
+        ]
+      properties:
+        candidateId: { type: string }
+        organizationId: { type: string }
+        predictedTrajectory: { type: number }
+        realisedVelocity: { type: number }
+        ownershipGrowth: { type: number }
+        roleEvolution: { type: string }
+        organizationalImpact: { type: number }
+        matchesPrediction: { type: boolean }
+        evidence: { type: array, items: { type: string } }
+    OrganizationalLearningSignal:
+      type: object
+      required:
+        [
+          organizationId,
+          successCorrelates,
+          failureCorrelates,
+          hiringBarShift,
+          founderStyleStability,
+          recommendedWeightAdjustments,
+          confidence,
+        ]
+      properties:
+        organizationId: { type: string }
+        successCorrelates:
+          type: array
+          items:
+            type: object
+            required: [attribute, weight, sampleSize, rationale]
+            properties:
+              attribute: { type: string }
+              weight: { type: number }
+              sampleSize: { type: integer }
+              rationale: { type: string }
+        failureCorrelates:
+          type: array
+          items:
+            type: object
+            required: [attribute, weight, sampleSize, rationale]
+            properties:
+              attribute: { type: string }
+              weight: { type: number }
+              sampleSize: { type: integer }
+              rationale: { type: string }
+        hiringBarShift: { type: number }
+        founderStyleStability: { type: number }
+        recommendedWeightAdjustments:
+          type: array
+          items:
+            type: object
+            required: [agent, adjustment, rationale]
+            properties:
+              agent: { type: string }
+              adjustment: { type: number }
+              rationale: { type: string }
+        confidence: { type: number }
+    BenchmarkResult:
+      type: object
+      required: [scenarioId, passed, assertionResults]
+      properties:
+        scenarioId: { type: string }
+        passed: { type: boolean }
+        assertionResults:
+          type: array
+          items:
+            type: object
+            required: [path, comparator, expected, actual, passed]
+            properties:
+              path: { type: string }
+              comparator:
+                type: string
+                enum: [lte, gte, eq, approx]
+              expected: { type: number }
+              actual: { type: number }
+              passed: { type: boolean }
+    EvaluationReport:
+      type: object
+      required:
+        [
+          generatedAt,
+          generatedBy,
+          predictionsEvaluated,
+          outcomesObserved,
+          systemCalibration,
+          perAgentCalibration,
+          perOrgCalibration,
+          perArchetypeCalibration,
+          reliability,
+          predictionEvaluation,
+          archetypePerformance,
+          organizationalLearning,
+          drift,
+          trajectory,
+          benchmarks,
+          longitudinalInsights,
+          recommendations,
+        ]
+      properties:
+        generatedAt: { type: string, format: date-time }
+        generatedBy: { type: string }
+        predictionsEvaluated: { type: integer }
+        outcomesObserved: { type: integer }
+        systemCalibration: { $ref: "#/components/schemas/CalibrationCurve" }
+        perAgentCalibration:
+          type: array
+          items: { $ref: "#/components/schemas/CalibrationCurve" }
+        perOrgCalibration:
+          type: array
+          items: { $ref: "#/components/schemas/CalibrationCurve" }
+        perArchetypeCalibration:
+          type: array
+          items: { $ref: "#/components/schemas/CalibrationCurve" }
+        reliability: { $ref: "#/components/schemas/ConfidenceReliabilityReport" }
+        predictionEvaluation: { $ref: "#/components/schemas/PredictionEvaluationReport" }
+        archetypePerformance:
+          type: array
+          items: { $ref: "#/components/schemas/ArchetypePerformance" }
+        organizationalLearning:
+          type: array
+          items: { $ref: "#/components/schemas/OrganizationalLearningSignal" }
+        drift: { $ref: "#/components/schemas/DriftReport" }
+        trajectory:
+          type: array
+          items: { $ref: "#/components/schemas/TrajectoryObservation" }
+        benchmarks:
+          type: array
+          items: { $ref: "#/components/schemas/BenchmarkResult" }
+        longitudinalInsights: { type: array, items: { type: string } }
+        recommendations: { type: array, items: { type: string } }
