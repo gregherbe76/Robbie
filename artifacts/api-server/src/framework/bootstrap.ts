@@ -49,6 +49,8 @@ import type {
   PredictionRecord,
 } from "@workspace/framework/evaluation";
 import { buildEvaluationContext } from "./evaluation";
+import { buildOperationsContext } from "./operations";
+import type { OperationsReport } from "@workspace/framework/intelligence-operations";
 
 const startedAt = Date.now();
 
@@ -75,6 +77,7 @@ const orgReports = new Map<string, OrganizationIntelligenceReport>();
 let evaluationReport: EvaluationReport | null = null;
 let evaluationOutcomes: OutcomeEvent[] = [];
 let evaluationPredictions: PredictionRecord[] = [];
+let operationsReport: OperationsReport | null = null;
 function orgKey(orgId: string, candidateId: string): string {
   return `${orgId}::${candidateId}`;
 }
@@ -596,6 +599,46 @@ async function seedAnalyses(registry: FrameworkRegistry): Promise<void> {
     tags: ["evaluation", "calibration", "longitudinal"],
   });
 
+  // ============================================================
+  // Intelligence Operations Layer
+  // ============================================================
+  const opsCtx = buildOperationsContext({
+    analyses: Array.from(analyses.values()),
+    cognitions,
+    orgFits,
+    orgReports,
+    organizationId: SAMPLE_ORG.id,
+    generatedAt: now,
+    evaluationReport,
+  });
+  operationsReport = opsCtx.report;
+  await registry.memory.put({
+    id: `mem:ops:report`,
+    scope: "organization",
+    subjectId: SAMPLE_ORG.id,
+    key: "operations.report",
+    value: {
+      totalCases: opsCtx.report.metrics.totalCases,
+      openInvestigations: opsCtx.report.metrics.openInvestigations,
+      pendingEvidenceRequests: opsCtx.report.metrics.pendingEvidenceRequests,
+      activeEscalations: opsCtx.report.metrics.activeEscalations,
+      unresolvedHypotheses: opsCtx.report.metrics.unresolvedHypotheses,
+      averageEffectiveConfidence:
+        opsCtx.report.metrics.averageEffectiveConfidence,
+    },
+    summary: `${opsCtx.report.metrics.totalCases} cases · ${opsCtx.report.metrics.openInvestigations} open investigations · ${opsCtx.report.metrics.activeEscalations} active escalations · avg effective confidence ${opsCtx.report.metrics.averageEffectiveConfidence.toFixed(2)}.`,
+    confidence: opsCtx.report.metrics.averageEffectiveConfidence,
+    provenance: {
+      producedBy: "intelligence-operations-engine",
+      producedAt: now,
+      rationale:
+        "Operationalized uncertainty: investigations, evidence requests, hypotheses, adversarial review, escalations, and reviewer consensus over all cases.",
+      derivedFrom: opsCtx.report.cases.map((c) => c.id),
+    },
+    createdAt: now,
+    tags: ["operations", "uncertainty", "audit"],
+  });
+
   for (const f of archetypeFreq) {
     await registry.memory.put({
       id: `mem:org:archetype:${f.archetypeId}`,
@@ -697,6 +740,10 @@ export function getEvaluationOutcomes(): OutcomeEvent[] {
 
 export function getEvaluationPredictions(): PredictionRecord[] {
   return evaluationPredictions;
+}
+
+export function getOperationsReport(): OperationsReport | null {
+  return operationsReport;
 }
 
 export function getUptimeSeconds(): number {

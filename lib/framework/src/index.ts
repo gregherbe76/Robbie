@@ -3,6 +3,7 @@ export * as flagship from "./agents/flagship/index.js";
 export * as cognition from "./cognition/index.js";
 export * as organizationIntelligence from "./organization_intelligence/index.js";
 export * as evaluation from "./evaluation/index.js";
+export * as intelligenceOperations from "./intelligence_operations/index.js";
 export * as skills from "./skills/index.js";
 export * as memory from "./memory/index.js";
 export * as orchestrator from "./orchestrator/index.js";

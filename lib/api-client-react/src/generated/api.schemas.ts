@@ -926,3 +926,440 @@ export interface EvaluationReport {
   recommendations: string[];
 }
 
+export type InvestigationTriggerKind = typeof InvestigationTriggerKind[keyof typeof InvestigationTriggerKind];
+
+
+export const InvestigationTriggerKind = {
+  'high-disagreement': 'high-disagreement',
+  'low-confidence': 'low-confidence',
+  'unresolved-ambiguity': 'unresolved-ambiguity',
+  'contradiction-severity': 'contradiction-severity',
+  'weak-evidence-density': 'weak-evidence-density',
+  'high-upside-high-risk': 'high-upside-high-risk',
+} as const;
+
+export interface InvestigationTrigger {
+  kind: InvestigationTriggerKind;
+  detail: string;
+  metric: number;
+  threshold: number;
+}
+
+export type InvestigationState = typeof InvestigationState[keyof typeof InvestigationState];
+
+
+export const InvestigationState = {
+  open: 'open',
+  evidence_requested: 'evidence_requested',
+  under_review: 'under_review',
+  escalated: 'escalated',
+  resolved: 'resolved',
+  unresolved: 'unresolved',
+  archived: 'archived',
+} as const;
+
+export type InvestigationConfidenceState = {
+  initial: number;
+  current: number;
+  delta: number;
+};
+
+export interface Investigation {
+  id: string;
+  caseId: string;
+  candidateId: string;
+  organizationId: string;
+  title: string;
+  rationale: string;
+  state: InvestigationState;
+  createdAt: string;
+  triggers: InvestigationTrigger[];
+  originatingAgents: string[];
+  evidenceGaps: string[];
+  unresolvedQuestions: string[];
+  confidenceState: InvestigationConfidenceState;
+  recommendedNextActions: string[];
+}
+
+export type AdversarialArgumentSide = typeof AdversarialArgumentSide[keyof typeof AdversarialArgumentSide];
+
+
+export const AdversarialArgumentSide = {
+  supporting: 'supporting',
+  refuting: 'refuting',
+} as const;
+
+export interface AdversarialArgument {
+  id: string;
+  side: AdversarialArgumentSide;
+  claim: string;
+  sourceAgent: string;
+  evidence: string[];
+  weight: number;
+}
+
+export interface ChallengeRebuttalChain {
+  id: string;
+  challenge: AdversarialArgument;
+  rebuttal: AdversarialArgument | null;
+  unresolved: boolean;
+  confidenceImpact: number;
+}
+
+export interface AdversarialReview {
+  id: string;
+  caseId: string;
+  topic: string;
+  arguments: AdversarialArgument[];
+  chains: ChallengeRebuttalChain[];
+  unresolvedTensions: string[];
+  netConfidenceImpact: number;
+}
+
+export type EvidenceRequestPriority = typeof EvidenceRequestPriority[keyof typeof EvidenceRequestPriority];
+
+
+export const EvidenceRequestPriority = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  critical: 'critical',
+} as const;
+
+export type EvidenceRequestRecommendedValidationMethod = typeof EvidenceRequestRecommendedValidationMethod[keyof typeof EvidenceRequestRecommendedValidationMethod];
+
+
+export const EvidenceRequestRecommendedValidationMethod = {
+  'interview-question': 'interview-question',
+  'reference-check': 'reference-check',
+  'practical-validation': 'practical-validation',
+  'code-sample': 'code-sample',
+  'context-deep-dive': 'context-deep-dive',
+} as const;
+
+export type EvidenceRequestState = typeof EvidenceRequestState[keyof typeof EvidenceRequestState];
+
+
+export const EvidenceRequestState = {
+  open: 'open',
+  in_progress: 'in_progress',
+  satisfied: 'satisfied',
+  abandoned: 'abandoned',
+} as const;
+
+export interface EvidenceRequest {
+  id: string;
+  caseId: string;
+  candidateId: string;
+  organizationId: string;
+  requestedEvidence: string;
+  rationale: string;
+  confidenceImpact: number;
+  priority: EvidenceRequestPriority;
+  recommendedValidationMethod: EvidenceRequestRecommendedValidationMethod;
+  recommendedQuestions: string[];
+  state: EvidenceRequestState;
+  originatingAgents: string[];
+}
+
+export type HypothesisUpdateKind = typeof HypothesisUpdateKind[keyof typeof HypothesisUpdateKind];
+
+
+export const HypothesisUpdateKind = {
+  'supporting-evidence': 'supporting-evidence',
+  'refuting-evidence': 'refuting-evidence',
+  'confidence-shift': 'confidence-shift',
+  'status-change': 'status-change',
+} as const;
+
+export interface HypothesisUpdate {
+  id: string;
+  at: string;
+  kind: HypothesisUpdateKind;
+  detail: string;
+  confidenceAfter: number;
+  sourceAgent: string;
+}
+
+export type HypothesisStatus = typeof HypothesisStatus[keyof typeof HypothesisStatus];
+
+
+export const HypothesisStatus = {
+  open: 'open',
+  supported: 'supported',
+  refuted: 'refuted',
+  competing: 'competing',
+  unresolved: 'unresolved',
+  abandoned: 'abandoned',
+} as const;
+
+export interface Hypothesis {
+  id: string;
+  caseId: string;
+  candidateId: string;
+  organizationId: string;
+  statement: string;
+  status: HypothesisStatus;
+  uncertaintyLevel: number;
+  confidence: number;
+  supportingEvidence: string[];
+  refutingEvidence: string[];
+  competingWith: string[];
+  history: HypothesisUpdate[];
+}
+
+export type DecisionState = typeof DecisionState[keyof typeof DecisionState];
+
+
+export const DecisionState = {
+  initial_assessment: 'initial_assessment',
+  investigation_required: 'investigation_required',
+  adversarial_review: 'adversarial_review',
+  human_review: 'human_review',
+  evidence_pending: 'evidence_pending',
+  calibration_warning: 'calibration_warning',
+  decision_ready: 'decision_ready',
+  unresolved: 'unresolved',
+} as const;
+
+export interface DecisionWorkflowTransition {
+  id: string;
+  at: string;
+  from: DecisionState;
+  to: DecisionState;
+  reviewer: string;
+  rationale: string;
+  confidenceBefore: number;
+  confidenceAfter: number;
+}
+
+export type DecisionReviewWorkflowStatePrematureCertaintyGuard = {
+  triggered: boolean;
+  reason: string;
+};
+
+export interface DecisionReviewWorkflowState {
+  caseId: string;
+  state: DecisionState;
+  stateRationale: string;
+  blockingFactors: string[];
+  uncertaintyPreserved: boolean;
+  transitions: DecisionWorkflowTransition[];
+  prematureCertaintyGuard: DecisionReviewWorkflowStatePrematureCertaintyGuard;
+}
+
+export type EscalationSeverity = typeof EscalationSeverity[keyof typeof EscalationSeverity];
+
+
+export const EscalationSeverity = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  critical: 'critical',
+} as const;
+
+export type EscalationRecommendedReviewType = typeof EscalationRecommendedReviewType[keyof typeof EscalationRecommendedReviewType];
+
+
+export const EscalationRecommendedReviewType = {
+  'senior-reviewer': 'senior-reviewer',
+  'founder-review': 'founder-review',
+  'technical-deep-dive': 'technical-deep-dive',
+  'reference-validation': 'reference-validation',
+  'adversarial-panel': 'adversarial-panel',
+  'extended-investigation': 'extended-investigation',
+} as const;
+
+export interface Escalation {
+  id: string;
+  caseId: string;
+  candidateId: string;
+  organizationId: string;
+  escalationReason: string;
+  severity: EscalationSeverity;
+  recommendedReviewType: EscalationRecommendedReviewType;
+  unresolvedRisks: string[];
+  blockingQuestions: string[];
+  triggeringSignals: string[];
+  createdAt: string;
+}
+
+export type HumanAnnotationKind = typeof HumanAnnotationKind[keyof typeof HumanAnnotationKind];
+
+
+export const HumanAnnotationKind = {
+  'review-note': 'review-note',
+  disagreement: 'disagreement',
+  'rationale-override': 'rationale-override',
+  'uncertainty-acknowledgement': 'uncertainty-acknowledgement',
+  'evidence-weighting-adjustment': 'evidence-weighting-adjustment',
+  'explicit-override': 'explicit-override',
+} as const;
+
+export interface HumanAnnotation {
+  id: string;
+  caseId: string;
+  reviewer: string;
+  kind: HumanAnnotationKind;
+  rationale: string;
+  at: string;
+  confidenceImpact: number;
+  targetAgent?: string;
+  targetField?: string;
+  beforeValue?: number;
+  afterValue?: number;
+  evidence: string[];
+}
+
+export type ReviewerKind = typeof ReviewerKind[keyof typeof ReviewerKind];
+
+
+export const ReviewerKind = {
+  agent: 'agent',
+  human: 'human',
+  panel: 'panel',
+} as const;
+
+export type ReviewerRecommendation = typeof ReviewerRecommendation[keyof typeof ReviewerRecommendation];
+
+
+export const ReviewerRecommendation = {
+  advance: 'advance',
+  investigate: 'investigate',
+  decline: 'decline',
+  abstain: 'abstain',
+} as const;
+
+export interface Reviewer {
+  id: string;
+  kind: ReviewerKind;
+  name: string;
+  confidence: number;
+  recommendation: ReviewerRecommendation;
+  rationale: string;
+}
+
+export interface ReasoningCluster {
+  id: string;
+  label: string;
+  reviewers: string[];
+  sharedClaim: string;
+  weight: number;
+}
+
+export type ConsensusReportReviewerConfidenceDistributionItemRecommendation = typeof ConsensusReportReviewerConfidenceDistributionItemRecommendation[keyof typeof ConsensusReportReviewerConfidenceDistributionItemRecommendation];
+
+
+export const ConsensusReportReviewerConfidenceDistributionItemRecommendation = {
+  advance: 'advance',
+  investigate: 'investigate',
+  decline: 'decline',
+  abstain: 'abstain',
+} as const;
+
+export type ConsensusReportReviewerConfidenceDistributionItem = {
+  reviewerId: string;
+  confidence: number;
+  recommendation: ConsensusReportReviewerConfidenceDistributionItemRecommendation;
+};
+
+export interface ConsensusReport {
+  caseId: string;
+  reviewers: Reviewer[];
+  consensusAreas: string[];
+  disagreementAreas: string[];
+  unresolvedQuestions: string[];
+  reviewerConfidenceDistribution: ConsensusReportReviewerConfidenceDistributionItem[];
+  reasoningClusters: ReasoningCluster[];
+  finalDecisionState: DecisionState;
+}
+
+export type AuditEventKind = typeof AuditEventKind[keyof typeof AuditEventKind];
+
+
+export const AuditEventKind = {
+  'case-opened': 'case-opened',
+  'investigation-opened': 'investigation-opened',
+  'investigation-state-changed': 'investigation-state-changed',
+  'evidence-requested': 'evidence-requested',
+  'hypothesis-added': 'hypothesis-added',
+  'hypothesis-updated': 'hypothesis-updated',
+  'adversarial-review-added': 'adversarial-review-added',
+  'escalation-raised': 'escalation-raised',
+  'human-annotation': 'human-annotation',
+  'decision-state-changed': 'decision-state-changed',
+  'calibration-warning': 'calibration-warning',
+  'longitudinal-update': 'longitudinal-update',
+} as const;
+
+export interface AuditEvent {
+  id: string;
+  caseId: string;
+  at: string;
+  actor: string;
+  kind: AuditEventKind;
+  summary: string;
+  confidenceBefore?: number;
+  confidenceAfter?: number;
+  relatedRefIds: string[];
+}
+
+export interface IntelligenceCase {
+  id: string;
+  candidateId: string;
+  candidateName: string;
+  organizationId: string;
+  targetRole: string;
+  createdAt: string;
+  decisionState: DecisionState;
+  decisionStateRationale: string;
+  workflow: DecisionReviewWorkflowState;
+  investigations: Investigation[];
+  evidenceRequests: EvidenceRequest[];
+  hypotheses: Hypothesis[];
+  adversarialReviews: AdversarialReview[];
+  escalations: Escalation[];
+  humanAnnotations: HumanAnnotation[];
+  consensus: ConsensusReport;
+  calibrationWarnings: string[];
+  longitudinalUpdates: string[];
+  unresolvedQuestionCount: number;
+  openEvidenceRequestCount: number;
+  openInvestigationCount: number;
+  competingHypothesisCount: number;
+  escalationSeverityMax: 'low' | 'medium' | 'high' | 'critical' | null;
+  effectiveConfidence: number;
+}
+
+export type OperationsMetricsCasesByDecisionState = {
+  initial_assessment: number;
+  investigation_required: number;
+  adversarial_review: number;
+  human_review: number;
+  evidence_pending: number;
+  calibration_warning: number;
+  decision_ready: number;
+  unresolved: number;
+};
+
+export interface OperationsMetrics {
+  totalCases: number;
+  casesByDecisionState: OperationsMetricsCasesByDecisionState;
+  openInvestigations: number;
+  pendingEvidenceRequests: number;
+  activeEscalations: number;
+  unresolvedHypotheses: number;
+  competingHypothesisPairs: number;
+  averageEffectiveConfidence: number;
+  humanInterventions: number;
+  prematureCertaintyGuardsTriggered: number;
+}
+
+export interface OperationsReport {
+  generatedAt: string;
+  generatedBy: string;
+  cases: IntelligenceCase[];
+  audit: AuditEvent[];
+  metrics: OperationsMetrics;
+}
+

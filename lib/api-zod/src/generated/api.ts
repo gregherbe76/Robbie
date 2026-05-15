@@ -1093,3 +1093,445 @@ export const ListEvaluationPredictionsResponseItem = zod.object({
 export const ListEvaluationPredictionsResponse = zod.array(ListEvaluationPredictionsResponseItem)
 
 
+/**
+ * @summary Full intelligence-operations report (cases, audit, metrics)
+ */
+export const GetOperationsReportResponse = zod.object({
+  "generatedAt": zod.coerce.date(),
+  "generatedBy": zod.string(),
+  "cases": zod.array(zod.object({
+  "id": zod.string(),
+  "candidateId": zod.string(),
+  "candidateName": zod.string(),
+  "organizationId": zod.string(),
+  "targetRole": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "decisionState": zod.enum(['initial_assessment', 'investigation_required', 'adversarial_review', 'human_review', 'evidence_pending', 'calibration_warning', 'decision_ready', 'unresolved']),
+  "decisionStateRationale": zod.string(),
+  "workflow": zod.object({
+  "caseId": zod.string(),
+  "state": zod.enum(['initial_assessment', 'investigation_required', 'adversarial_review', 'human_review', 'evidence_pending', 'calibration_warning', 'decision_ready', 'unresolved']),
+  "stateRationale": zod.string(),
+  "blockingFactors": zod.array(zod.string()),
+  "uncertaintyPreserved": zod.boolean(),
+  "transitions": zod.array(zod.object({
+  "id": zod.string(),
+  "at": zod.coerce.date(),
+  "from": zod.enum(['initial_assessment', 'investigation_required', 'adversarial_review', 'human_review', 'evidence_pending', 'calibration_warning', 'decision_ready', 'unresolved']),
+  "to": zod.enum(['initial_assessment', 'investigation_required', 'adversarial_review', 'human_review', 'evidence_pending', 'calibration_warning', 'decision_ready', 'unresolved']),
+  "reviewer": zod.string(),
+  "rationale": zod.string(),
+  "confidenceBefore": zod.number(),
+  "confidenceAfter": zod.number()
+})),
+  "prematureCertaintyGuard": zod.object({
+  "triggered": zod.boolean(),
+  "reason": zod.string()
+})
+}),
+  "investigations": zod.array(zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "candidateId": zod.string(),
+  "organizationId": zod.string(),
+  "title": zod.string(),
+  "rationale": zod.string(),
+  "state": zod.enum(['open', 'evidence_requested', 'under_review', 'escalated', 'resolved', 'unresolved', 'archived']),
+  "createdAt": zod.coerce.date(),
+  "triggers": zod.array(zod.object({
+  "kind": zod.enum(['high-disagreement', 'low-confidence', 'unresolved-ambiguity', 'contradiction-severity', 'weak-evidence-density', 'high-upside-high-risk']),
+  "detail": zod.string(),
+  "metric": zod.number(),
+  "threshold": zod.number()
+})),
+  "originatingAgents": zod.array(zod.string()),
+  "evidenceGaps": zod.array(zod.string()),
+  "unresolvedQuestions": zod.array(zod.string()),
+  "confidenceState": zod.object({
+  "initial": zod.number(),
+  "current": zod.number(),
+  "delta": zod.number()
+}),
+  "recommendedNextActions": zod.array(zod.string())
+})),
+  "evidenceRequests": zod.array(zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "candidateId": zod.string(),
+  "organizationId": zod.string(),
+  "requestedEvidence": zod.string(),
+  "rationale": zod.string(),
+  "confidenceImpact": zod.number(),
+  "priority": zod.enum(['low', 'medium', 'high', 'critical']),
+  "recommendedValidationMethod": zod.enum(['interview-question', 'reference-check', 'practical-validation', 'code-sample', 'context-deep-dive']),
+  "recommendedQuestions": zod.array(zod.string()),
+  "state": zod.enum(['open', 'in_progress', 'satisfied', 'abandoned']),
+  "originatingAgents": zod.array(zod.string())
+})),
+  "hypotheses": zod.array(zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "candidateId": zod.string(),
+  "organizationId": zod.string(),
+  "statement": zod.string(),
+  "status": zod.enum(['open', 'supported', 'refuted', 'competing', 'unresolved', 'abandoned']),
+  "uncertaintyLevel": zod.number(),
+  "confidence": zod.number(),
+  "supportingEvidence": zod.array(zod.string()),
+  "refutingEvidence": zod.array(zod.string()),
+  "competingWith": zod.array(zod.string()),
+  "history": zod.array(zod.object({
+  "id": zod.string(),
+  "at": zod.coerce.date(),
+  "kind": zod.enum(['supporting-evidence', 'refuting-evidence', 'confidence-shift', 'status-change']),
+  "detail": zod.string(),
+  "confidenceAfter": zod.number(),
+  "sourceAgent": zod.string()
+}))
+})),
+  "adversarialReviews": zod.array(zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "topic": zod.string(),
+  "arguments": zod.array(zod.object({
+  "id": zod.string(),
+  "side": zod.enum(['supporting', 'refuting']),
+  "claim": zod.string(),
+  "sourceAgent": zod.string(),
+  "evidence": zod.array(zod.string()),
+  "weight": zod.number()
+})),
+  "chains": zod.array(zod.object({
+  "id": zod.string(),
+  "challenge": zod.object({
+  "id": zod.string(),
+  "side": zod.enum(['supporting', 'refuting']),
+  "claim": zod.string(),
+  "sourceAgent": zod.string(),
+  "evidence": zod.array(zod.string()),
+  "weight": zod.number()
+}),
+  "rebuttal": zod.union([zod.object({
+  "id": zod.string(),
+  "side": zod.enum(['supporting', 'refuting']),
+  "claim": zod.string(),
+  "sourceAgent": zod.string(),
+  "evidence": zod.array(zod.string()),
+  "weight": zod.number()
+}),zod.null()]),
+  "unresolved": zod.boolean(),
+  "confidenceImpact": zod.number()
+})),
+  "unresolvedTensions": zod.array(zod.string()),
+  "netConfidenceImpact": zod.number()
+})),
+  "escalations": zod.array(zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "candidateId": zod.string(),
+  "organizationId": zod.string(),
+  "escalationReason": zod.string(),
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "recommendedReviewType": zod.enum(['senior-reviewer', 'founder-review', 'technical-deep-dive', 'reference-validation', 'adversarial-panel', 'extended-investigation']),
+  "unresolvedRisks": zod.array(zod.string()),
+  "blockingQuestions": zod.array(zod.string()),
+  "triggeringSignals": zod.array(zod.string()),
+  "createdAt": zod.coerce.date()
+})),
+  "humanAnnotations": zod.array(zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "reviewer": zod.string(),
+  "kind": zod.enum(['review-note', 'disagreement', 'rationale-override', 'uncertainty-acknowledgement', 'evidence-weighting-adjustment', 'explicit-override']),
+  "rationale": zod.string(),
+  "at": zod.coerce.date(),
+  "confidenceImpact": zod.number(),
+  "targetAgent": zod.string().optional(),
+  "targetField": zod.string().optional(),
+  "beforeValue": zod.number().optional(),
+  "afterValue": zod.number().optional(),
+  "evidence": zod.array(zod.string())
+})),
+  "consensus": zod.object({
+  "caseId": zod.string(),
+  "reviewers": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['agent', 'human', 'panel']),
+  "name": zod.string(),
+  "confidence": zod.number(),
+  "recommendation": zod.enum(['advance', 'investigate', 'decline', 'abstain']),
+  "rationale": zod.string()
+})),
+  "consensusAreas": zod.array(zod.string()),
+  "disagreementAreas": zod.array(zod.string()),
+  "unresolvedQuestions": zod.array(zod.string()),
+  "reviewerConfidenceDistribution": zod.array(zod.object({
+  "reviewerId": zod.string(),
+  "confidence": zod.number(),
+  "recommendation": zod.enum(['advance', 'investigate', 'decline', 'abstain'])
+})),
+  "reasoningClusters": zod.array(zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "reviewers": zod.array(zod.string()),
+  "sharedClaim": zod.string(),
+  "weight": zod.number()
+})),
+  "finalDecisionState": zod.enum(['initial_assessment', 'investigation_required', 'adversarial_review', 'human_review', 'evidence_pending', 'calibration_warning', 'decision_ready', 'unresolved'])
+}),
+  "calibrationWarnings": zod.array(zod.string()),
+  "longitudinalUpdates": zod.array(zod.string()),
+  "unresolvedQuestionCount": zod.number(),
+  "openEvidenceRequestCount": zod.number(),
+  "openInvestigationCount": zod.number(),
+  "competingHypothesisCount": zod.number(),
+  "escalationSeverityMax": zod.union([zod.enum(['low', 'medium', 'high', 'critical']),zod.null()]),
+  "effectiveConfidence": zod.number()
+})),
+  "audit": zod.array(zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "at": zod.coerce.date(),
+  "actor": zod.string(),
+  "kind": zod.enum(['case-opened', 'investigation-opened', 'investigation-state-changed', 'evidence-requested', 'hypothesis-added', 'hypothesis-updated', 'adversarial-review-added', 'escalation-raised', 'human-annotation', 'decision-state-changed', 'calibration-warning', 'longitudinal-update']),
+  "summary": zod.string(),
+  "confidenceBefore": zod.number().optional(),
+  "confidenceAfter": zod.number().optional(),
+  "relatedRefIds": zod.array(zod.string())
+})),
+  "metrics": zod.object({
+  "totalCases": zod.number(),
+  "casesByDecisionState": zod.object({
+  "initial_assessment": zod.number(),
+  "investigation_required": zod.number(),
+  "adversarial_review": zod.number(),
+  "human_review": zod.number(),
+  "evidence_pending": zod.number(),
+  "calibration_warning": zod.number(),
+  "decision_ready": zod.number(),
+  "unresolved": zod.number()
+}),
+  "openInvestigations": zod.number(),
+  "pendingEvidenceRequests": zod.number(),
+  "activeEscalations": zod.number(),
+  "unresolvedHypotheses": zod.number(),
+  "competingHypothesisPairs": zod.number(),
+  "averageEffectiveConfidence": zod.number(),
+  "humanInterventions": zod.number(),
+  "prematureCertaintyGuardsTriggered": zod.number()
+})
+})
+
+
+/**
+ * @summary List persistent intelligence cases
+ */
+export const ListIntelligenceCasesResponseItem = zod.object({
+  "id": zod.string(),
+  "candidateId": zod.string(),
+  "candidateName": zod.string(),
+  "organizationId": zod.string(),
+  "targetRole": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "decisionState": zod.enum(['initial_assessment', 'investigation_required', 'adversarial_review', 'human_review', 'evidence_pending', 'calibration_warning', 'decision_ready', 'unresolved']),
+  "decisionStateRationale": zod.string(),
+  "workflow": zod.object({
+  "caseId": zod.string(),
+  "state": zod.enum(['initial_assessment', 'investigation_required', 'adversarial_review', 'human_review', 'evidence_pending', 'calibration_warning', 'decision_ready', 'unresolved']),
+  "stateRationale": zod.string(),
+  "blockingFactors": zod.array(zod.string()),
+  "uncertaintyPreserved": zod.boolean(),
+  "transitions": zod.array(zod.object({
+  "id": zod.string(),
+  "at": zod.coerce.date(),
+  "from": zod.enum(['initial_assessment', 'investigation_required', 'adversarial_review', 'human_review', 'evidence_pending', 'calibration_warning', 'decision_ready', 'unresolved']),
+  "to": zod.enum(['initial_assessment', 'investigation_required', 'adversarial_review', 'human_review', 'evidence_pending', 'calibration_warning', 'decision_ready', 'unresolved']),
+  "reviewer": zod.string(),
+  "rationale": zod.string(),
+  "confidenceBefore": zod.number(),
+  "confidenceAfter": zod.number()
+})),
+  "prematureCertaintyGuard": zod.object({
+  "triggered": zod.boolean(),
+  "reason": zod.string()
+})
+}),
+  "investigations": zod.array(zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "candidateId": zod.string(),
+  "organizationId": zod.string(),
+  "title": zod.string(),
+  "rationale": zod.string(),
+  "state": zod.enum(['open', 'evidence_requested', 'under_review', 'escalated', 'resolved', 'unresolved', 'archived']),
+  "createdAt": zod.coerce.date(),
+  "triggers": zod.array(zod.object({
+  "kind": zod.enum(['high-disagreement', 'low-confidence', 'unresolved-ambiguity', 'contradiction-severity', 'weak-evidence-density', 'high-upside-high-risk']),
+  "detail": zod.string(),
+  "metric": zod.number(),
+  "threshold": zod.number()
+})),
+  "originatingAgents": zod.array(zod.string()),
+  "evidenceGaps": zod.array(zod.string()),
+  "unresolvedQuestions": zod.array(zod.string()),
+  "confidenceState": zod.object({
+  "initial": zod.number(),
+  "current": zod.number(),
+  "delta": zod.number()
+}),
+  "recommendedNextActions": zod.array(zod.string())
+})),
+  "evidenceRequests": zod.array(zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "candidateId": zod.string(),
+  "organizationId": zod.string(),
+  "requestedEvidence": zod.string(),
+  "rationale": zod.string(),
+  "confidenceImpact": zod.number(),
+  "priority": zod.enum(['low', 'medium', 'high', 'critical']),
+  "recommendedValidationMethod": zod.enum(['interview-question', 'reference-check', 'practical-validation', 'code-sample', 'context-deep-dive']),
+  "recommendedQuestions": zod.array(zod.string()),
+  "state": zod.enum(['open', 'in_progress', 'satisfied', 'abandoned']),
+  "originatingAgents": zod.array(zod.string())
+})),
+  "hypotheses": zod.array(zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "candidateId": zod.string(),
+  "organizationId": zod.string(),
+  "statement": zod.string(),
+  "status": zod.enum(['open', 'supported', 'refuted', 'competing', 'unresolved', 'abandoned']),
+  "uncertaintyLevel": zod.number(),
+  "confidence": zod.number(),
+  "supportingEvidence": zod.array(zod.string()),
+  "refutingEvidence": zod.array(zod.string()),
+  "competingWith": zod.array(zod.string()),
+  "history": zod.array(zod.object({
+  "id": zod.string(),
+  "at": zod.coerce.date(),
+  "kind": zod.enum(['supporting-evidence', 'refuting-evidence', 'confidence-shift', 'status-change']),
+  "detail": zod.string(),
+  "confidenceAfter": zod.number(),
+  "sourceAgent": zod.string()
+}))
+})),
+  "adversarialReviews": zod.array(zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "topic": zod.string(),
+  "arguments": zod.array(zod.object({
+  "id": zod.string(),
+  "side": zod.enum(['supporting', 'refuting']),
+  "claim": zod.string(),
+  "sourceAgent": zod.string(),
+  "evidence": zod.array(zod.string()),
+  "weight": zod.number()
+})),
+  "chains": zod.array(zod.object({
+  "id": zod.string(),
+  "challenge": zod.object({
+  "id": zod.string(),
+  "side": zod.enum(['supporting', 'refuting']),
+  "claim": zod.string(),
+  "sourceAgent": zod.string(),
+  "evidence": zod.array(zod.string()),
+  "weight": zod.number()
+}),
+  "rebuttal": zod.union([zod.object({
+  "id": zod.string(),
+  "side": zod.enum(['supporting', 'refuting']),
+  "claim": zod.string(),
+  "sourceAgent": zod.string(),
+  "evidence": zod.array(zod.string()),
+  "weight": zod.number()
+}),zod.null()]),
+  "unresolved": zod.boolean(),
+  "confidenceImpact": zod.number()
+})),
+  "unresolvedTensions": zod.array(zod.string()),
+  "netConfidenceImpact": zod.number()
+})),
+  "escalations": zod.array(zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "candidateId": zod.string(),
+  "organizationId": zod.string(),
+  "escalationReason": zod.string(),
+  "severity": zod.enum(['low', 'medium', 'high', 'critical']),
+  "recommendedReviewType": zod.enum(['senior-reviewer', 'founder-review', 'technical-deep-dive', 'reference-validation', 'adversarial-panel', 'extended-investigation']),
+  "unresolvedRisks": zod.array(zod.string()),
+  "blockingQuestions": zod.array(zod.string()),
+  "triggeringSignals": zod.array(zod.string()),
+  "createdAt": zod.coerce.date()
+})),
+  "humanAnnotations": zod.array(zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "reviewer": zod.string(),
+  "kind": zod.enum(['review-note', 'disagreement', 'rationale-override', 'uncertainty-acknowledgement', 'evidence-weighting-adjustment', 'explicit-override']),
+  "rationale": zod.string(),
+  "at": zod.coerce.date(),
+  "confidenceImpact": zod.number(),
+  "targetAgent": zod.string().optional(),
+  "targetField": zod.string().optional(),
+  "beforeValue": zod.number().optional(),
+  "afterValue": zod.number().optional(),
+  "evidence": zod.array(zod.string())
+})),
+  "consensus": zod.object({
+  "caseId": zod.string(),
+  "reviewers": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['agent', 'human', 'panel']),
+  "name": zod.string(),
+  "confidence": zod.number(),
+  "recommendation": zod.enum(['advance', 'investigate', 'decline', 'abstain']),
+  "rationale": zod.string()
+})),
+  "consensusAreas": zod.array(zod.string()),
+  "disagreementAreas": zod.array(zod.string()),
+  "unresolvedQuestions": zod.array(zod.string()),
+  "reviewerConfidenceDistribution": zod.array(zod.object({
+  "reviewerId": zod.string(),
+  "confidence": zod.number(),
+  "recommendation": zod.enum(['advance', 'investigate', 'decline', 'abstain'])
+})),
+  "reasoningClusters": zod.array(zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "reviewers": zod.array(zod.string()),
+  "sharedClaim": zod.string(),
+  "weight": zod.number()
+})),
+  "finalDecisionState": zod.enum(['initial_assessment', 'investigation_required', 'adversarial_review', 'human_review', 'evidence_pending', 'calibration_warning', 'decision_ready', 'unresolved'])
+}),
+  "calibrationWarnings": zod.array(zod.string()),
+  "longitudinalUpdates": zod.array(zod.string()),
+  "unresolvedQuestionCount": zod.number(),
+  "openEvidenceRequestCount": zod.number(),
+  "openInvestigationCount": zod.number(),
+  "competingHypothesisCount": zod.number(),
+  "escalationSeverityMax": zod.union([zod.enum(['low', 'medium', 'high', 'critical']),zod.null()]),
+  "effectiveConfidence": zod.number()
+})
+export const ListIntelligenceCasesResponse = zod.array(ListIntelligenceCasesResponseItem)
+
+
+/**
+ * @summary Append-only operations audit timeline
+ */
+export const ListOperationsAuditResponseItem = zod.object({
+  "id": zod.string(),
+  "caseId": zod.string(),
+  "at": zod.coerce.date(),
+  "actor": zod.string(),
+  "kind": zod.enum(['case-opened', 'investigation-opened', 'investigation-state-changed', 'evidence-requested', 'hypothesis-added', 'hypothesis-updated', 'adversarial-review-added', 'escalation-raised', 'human-annotation', 'decision-state-changed', 'calibration-warning', 'longitudinal-update']),
+  "summary": zod.string(),
+  "confidenceBefore": zod.number().optional(),
+  "confidenceAfter": zod.number().optional(),
+  "relatedRefIds": zod.array(zod.string())
+})
+export const ListOperationsAuditResponse = zod.array(ListOperationsAuditResponseItem)
+
+

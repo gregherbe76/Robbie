@@ -20,13 +20,16 @@ import type {
 
 import type {
   Agent,
+  AuditEvent,
   CandidateAnalysis,
   CandidateOrganizationFitResult,
   CognitiveSynthesis,
   EvaluationReport,
   GraphSnapshot,
   HealthStatus,
+  IntelligenceCase,
   MemoryEntry,
+  OperationsReport,
   OrganizationContext,
   OrganizationIntelligenceReport,
   OutcomeEvent,
@@ -1658,6 +1661,237 @@ export function useListEvaluationPredictions<TData = Awaited<ReturnType<typeof l
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getListEvaluationPredictionsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetOperationsReportUrl = () => {
+
+
+
+
+  return `/api/operations/report`
+}
+
+/**
+ * @summary Full intelligence-operations report (cases, audit, metrics)
+ */
+export const getOperationsReport = async ( options?: RequestInit): Promise<OperationsReport> => {
+
+  return customFetch<OperationsReport>(getGetOperationsReportUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetOperationsReportQueryKey = () => {
+    return [
+    `/api/operations/report`
+    ] as const;
+    }
+
+
+export const getGetOperationsReportQueryOptions = <TData = Awaited<ReturnType<typeof getOperationsReport>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOperationsReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOperationsReportQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOperationsReport>>> = ({ signal }) => getOperationsReport({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOperationsReport>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetOperationsReportQueryResult = NonNullable<Awaited<ReturnType<typeof getOperationsReport>>>
+export type GetOperationsReportQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Full intelligence-operations report (cases, audit, metrics)
+ */
+
+export function useGetOperationsReport<TData = Awaited<ReturnType<typeof getOperationsReport>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOperationsReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetOperationsReportQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListIntelligenceCasesUrl = () => {
+
+
+
+
+  return `/api/operations/cases`
+}
+
+/**
+ * @summary List persistent intelligence cases
+ */
+export const listIntelligenceCases = async ( options?: RequestInit): Promise<IntelligenceCase[]> => {
+
+  return customFetch<IntelligenceCase[]>(getListIntelligenceCasesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListIntelligenceCasesQueryKey = () => {
+    return [
+    `/api/operations/cases`
+    ] as const;
+    }
+
+
+export const getListIntelligenceCasesQueryOptions = <TData = Awaited<ReturnType<typeof listIntelligenceCases>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listIntelligenceCases>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListIntelligenceCasesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listIntelligenceCases>>> = ({ signal }) => listIntelligenceCases({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listIntelligenceCases>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListIntelligenceCasesQueryResult = NonNullable<Awaited<ReturnType<typeof listIntelligenceCases>>>
+export type ListIntelligenceCasesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List persistent intelligence cases
+ */
+
+export function useListIntelligenceCases<TData = Awaited<ReturnType<typeof listIntelligenceCases>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listIntelligenceCases>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListIntelligenceCasesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListOperationsAuditUrl = () => {
+
+
+
+
+  return `/api/operations/audit`
+}
+
+/**
+ * @summary Append-only operations audit timeline
+ */
+export const listOperationsAudit = async ( options?: RequestInit): Promise<AuditEvent[]> => {
+
+  return customFetch<AuditEvent[]>(getListOperationsAuditUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListOperationsAuditQueryKey = () => {
+    return [
+    `/api/operations/audit`
+    ] as const;
+    }
+
+
+export const getListOperationsAuditQueryOptions = <TData = Awaited<ReturnType<typeof listOperationsAudit>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listOperationsAudit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListOperationsAuditQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listOperationsAudit>>> = ({ signal }) => listOperationsAudit({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listOperationsAudit>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListOperationsAuditQueryResult = NonNullable<Awaited<ReturnType<typeof listOperationsAudit>>>
+export type ListOperationsAuditQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Append-only operations audit timeline
+ */
+
+export function useListOperationsAudit<TData = Awaited<ReturnType<typeof listOperationsAudit>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listOperationsAudit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListOperationsAuditQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

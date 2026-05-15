@@ -30,6 +30,10 @@
       "types": "./dist/evaluation/index.d.ts",
       "import": "./dist/evaluation/index.js"
     },
+    "./intelligence-operations": {
+      "types": "./dist/intelligence_operations/index.d.ts",
+      "import": "./dist/intelligence_operations/index.js"
+    },
     "./skills": {
       "types": "./dist/skills/index.d.ts",
       "import": "./dist/skills/index.js"

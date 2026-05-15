@@ -336,6 +336,46 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/PredictionRecord"
+  /operations/report:
+    get:
+      operationId: getOperationsReport
+      tags: [operations]
+      summary: Full intelligence-operations report (cases, audit, metrics)
+      responses:
+        "200":
+          description: Operations report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationsReport"
+  /operations/cases:
+    get:
+      operationId: listIntelligenceCases
+      tags: [operations]
+      summary: List persistent intelligence cases
+      responses:
+        "200":
+          description: Intelligence cases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/IntelligenceCase"
+  /operations/audit:
+    get:
+      operationId: listOperationsAudit
+      tags: [operations]
+      summary: Append-only operations audit timeline
+      responses:
+        "200":
+          description: Audit events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuditEvent"
 components:
   schemas:
     HealthStatus:
@@ -1557,3 +1597,555 @@ components:
           items: { $ref: "#/components/schemas/BenchmarkResult" }
         longitudinalInsights: { type: array, items: { type: string } }
         recommendations: { type: array, items: { type: string } }
+    InvestigationTrigger:
+      type: object
+      required: [kind, detail, metric, threshold]
+      properties:
+        kind:
+          type: string
+          enum:
+            [
+              high-disagreement,
+              low-confidence,
+              unresolved-ambiguity,
+              contradiction-severity,
+              weak-evidence-density,
+              high-upside-high-risk,
+            ]
+        detail: { type: string }
+        metric: { type: number }
+        threshold: { type: number }
+    Investigation:
+      type: object
+      required:
+        [
+          id,
+          caseId,
+          candidateId,
+          organizationId,
+          title,
+          rationale,
+          state,
+          createdAt,
+          triggers,
+          originatingAgents,
+          evidenceGaps,
+          unresolvedQuestions,
+          confidenceState,
+          recommendedNextActions,
+        ]
+      properties:
+        id: { type: string }
+        caseId: { type: string }
+        candidateId: { type: string }
+        organizationId: { type: string }
+        title: { type: string }
+        rationale: { type: string }
+        state:
+          type: string
+          enum:
+            [
+              open,
+              evidence_requested,
+              under_review,
+              escalated,
+              resolved,
+              unresolved,
+              archived,
+            ]
+        createdAt: { type: string, format: date-time }
+        triggers:
+          type: array
+          items: { $ref: "#/components/schemas/InvestigationTrigger" }
+        originatingAgents: { type: array, items: { type: string } }
+        evidenceGaps: { type: array, items: { type: string } }
+        unresolvedQuestions: { type: array, items: { type: string } }
+        confidenceState:
+          type: object
+          required: [initial, current, delta]
+          properties:
+            initial: { type: number }
+            current: { type: number }
+            delta: { type: number }
+        recommendedNextActions: { type: array, items: { type: string } }
+    AdversarialArgument:
+      type: object
+      required: [id, side, claim, sourceAgent, evidence, weight]
+      properties:
+        id: { type: string }
+        side: { type: string, enum: [supporting, refuting] }
+        claim: { type: string }
+        sourceAgent: { type: string }
+        evidence: { type: array, items: { type: string } }
+        weight: { type: number }
+    ChallengeRebuttalChain:
+      type: object
+      required: [id, challenge, rebuttal, unresolved, confidenceImpact]
+      properties:
+        id: { type: string }
+        challenge: { $ref: "#/components/schemas/AdversarialArgument" }
+        rebuttal:
+          oneOf:
+            - { $ref: "#/components/schemas/AdversarialArgument" }
+            - { type: "null" }
+        unresolved: { type: boolean }
+        confidenceImpact: { type: number }
+    AdversarialReview:
+      type: object
+      required:
+        [
+          id,
+          caseId,
+          topic,
+          arguments,
+          chains,
+          unresolvedTensions,
+          netConfidenceImpact,
+        ]
+      properties:
+        id: { type: string }
+        caseId: { type: string }
+        topic: { type: string }
+        arguments:
+          type: array
+          items: { $ref: "#/components/schemas/AdversarialArgument" }
+        chains:
+          type: array
+          items: { $ref: "#/components/schemas/ChallengeRebuttalChain" }
+        unresolvedTensions: { type: array, items: { type: string } }
+        netConfidenceImpact: { type: number }
+    EvidenceRequest:
+      type: object
+      required:
+        [
+          id,
+          caseId,
+          candidateId,
+          organizationId,
+          requestedEvidence,
+          rationale,
+          confidenceImpact,
+          priority,
+          recommendedValidationMethod,
+          recommendedQuestions,
+          state,
+          originatingAgents,
+        ]
+      properties:
+        id: { type: string }
+        caseId: { type: string }
+        candidateId: { type: string }
+        organizationId: { type: string }
+        requestedEvidence: { type: string }
+        rationale: { type: string }
+        confidenceImpact: { type: number }
+        priority: { type: string, enum: [low, medium, high, critical] }
+        recommendedValidationMethod:
+          type: string
+          enum:
+            [
+              interview-question,
+              reference-check,
+              practical-validation,
+              code-sample,
+              context-deep-dive,
+            ]
+        recommendedQuestions: { type: array, items: { type: string } }
+        state:
+          type: string
+          enum: [open, in_progress, satisfied, abandoned]
+        originatingAgents: { type: array, items: { type: string } }
+    HypothesisUpdate:
+      type: object
+      required: [id, at, kind, detail, confidenceAfter, sourceAgent]
+      properties:
+        id: { type: string }
+        at: { type: string, format: date-time }
+        kind:
+          type: string
+          enum:
+            [
+              supporting-evidence,
+              refuting-evidence,
+              confidence-shift,
+              status-change,
+            ]
+        detail: { type: string }
+        confidenceAfter: { type: number }
+        sourceAgent: { type: string }
+    Hypothesis:
+      type: object
+      required:
+        [
+          id,
+          caseId,
+          candidateId,
+          organizationId,
+          statement,
+          status,
+          uncertaintyLevel,
+          confidence,
+          supportingEvidence,
+          refutingEvidence,
+          competingWith,
+          history,
+        ]
+      properties:
+        id: { type: string }
+        caseId: { type: string }
+        candidateId: { type: string }
+        organizationId: { type: string }
+        statement: { type: string }
+        status:
+          type: string
+          enum: [open, supported, refuted, competing, unresolved, abandoned]
+        uncertaintyLevel: { type: number }
+        confidence: { type: number }
+        supportingEvidence: { type: array, items: { type: string } }
+        refutingEvidence: { type: array, items: { type: string } }
+        competingWith: { type: array, items: { type: string } }
+        history:
+          type: array
+          items: { $ref: "#/components/schemas/HypothesisUpdate" }
+    DecisionState:
+      type: string
+      enum:
+        [
+          initial_assessment,
+          investigation_required,
+          adversarial_review,
+          human_review,
+          evidence_pending,
+          calibration_warning,
+          decision_ready,
+          unresolved,
+        ]
+    DecisionWorkflowTransition:
+      type: object
+      required:
+        [
+          id,
+          at,
+          from,
+          to,
+          reviewer,
+          rationale,
+          confidenceBefore,
+          confidenceAfter,
+        ]
+      properties:
+        id: { type: string }
+        at: { type: string, format: date-time }
+        from: { $ref: "#/components/schemas/DecisionState" }
+        to: { $ref: "#/components/schemas/DecisionState" }
+        reviewer: { type: string }
+        rationale: { type: string }
+        confidenceBefore: { type: number }
+        confidenceAfter: { type: number }
+    DecisionReviewWorkflowState:
+      type: object
+      required:
+        [
+          caseId,
+          state,
+          stateRationale,
+          blockingFactors,
+          uncertaintyPreserved,
+          transitions,
+          prematureCertaintyGuard,
+        ]
+      properties:
+        caseId: { type: string }
+        state: { $ref: "#/components/schemas/DecisionState" }
+        stateRationale: { type: string }
+        blockingFactors: { type: array, items: { type: string } }
+        uncertaintyPreserved: { type: boolean }
+        transitions:
+          type: array
+          items: { $ref: "#/components/schemas/DecisionWorkflowTransition" }
+        prematureCertaintyGuard:
+          type: object
+          required: [triggered, reason]
+          properties:
+            triggered: { type: boolean }
+            reason: { type: string }
+    Escalation:
+      type: object
+      required:
+        [
+          id,
+          caseId,
+          candidateId,
+          organizationId,
+          escalationReason,
+          severity,
+          recommendedReviewType,
+          unresolvedRisks,
+          blockingQuestions,
+          triggeringSignals,
+          createdAt,
+        ]
+      properties:
+        id: { type: string }
+        caseId: { type: string }
+        candidateId: { type: string }
+        organizationId: { type: string }
+        escalationReason: { type: string }
+        severity: { type: string, enum: [low, medium, high, critical] }
+        recommendedReviewType:
+          type: string
+          enum:
+            [
+              senior-reviewer,
+              founder-review,
+              technical-deep-dive,
+              reference-validation,
+              adversarial-panel,
+              extended-investigation,
+            ]
+        unresolvedRisks: { type: array, items: { type: string } }
+        blockingQuestions: { type: array, items: { type: string } }
+        triggeringSignals: { type: array, items: { type: string } }
+        createdAt: { type: string, format: date-time }
+    HumanAnnotation:
+      type: object
+      required:
+        [id, caseId, reviewer, kind, rationale, at, confidenceImpact, evidence]
+      properties:
+        id: { type: string }
+        caseId: { type: string }
+        reviewer: { type: string }
+        kind:
+          type: string
+          enum:
+            [
+              review-note,
+              disagreement,
+              rationale-override,
+              uncertainty-acknowledgement,
+              evidence-weighting-adjustment,
+              explicit-override,
+            ]
+        rationale: { type: string }
+        at: { type: string, format: date-time }
+        confidenceImpact: { type: number }
+        targetAgent: { type: string }
+        targetField: { type: string }
+        beforeValue: { type: number }
+        afterValue: { type: number }
+        evidence: { type: array, items: { type: string } }
+    Reviewer:
+      type: object
+      required: [id, kind, name, confidence, recommendation, rationale]
+      properties:
+        id: { type: string }
+        kind: { type: string, enum: [agent, human, panel] }
+        name: { type: string }
+        confidence: { type: number }
+        recommendation:
+          type: string
+          enum: [advance, investigate, decline, abstain]
+        rationale: { type: string }
+    ReasoningCluster:
+      type: object
+      required: [id, label, reviewers, sharedClaim, weight]
+      properties:
+        id: { type: string }
+        label: { type: string }
+        reviewers: { type: array, items: { type: string } }
+        sharedClaim: { type: string }
+        weight: { type: number }
+    ConsensusReport:
+      type: object
+      required:
+        [
+          caseId,
+          reviewers,
+          consensusAreas,
+          disagreementAreas,
+          unresolvedQuestions,
+          reviewerConfidenceDistribution,
+          reasoningClusters,
+          finalDecisionState,
+        ]
+      properties:
+        caseId: { type: string }
+        reviewers:
+          type: array
+          items: { $ref: "#/components/schemas/Reviewer" }
+        consensusAreas: { type: array, items: { type: string } }
+        disagreementAreas: { type: array, items: { type: string } }
+        unresolvedQuestions: { type: array, items: { type: string } }
+        reviewerConfidenceDistribution:
+          type: array
+          items:
+            type: object
+            required: [reviewerId, confidence, recommendation]
+            properties:
+              reviewerId: { type: string }
+              confidence: { type: number }
+              recommendation:
+                type: string
+                enum: [advance, investigate, decline, abstain]
+        reasoningClusters:
+          type: array
+          items: { $ref: "#/components/schemas/ReasoningCluster" }
+        finalDecisionState: { $ref: "#/components/schemas/DecisionState" }
+    AuditEvent:
+      type: object
+      required: [id, caseId, at, actor, kind, summary, relatedRefIds]
+      properties:
+        id: { type: string }
+        caseId: { type: string }
+        at: { type: string, format: date-time }
+        actor: { type: string }
+        kind:
+          type: string
+          enum:
+            [
+              case-opened,
+              investigation-opened,
+              investigation-state-changed,
+              evidence-requested,
+              hypothesis-added,
+              hypothesis-updated,
+              adversarial-review-added,
+              escalation-raised,
+              human-annotation,
+              decision-state-changed,
+              calibration-warning,
+              longitudinal-update,
+            ]
+        summary: { type: string }
+        confidenceBefore: { type: number }
+        confidenceAfter: { type: number }
+        relatedRefIds: { type: array, items: { type: string } }
+    IntelligenceCase:
+      type: object
+      required:
+        [
+          id,
+          candidateId,
+          candidateName,
+          organizationId,
+          targetRole,
+          createdAt,
+          decisionState,
+          decisionStateRationale,
+          workflow,
+          investigations,
+          evidenceRequests,
+          hypotheses,
+          adversarialReviews,
+          escalations,
+          humanAnnotations,
+          consensus,
+          calibrationWarnings,
+          longitudinalUpdates,
+          unresolvedQuestionCount,
+          openEvidenceRequestCount,
+          openInvestigationCount,
+          competingHypothesisCount,
+          escalationSeverityMax,
+          effectiveConfidence,
+        ]
+      properties:
+        id: { type: string }
+        candidateId: { type: string }
+        candidateName: { type: string }
+        organizationId: { type: string }
+        targetRole: { type: string }
+        createdAt: { type: string, format: date-time }
+        decisionState: { $ref: "#/components/schemas/DecisionState" }
+        decisionStateRationale: { type: string }
+        workflow: { $ref: "#/components/schemas/DecisionReviewWorkflowState" }
+        investigations:
+          type: array
+          items: { $ref: "#/components/schemas/Investigation" }
+        evidenceRequests:
+          type: array
+          items: { $ref: "#/components/schemas/EvidenceRequest" }
+        hypotheses:
+          type: array
+          items: { $ref: "#/components/schemas/Hypothesis" }
+        adversarialReviews:
+          type: array
+          items: { $ref: "#/components/schemas/AdversarialReview" }
+        escalations:
+          type: array
+          items: { $ref: "#/components/schemas/Escalation" }
+        humanAnnotations:
+          type: array
+          items: { $ref: "#/components/schemas/HumanAnnotation" }
+        consensus: { $ref: "#/components/schemas/ConsensusReport" }
+        calibrationWarnings: { type: array, items: { type: string } }
+        longitudinalUpdates: { type: array, items: { type: string } }
+        unresolvedQuestionCount: { type: integer }
+        openEvidenceRequestCount: { type: integer }
+        openInvestigationCount: { type: integer }
+        competingHypothesisCount: { type: integer }
+        escalationSeverityMax:
+          oneOf:
+            - { type: string, enum: [low, medium, high, critical] }
+            - { type: "null" }
+        effectiveConfidence: { type: number }
+    OperationsMetrics:
+      type: object
+      required:
+        [
+          totalCases,
+          casesByDecisionState,
+          openInvestigations,
+          pendingEvidenceRequests,
+          activeEscalations,
+          unresolvedHypotheses,
+          competingHypothesisPairs,
+          averageEffectiveConfidence,
+          humanInterventions,
+          prematureCertaintyGuardsTriggered,
+        ]
+      properties:
+        totalCases: { type: integer }
+        casesByDecisionState:
+          type: object
+          required:
+            [
+              initial_assessment,
+              investigation_required,
+              adversarial_review,
+              human_review,
+              evidence_pending,
+              calibration_warning,
+              decision_ready,
+              unresolved,
+            ]
+          properties:
+            initial_assessment: { type: integer }
+            investigation_required: { type: integer }
+            adversarial_review: { type: integer }
+            human_review: { type: integer }
+            evidence_pending: { type: integer }
+            calibration_warning: { type: integer }
+            decision_ready: { type: integer }
+            unresolved: { type: integer }
+        openInvestigations: { type: integer }
+        pendingEvidenceRequests: { type: integer }
+        activeEscalations: { type: integer }
+        unresolvedHypotheses: { type: integer }
+        competingHypothesisPairs: { type: integer }
+        averageEffectiveConfidence: { type: number }
+        humanInterventions: { type: integer }
+        prematureCertaintyGuardsTriggered: { type: integer }
+    OperationsReport:
+      type: object
+      required: [generatedAt, generatedBy, cases, audit, metrics]
+      properties:
+        generatedAt: { type: string, format: date-time }
+        generatedBy: { type: string }
+        cases:
+          type: array
+          items: { $ref: "#/components/schemas/IntelligenceCase" }
+        audit:
+          type: array
+          items: { $ref: "#/components/schemas/AuditEvent" }
+        metrics: { $ref: "#/components/schemas/OperationsMetrics" }

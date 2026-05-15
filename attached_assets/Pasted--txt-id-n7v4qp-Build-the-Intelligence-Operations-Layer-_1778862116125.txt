@@ -1,0 +1,403 @@
+```txt id="n7v4qp"
+Build the Intelligence Operations Layer for the Recruiting Intelligence Framework.
+
+IMPORTANT:
+The framework already has:
+- candidate intelligence
+- cross-agent cognition
+- organization intelligence
+- calibration/evaluation
+- longitudinal learning
+- deterministic reasoning
+- provenance-first architecture
+
+The next phase is NOT more scoring.
+
+The next phase is:
+- operationalizing uncertainty,
+- investigation workflows,
+- adversarial reasoning,
+- evidence escalation,
+- epistemic review operations.
+
+The framework must evolve from:
+"recruiting cognition system"
+
+into:
+"a recruiting intelligence operations system."
+
+--------------------------------------------------
+Core Thesis
+--------------------------------------------------
+
+High-quality recruiting decisions are not:
+- single-pass evaluations.
+
+They are:
+- iterative investigations under uncertainty.
+
+The framework must support:
+- uncertainty escalation,
+- adversarial review,
+- evidence requests,
+- challenge/rebuttal workflows,
+- investigation loops,
+- human oversight,
+- explicit unresolved questions.
+
+This is NOT ATS workflow orchestration.
+This is:
+- epistemic operations infrastructure.
+
+--------------------------------------------------
+Build These Components
+--------------------------------------------------
+
+Create:
+lib/framework/src/intelligence_operations/
+
+Required components:
+
+1. InvestigationEngine
+2. AdversarialReviewEngine
+3. EvidenceRequestEngine
+4. HypothesisTrackingSystem
+5. DecisionReviewWorkflow
+6. EscalationEngine
+7. HumanOversightLayer
+8. Multi-ReviewerConsensusEngine
+9. IntelligenceCaseSystem
+10. OperationsAuditEngine
+
+--------------------------------------------------
+1. InvestigationEngine
+--------------------------------------------------
+
+The framework must support iterative investigation.
+
+Investigations are triggered by:
+- high disagreement
+- low confidence
+- unresolved ambiguity
+- contradiction severity
+- weak evidence density
+- high-upside/high-risk profiles
+
+Each investigation becomes:
+- a persistent intelligence case.
+
+Build:
+- investigation lifecycle
+- investigation states
+- investigation rationale
+- evidence tracking
+- unresolved question tracking
+
+Investigation states:
+- open
+- evidence_requested
+- under_review
+- escalated
+- resolved
+- unresolved
+- archived
+
+Each investigation must contain:
+- triggering conditions
+- originating agents
+- evidence gaps
+- confidence state
+- unresolved questions
+- recommended next actions
+
+--------------------------------------------------
+2. AdversarialReviewEngine
+--------------------------------------------------
+
+Build explicit adversarial reasoning.
+
+The system must support:
+- argument vs counterargument
+- challenge vs rebuttal
+- supporting vs refuting evidence
+- disagreement preservation
+
+Examples:
+- "trajectory suggests upside"
+vs
+- "contradictions suggest inflated narrative"
+
+Implement:
+- adversarial reasoning graph
+- challenge chains
+- rebuttal chains
+- confidence impact analysis
+- unresolved tension tracking
+
+The system must NEVER flatten disagreement artificially.
+
+--------------------------------------------------
+3. EvidenceRequestEngine
+--------------------------------------------------
+
+The framework must actively request missing evidence.
+
+Examples:
+- missing production-scale evidence
+- weak distributed systems evidence
+- unsupported leadership claims
+- unclear ownership progression
+
+Generate:
+- evidence request recommendations
+- interview question recommendations
+- reference-check recommendations
+- practical validation recommendations
+
+Output:
+{
+  requestedEvidence,
+  rationale,
+  confidenceImpact,
+  priority,
+  recommendedValidationMethod
+}
+
+--------------------------------------------------
+4. HypothesisTrackingSystem
+--------------------------------------------------
+
+Track explicit recruiting hypotheses.
+
+Examples:
+- "candidate is founder-shaped"
+- "candidate inflates technical depth"
+- "candidate thrives in ambiguity"
+- "candidate requires high structure"
+
+Each hypothesis must contain:
+- supporting evidence
+- refuting evidence
+- uncertainty level
+- confidence evolution
+- historical updates
+
+The system must:
+- preserve competing hypotheses
+- track unresolved hypotheses
+- support temporal evolution
+
+--------------------------------------------------
+5. DecisionReviewWorkflow
+--------------------------------------------------
+
+Build intelligence review workflows.
+
+NOT recruiting pipelines.
+
+Decision states:
+- initial_assessment
+- investigation_required
+- adversarial_review
+- human_review
+- evidence_pending
+- calibration_warning
+- decision_ready
+- unresolved
+
+The workflow must:
+- preserve uncertainty
+- expose disagreement
+- prevent premature certainty
+- require explicit rationale for overrides
+
+--------------------------------------------------
+6. EscalationEngine
+--------------------------------------------------
+
+Escalate high-risk or high-ambiguity cases.
+
+Escalation triggers:
+- extreme disagreement
+- confidence collapse
+- unresolved contradiction clusters
+- evidence insufficiency
+- high-upside/high-risk profiles
+- calibration warnings
+
+Escalation targets:
+- senior reviewer
+- founder review
+- technical deep-dive
+- reference validation
+- adversarial panel
+- extended investigation
+
+Output:
+{
+  escalationReason,
+  severity,
+  recommendedReviewType,
+  unresolvedRisks,
+  blockingQuestions
+}
+
+--------------------------------------------------
+7. HumanOversightLayer
+--------------------------------------------------
+
+Humans must remain first-class participants.
+
+Build:
+- reviewer annotations
+- disagreement annotations
+- rationale overrides
+- uncertainty acknowledgements
+- evidence weighting adjustments
+- explicit override logging
+
+Every human action must include:
+- rationale
+- provenance
+- timestamp
+- confidence impact
+
+No silent overrides allowed.
+
+--------------------------------------------------
+8. Multi-ReviewerConsensusEngine
+--------------------------------------------------
+
+Support structured multi-reviewer reasoning.
+
+NOT voting.
+
+The system must:
+- aggregate reasoning
+- preserve disagreements
+- track reviewer confidence
+- detect reasoning clusters
+- surface unresolved tensions
+
+Output:
+{
+  consensusAreas,
+  disagreementAreas,
+  unresolvedQuestions,
+  reviewerConfidenceDistribution,
+  finalDecisionState
+}
+
+--------------------------------------------------
+9. IntelligenceCaseSystem
+--------------------------------------------------
+
+Build persistent intelligence cases.
+
+Each candidate × organization evaluation becomes:
+- an inspectable intelligence case.
+
+Cases must contain:
+- all agent outputs
+- investigations
+- evidence requests
+- hypotheses
+- adversarial reviews
+- escalation history
+- human annotations
+- calibration warnings
+- longitudinal updates
+
+Cases become:
+- the operational unit of recruiting intelligence.
+
+--------------------------------------------------
+10. OperationsAuditEngine
+--------------------------------------------------
+
+Build operational auditability.
+
+Track:
+- who changed what
+- why
+- confidence changes
+- escalation history
+- overridden recommendations
+- unresolved warnings
+- investigation outcomes
+
+Generate:
+- full decision timeline
+- provenance graph
+- reasoning evolution
+- uncertainty evolution
+
+The framework must support:
+- replayable investigations
+- deterministic audits
+- historical reasoning inspection
+
+--------------------------------------------------
+Frontend Requirements
+--------------------------------------------------
+
+Add:
+/operations
+
+Main sections:
+- active intelligence cases
+- investigations
+- unresolved ambiguity queue
+- escalation queue
+- adversarial review panel
+- hypothesis tracker
+- evidence request center
+- reviewer consensus explorer
+- operational audit timeline
+
+UI philosophy:
+- intelligence operations center
+- analytical
+- high-trust
+- investigation-oriented
+- uncertainty-visible
+
+Avoid:
+- ATS workflows
+- hiring stages
+- CRM UX
+- simplistic dashboards
+
+--------------------------------------------------
+Critical Constraints
+--------------------------------------------------
+
+Maintain:
+- deterministic execution
+- provenance-first architecture
+- explicit uncertainty
+- disagreement preservation
+- inspectable reasoning
+- auditability
+- replayability
+
+Do NOT:
+- collapse disagreement into single scores
+- hide escalations
+- silently mutate confidence
+- flatten adversarial reasoning
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+The framework should evolve from:
+"a recruiting cognition framework"
+
+into:
+
+"a recruiting intelligence operations system
+capable of structured investigation,
+adversarial review,
+and decision-making under uncertainty."
+```
