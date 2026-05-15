@@ -494,6 +494,162 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IngestionAuditBundle"
+  /collaboration/state:
+    get:
+      operationId: getCollaborationState
+      tags: [collaboration]
+      summary: Full collaboration snapshot — reviewers, cases, disagreements, overrides, audit, organizational memory
+      responses:
+        "200":
+          description: Snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationStateResponse"
+  /collaboration/cases:
+    post:
+      operationId: openCollaborationCase
+      tags: [collaboration]
+      summary: Open a new collaborative case
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpenCollaborationCaseRequest"
+      responses:
+        "200":
+          description: Opened case
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborativeCase"
+  /collaboration/cases/{id}:
+    get:
+      operationId: getCollaborationCase
+      tags: [collaboration]
+      summary: Get a collaborative case with its full reasoning bundle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Case detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationCaseDetail"
+        "404":
+          description: Not found
+  /collaboration/cases/{id}/review:
+    post:
+      operationId: recordCollaborationReview
+      tags: [collaboration]
+      summary: Record a reviewer action against a case
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollaborationReviewRequest"
+      responses:
+        "200":
+          description: Review accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationReviewResult"
+  /collaboration/cases/{id}/override:
+    post:
+      operationId: recordCollaborationOverride
+      tags: [collaboration]
+      summary: Issue an explicit override against a case recommendation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollaborationOverrideRequest"
+      responses:
+        "200":
+          description: Override recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationOverrideRecord"
+  /collaboration/cases/{id}/evidence-review:
+    post:
+      operationId: recordCollaborationEvidenceReview
+      tags: [collaboration]
+      summary: Annotate, challenge, or adjust reliability of a piece of evidence in the context of a case
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollaborationEvidenceReviewRequest"
+      responses:
+        "200":
+          description: Evidence review recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationEvidenceReviewEntry"
+  /collaboration/reviewer/{id}/calibration:
+    get:
+      operationId: getCollaborationReviewerCalibration
+      tags: [collaboration]
+      summary: Reviewer calibration report (contextual, per-domain)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Reviewer calibration report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationReviewerCalibrationReport"
+        "404":
+          description: Not found
+  /collaboration/audit/{caseId}:
+    get:
+      operationId: getCollaborationAudit
+      tags: [collaboration]
+      summary: Append-only collaboration audit bundle for a case
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Audit bundle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationAuditBundle"
+        "404":
+          description: Not found
 components:
   schemas:
     HealthStatus:
@@ -2840,3 +2996,750 @@ components:
         auditEntries:
           type: array
           items: { $ref: "#/components/schemas/IngestionAuditEntry" }
+    CollaborationReviewerType:
+      type: string
+      enum: [recruiter, founder, hiring_manager, technical_reviewer, executive, external_advisor]
+    CollaborationCalibrationProfile:
+      type: object
+      required: [domain, brier, overconfidence, sampleSize]
+      properties:
+        domain: { type: string }
+        brier: { type: number, nullable: true }
+        overconfidence: { type: number, nullable: true }
+        sampleSize: { type: integer }
+    CollaborationConfidencePatterns:
+      type: object
+      required: [meanConfidence, confidenceVariance, uncertaintyExpressionRate, evidenceSeekingRate]
+      properties:
+        meanConfidence: { type: number }
+        confidenceVariance: { type: number }
+        uncertaintyExpressionRate: { type: number }
+        evidenceSeekingRate: { type: number }
+    CollaborationHistoricalDecisionStats:
+      type: object
+      required: [totalCases, agreementsWithConsensus, disagreementsWithConsensus, overridesIssued, overrideSuccessRate]
+      properties:
+        totalCases: { type: integer }
+        agreementsWithConsensus: { type: integer }
+        disagreementsWithConsensus: { type: integer }
+        overridesIssued: { type: integer }
+        overrideSuccessRate: { type: number, nullable: true }
+    CollaborationReviewerIdentity:
+      type: object
+      required:
+        - reviewerId
+        - reviewerType
+        - displayName
+        - expertiseAreas
+        - calibrationProfile
+        - confidencePatterns
+        - historicalDecisionStats
+        - registeredAt
+      properties:
+        reviewerId: { type: string }
+        reviewerType: { $ref: "#/components/schemas/CollaborationReviewerType" }
+        displayName: { type: string }
+        expertiseAreas:
+          type: array
+          items: { type: string }
+        calibrationProfile:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationCalibrationProfile" }
+        confidencePatterns: { $ref: "#/components/schemas/CollaborationConfidencePatterns" }
+        historicalDecisionStats: { $ref: "#/components/schemas/CollaborationHistoricalDecisionStats" }
+        registeredAt: { type: string, format: date-time }
+    CollaborationCaseSubject:
+      type: object
+      required: [subjectKind, subjectId, subjectDisplayName]
+      properties:
+        subjectKind:
+          type: string
+          enum: [candidate, role, organization, pattern]
+        subjectId: { type: string }
+        subjectDisplayName: { type: string }
+    CollaborationCaseState:
+      type: string
+      enum:
+        - under_investigation
+        - awaiting_review
+        - disagreement_active
+        - escalation_required
+        - consensus_reached
+        - unresolved
+        - archived
+    CollaborationUnresolvedTension:
+      type: object
+      required: [tensionId, description, reviewerIds, severity, noteAt]
+      properties:
+        tensionId: { type: string }
+        description: { type: string }
+        reviewerIds:
+          type: array
+          items: { type: string }
+        severity: { type: number }
+        noteAt: { type: string, format: date-time }
+    CollaborationEscalation:
+      type: object
+      required: [escalationId, fromReviewerId, toReviewerId, reason, raisedAt, resolvedAt]
+      properties:
+        escalationId: { type: string }
+        fromReviewerId: { type: string }
+        toReviewerId: { type: string }
+        reason: { type: string }
+        raisedAt: { type: string, format: date-time }
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+    CollaborationAnchoringRecommendation:
+      type: object
+      required: [recommendationId, summary, confidence]
+      properties:
+        recommendationId: { type: string }
+        summary: { type: string }
+        confidence: { type: number }
+    CollaborativeCase:
+      type: object
+      required:
+        - caseId
+        - title
+        - subject
+        - state
+        - openedAt
+        - lastUpdatedAt
+        - invitedReviewers
+        - framing
+        - unresolvedTensions
+        - escalations
+      properties:
+        caseId: { type: string }
+        title: { type: string }
+        subject: { $ref: "#/components/schemas/CollaborationCaseSubject" }
+        state: { $ref: "#/components/schemas/CollaborationCaseState" }
+        openedAt: { type: string, format: date-time }
+        lastUpdatedAt: { type: string, format: date-time }
+        invitedReviewers:
+          type: array
+          items: { type: string }
+        framing: { type: string }
+        anchoringRecommendation:
+          $ref: "#/components/schemas/CollaborationAnchoringRecommendation"
+        unresolvedTensions:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationUnresolvedTension" }
+        escalations:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationEscalation" }
+    CollaborationReviewerAction:
+      type: object
+      required:
+        - actionId
+        - caseId
+        - reviewerId
+        - kind
+        - target
+        - rationale
+        - confidence
+        - derivedFrom
+        - ambiguityMarkers
+        - timestamp
+      properties:
+        actionId: { type: string }
+        caseId: { type: string }
+        reviewerId: { type: string }
+        kind:
+          type: string
+          enum:
+            - annotate_evidence
+            - support_hypothesis
+            - challenge_hypothesis
+            - attach_uncertainty
+            - request_evidence
+            - mark_unresolved
+            - disagree_with_agent
+            - disagree_with_reviewer
+        target:
+          type: object
+          required: [kind, id]
+          properties:
+            kind: { type: string }
+            id: { type: string }
+        rationale: { type: string }
+        confidence: { type: number }
+        derivedFrom:
+          type: array
+          items: { type: string }
+        ambiguityMarkers:
+          type: array
+          items: { type: string }
+        timestamp: { type: string, format: date-time }
+    CollaborationDisagreementPosition:
+      type: object
+      required: [positionId, holderKind, holderId, stance, rationale, confidence, derivedFrom, recordedAt]
+      properties:
+        positionId: { type: string }
+        holderKind:
+          type: string
+          enum: [reviewer, agent]
+        holderId: { type: string }
+        stance: { type: string }
+        rationale: { type: string, minLength: 1 }
+        confidence: { type: number }
+        derivedFrom:
+          type: array
+          items: { type: string }
+        recordedAt: { type: string, format: date-time }
+    CollaborationDisagreement:
+      type: object
+      required:
+        - disagreementId
+        - caseId
+        - topic
+        - positions
+        - severity
+        - severityScore
+        - resolvedAt
+        - resolutionSummary
+      properties:
+        disagreementId: { type: string }
+        caseId: { type: string }
+        topic: { type: string }
+        positions:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationDisagreementPosition" }
+        severity:
+          type: string
+          enum: [minor, moderate, major, blocking]
+        severityScore: { type: number }
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        resolutionSummary:
+          type: string
+          nullable: true
+    CollaborationDisagreementCluster:
+      type: object
+      required: [clusterId, label, disagreementIds, recurringPatternId]
+      properties:
+        clusterId: { type: string }
+        label: { type: string }
+        disagreementIds:
+          type: array
+          items: { type: string }
+        recurringPatternId:
+          type: string
+          nullable: true
+    CollaborationEvidenceReviewEntry:
+      type: object
+      required:
+        - reviewId
+        - caseId
+        - evidenceId
+        - reviewerId
+        - kind
+        - rationale
+        - reliabilityDelta
+        - counterEvidenceIds
+        - ambiguityMarkers
+        - timestamp
+      properties:
+        reviewId: { type: string }
+        caseId: { type: string }
+        evidenceId: { type: string }
+        reviewerId: { type: string }
+        kind:
+          type: string
+          enum:
+            - annotation
+            - challenge_quality
+            - reliability_adjust
+            - request_validation
+            - counter_evidence
+            - ambiguity_flag
+            - provenance_flag
+        rationale: { type: string }
+        reliabilityDelta:
+          type: number
+          nullable: true
+        counterEvidenceIds:
+          type: array
+          items: { type: string }
+        ambiguityMarkers:
+          type: array
+          items: { type: string }
+        timestamp: { type: string, format: date-time }
+    CollaborationOverrideRecord:
+      type: object
+      required:
+        - overrideId
+        - caseId
+        - reviewerId
+        - affectedRecommendationId
+        - reason
+        - confidenceImpact
+        - acknowledgedRisks
+        - direction
+        - issuedAt
+        - outcome
+        - outcomeNote
+      properties:
+        overrideId: { type: string }
+        caseId: { type: string }
+        reviewerId: { type: string }
+        affectedRecommendationId: { type: string }
+        reason: { type: string }
+        confidenceImpact: { type: number }
+        acknowledgedRisks:
+          type: array
+          items: { type: string }
+        direction:
+          type: string
+          enum:
+            - accept_against_recommendation
+            - reject_against_recommendation
+            - modify
+        issuedAt: { type: string, format: date-time }
+        outcome:
+          type: string
+          enum: [pending, validated_correct, validated_incorrect, inconclusive]
+        outcomeNote:
+          type: string
+          nullable: true
+    CollaborationAuditEntry:
+      type: object
+      required:
+        - entryId
+        - caseId
+        - kind
+        - actorId
+        - summary
+        - beforeAfter
+        - derivedFrom
+        - timestamp
+      properties:
+        entryId: { type: string }
+        caseId: { type: string }
+        kind:
+          type: string
+          enum:
+            - case_opened
+            - case_state_changed
+            - reviewer_action
+            - evidence_review
+            - disagreement_opened
+            - disagreement_resolved
+            - escalation_raised
+            - escalation_resolved
+            - override_issued
+            - override_outcome
+            - consensus_reached
+            - case_archived
+        actorId: { type: string }
+        summary: { type: string }
+        beforeAfter:
+          type: object
+          nullable: true
+          required: [field, before, after]
+          properties:
+            field: { type: string }
+            before:
+              oneOf:
+                - { type: string }
+                - { type: number }
+              nullable: true
+            after:
+              oneOf:
+                - { type: string }
+                - { type: number }
+              nullable: true
+        derivedFrom:
+          type: array
+          items: { type: string }
+        timestamp: { type: string, format: date-time }
+    CollaborationConsensusPattern:
+      type: object
+      required: [patternId, label, description, exampleCaseIds, agreementRate, predictiveValue, observedAt]
+      properties:
+        patternId: { type: string }
+        label: { type: string }
+        description: { type: string }
+        exampleCaseIds:
+          type: array
+          items: { type: string }
+        agreementRate: { type: number }
+        predictiveValue: { type: number }
+        observedAt: { type: string, format: date-time }
+    CollaborationOrganizationalReasoningMemory:
+      type: object
+      required:
+        - recurringDisagreements
+        - organizationalBiases
+        - reviewerClusters
+        - successPatterns
+        - failurePatterns
+        - escalationArchetypes
+        - overrideArchetypes
+        - computedAt
+      properties:
+        recurringDisagreements:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationDisagreementCluster" }
+        organizationalBiases:
+          type: array
+          items:
+            type: object
+            required: [biasId, label, description, confidence, derivedFrom]
+            properties:
+              biasId: { type: string }
+              label: { type: string }
+              description: { type: string }
+              confidence: { type: number }
+              derivedFrom:
+                type: array
+                items: { type: string }
+        reviewerClusters:
+          type: array
+          items:
+            type: object
+            required: [clusterId, label, reviewerIds, rationale]
+            properties:
+              clusterId: { type: string }
+              label: { type: string }
+              reviewerIds:
+                type: array
+                items: { type: string }
+              rationale: { type: string }
+        successPatterns:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationConsensusPattern" }
+        failurePatterns:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationConsensusPattern" }
+        escalationArchetypes:
+          type: array
+          items:
+            type: object
+            required: [archetypeId, label, description, exampleEscalationIds]
+            properties:
+              archetypeId: { type: string }
+              label: { type: string }
+              description: { type: string }
+              exampleEscalationIds:
+                type: array
+                items: { type: string }
+        overrideArchetypes:
+          type: array
+          items:
+            type: object
+            required: [archetypeId, label, description, exampleOverrideIds]
+            properties:
+              archetypeId: { type: string }
+              label: { type: string }
+              description: { type: string }
+              exampleOverrideIds:
+                type: array
+                items: { type: string }
+        computedAt: { type: string, format: date-time }
+    CollaborationDecisionLineageNode:
+      type: object
+      required: [nodeId, caseId, kind, actorId, summary, confidenceAfter, disagreementSeverityAfter, derivedFrom, timestamp]
+      properties:
+        nodeId: { type: string }
+        caseId: { type: string }
+        kind:
+          type: string
+          enum:
+            - cognition_output
+            - reviewer_action
+            - evidence_review
+            - disagreement_opened
+            - disagreement_resolved
+            - escalation
+            - override
+            - recommendation_change
+            - consensus_reached
+        actorId: { type: string }
+        summary: { type: string }
+        confidenceAfter:
+          type: number
+          nullable: true
+        disagreementSeverityAfter:
+          type: number
+          nullable: true
+        derivedFrom:
+          type: array
+          items: { type: string }
+        timestamp: { type: string, format: date-time }
+    CollaborationDecisionLineageEdge:
+      type: object
+      required: [fromNodeId, toNodeId, relation]
+      properties:
+        fromNodeId: { type: string }
+        toNodeId: { type: string }
+        relation:
+          type: string
+          enum: [caused, informed, contradicted, resolved]
+    CollaborationDecisionTimeline:
+      type: object
+      required: [caseId, nodes, edges, confidenceSeries, disagreementSeries]
+      properties:
+        caseId: { type: string }
+        nodes:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationDecisionLineageNode" }
+        edges:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationDecisionLineageEdge" }
+        confidenceSeries:
+          type: array
+          items:
+            type: object
+            required: [timestamp, value]
+            properties:
+              timestamp: { type: string, format: date-time }
+              value: { type: number }
+        disagreementSeries:
+          type: array
+          items:
+            type: object
+            required: [timestamp, value]
+            properties:
+              timestamp: { type: string, format: date-time }
+              value: { type: number }
+    CollaborationReviewerCalibrationReport:
+      type: object
+      required:
+        - reviewerId
+        - reviewerCalibration
+        - reliability
+        - overconfidenceRisk
+        - disagreementValue
+        - calibrationDrift
+        - historicalPatterns
+        - computedAt
+      properties:
+        reviewerId: { type: string }
+        reviewerCalibration:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationCalibrationProfile" }
+        reliability:
+          type: number
+          nullable: true
+        overconfidenceRisk:
+          type: number
+          nullable: true
+        disagreementValue:
+          type: number
+          nullable: true
+        calibrationDrift:
+          type: number
+          nullable: true
+        historicalPatterns:
+          type: array
+          items:
+            type: object
+            required: [pattern, occurrences, note]
+            properties:
+              pattern: { type: string }
+              occurrences: { type: integer }
+              note: { type: string }
+        computedAt: { type: string, format: date-time }
+    CollaborationStateResponse:
+      type: object
+      required:
+        - reviewers
+        - cases
+        - actions
+        - evidenceReviews
+        - disagreements
+        - disagreementClusters
+        - overrides
+        - audit
+        - organizationalMemory
+      properties:
+        reviewers:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationReviewerIdentity" }
+        cases:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborativeCase" }
+        actions:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationReviewerAction" }
+        evidenceReviews:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationEvidenceReviewEntry" }
+        disagreements:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationDisagreement" }
+        disagreementClusters:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationDisagreementCluster" }
+        overrides:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationOverrideRecord" }
+        audit:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationAuditEntry" }
+        organizationalMemory:
+          $ref: "#/components/schemas/CollaborationOrganizationalReasoningMemory"
+    CollaborationCaseDetail:
+      type: object
+      required:
+        - case
+        - actions
+        - evidenceReviews
+        - disagreements
+        - overrides
+        - audit
+        - timeline
+      properties:
+        case: { $ref: "#/components/schemas/CollaborativeCase" }
+        actions:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationReviewerAction" }
+        evidenceReviews:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationEvidenceReviewEntry" }
+        disagreements:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationDisagreement" }
+        overrides:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationOverrideRecord" }
+        audit:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationAuditEntry" }
+        timeline: { $ref: "#/components/schemas/CollaborationDecisionTimeline" }
+    OpenCollaborationCaseRequest:
+      type: object
+      required: [title, subjectKind, subjectId, subjectDisplayName, framing, invitedReviewers]
+      properties:
+        title: { type: string }
+        subjectKind:
+          type: string
+          enum: [candidate, role, organization, pattern]
+        subjectId: { type: string }
+        subjectDisplayName: { type: string }
+        framing: { type: string }
+        invitedReviewers:
+          type: array
+          items: { type: string }
+        anchoringRecommendation:
+          $ref: "#/components/schemas/CollaborationAnchoringRecommendation"
+        now: { type: string, format: date-time }
+    CollaborationReviewRequest:
+      type: object
+      required: [reviewerId, kind, target, rationale, confidence, derivedFrom]
+      properties:
+        reviewerId: { type: string }
+        kind:
+          type: string
+          enum:
+            - annotate_evidence
+            - support_hypothesis
+            - challenge_hypothesis
+            - attach_uncertainty
+            - request_evidence
+            - mark_unresolved
+            - disagree_with_agent
+            - disagree_with_reviewer
+        target:
+          type: object
+          required: [kind, id]
+          properties:
+            kind: { type: string }
+            id: { type: string }
+        rationale: { type: string }
+        confidence: { type: number }
+        derivedFrom:
+          type: array
+          items: { type: string }
+        ambiguityMarkers:
+          type: array
+          items: { type: string }
+        disagreement:
+          type: object
+          required: [topic, severityScore, positions]
+          properties:
+            topic: { type: string }
+            severityScore: { type: number }
+            positions:
+              type: array
+              minItems: 2
+              items:
+                type: object
+                required: [holderKind, holderId, stance, rationale, confidence, derivedFrom]
+                properties:
+                  holderKind:
+                    type: string
+                    enum: [reviewer, agent]
+                  holderId: { type: string }
+                  stance: { type: string }
+                  rationale: { type: string, minLength: 1 }
+                  confidence: { type: number }
+                  derivedFrom:
+                    type: array
+                    items: { type: string }
+        transitionTo:
+          $ref: "#/components/schemas/CollaborationCaseState"
+        now: { type: string, format: date-time }
+    CollaborationReviewResult:
+      type: object
+      required: [action, case]
+      properties:
+        action: { $ref: "#/components/schemas/CollaborationReviewerAction" }
+        disagreement: { $ref: "#/components/schemas/CollaborationDisagreement" }
+        case: { $ref: "#/components/schemas/CollaborativeCase" }
+    CollaborationOverrideRequest:
+      type: object
+      required: [reviewerId, affectedRecommendationId, reason, confidenceImpact, acknowledgedRisks, direction]
+      properties:
+        reviewerId: { type: string }
+        affectedRecommendationId: { type: string }
+        reason: { type: string }
+        confidenceImpact: { type: number }
+        acknowledgedRisks:
+          type: array
+          items: { type: string }
+        direction:
+          type: string
+          enum:
+            - accept_against_recommendation
+            - reject_against_recommendation
+            - modify
+        now: { type: string, format: date-time }
+    CollaborationEvidenceReviewRequest:
+      type: object
+      required: [evidenceId, reviewerId, kind, rationale]
+      properties:
+        evidenceId: { type: string }
+        reviewerId: { type: string }
+        kind:
+          type: string
+          enum:
+            - annotation
+            - challenge_quality
+            - reliability_adjust
+            - request_validation
+            - counter_evidence
+            - ambiguity_flag
+            - provenance_flag
+        rationale: { type: string }
+        reliabilityDelta: { type: number }
+        counterEvidenceIds:
+          type: array
+          items: { type: string }
+        ambiguityMarkers:
+          type: array
+          items: { type: string }
+        now: { type: string, format: date-time }
+    CollaborationAuditBundle:
+      type: object
+      required: [caseId, entries]
+      properties:
+        caseId: { type: string }
+        entries:
+          type: array
+          items: { $ref: "#/components/schemas/CollaborationAuditEntry" }

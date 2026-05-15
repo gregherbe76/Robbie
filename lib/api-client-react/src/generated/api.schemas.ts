@@ -1823,3 +1823,570 @@ export interface IngestionAuditBundle {
   auditEntries: IngestionAuditEntry[];
 }
 
+export type CollaborationReviewerType = typeof CollaborationReviewerType[keyof typeof CollaborationReviewerType];
+
+
+export const CollaborationReviewerType = {
+  recruiter: 'recruiter',
+  founder: 'founder',
+  hiring_manager: 'hiring_manager',
+  technical_reviewer: 'technical_reviewer',
+  executive: 'executive',
+  external_advisor: 'external_advisor',
+} as const;
+
+export interface CollaborationCalibrationProfile {
+  domain: string;
+  brier: number | null;
+  overconfidence: number | null;
+  sampleSize: number;
+}
+
+export interface CollaborationConfidencePatterns {
+  meanConfidence: number;
+  confidenceVariance: number;
+  uncertaintyExpressionRate: number;
+  evidenceSeekingRate: number;
+}
+
+export interface CollaborationHistoricalDecisionStats {
+  totalCases: number;
+  agreementsWithConsensus: number;
+  disagreementsWithConsensus: number;
+  overridesIssued: number;
+  overrideSuccessRate: number | null;
+}
+
+export interface CollaborationReviewerIdentity {
+  reviewerId: string;
+  reviewerType: CollaborationReviewerType;
+  displayName: string;
+  expertiseAreas: string[];
+  calibrationProfile: CollaborationCalibrationProfile[];
+  confidencePatterns: CollaborationConfidencePatterns;
+  historicalDecisionStats: CollaborationHistoricalDecisionStats;
+  registeredAt: string;
+}
+
+export type CollaborationCaseSubjectSubjectKind = typeof CollaborationCaseSubjectSubjectKind[keyof typeof CollaborationCaseSubjectSubjectKind];
+
+
+export const CollaborationCaseSubjectSubjectKind = {
+  candidate: 'candidate',
+  role: 'role',
+  organization: 'organization',
+  pattern: 'pattern',
+} as const;
+
+export interface CollaborationCaseSubject {
+  subjectKind: CollaborationCaseSubjectSubjectKind;
+  subjectId: string;
+  subjectDisplayName: string;
+}
+
+export type CollaborationCaseState = typeof CollaborationCaseState[keyof typeof CollaborationCaseState];
+
+
+export const CollaborationCaseState = {
+  under_investigation: 'under_investigation',
+  awaiting_review: 'awaiting_review',
+  disagreement_active: 'disagreement_active',
+  escalation_required: 'escalation_required',
+  consensus_reached: 'consensus_reached',
+  unresolved: 'unresolved',
+  archived: 'archived',
+} as const;
+
+export interface CollaborationUnresolvedTension {
+  tensionId: string;
+  description: string;
+  reviewerIds: string[];
+  severity: number;
+  noteAt: string;
+}
+
+export interface CollaborationEscalation {
+  escalationId: string;
+  fromReviewerId: string;
+  toReviewerId: string;
+  reason: string;
+  raisedAt: string;
+  resolvedAt: string | null;
+}
+
+export interface CollaborationAnchoringRecommendation {
+  recommendationId: string;
+  summary: string;
+  confidence: number;
+}
+
+export interface CollaborativeCase {
+  caseId: string;
+  title: string;
+  subject: CollaborationCaseSubject;
+  state: CollaborationCaseState;
+  openedAt: string;
+  lastUpdatedAt: string;
+  invitedReviewers: string[];
+  framing: string;
+  anchoringRecommendation?: CollaborationAnchoringRecommendation;
+  unresolvedTensions: CollaborationUnresolvedTension[];
+  escalations: CollaborationEscalation[];
+}
+
+export type CollaborationReviewerActionKind = typeof CollaborationReviewerActionKind[keyof typeof CollaborationReviewerActionKind];
+
+
+export const CollaborationReviewerActionKind = {
+  annotate_evidence: 'annotate_evidence',
+  support_hypothesis: 'support_hypothesis',
+  challenge_hypothesis: 'challenge_hypothesis',
+  attach_uncertainty: 'attach_uncertainty',
+  request_evidence: 'request_evidence',
+  mark_unresolved: 'mark_unresolved',
+  disagree_with_agent: 'disagree_with_agent',
+  disagree_with_reviewer: 'disagree_with_reviewer',
+} as const;
+
+export type CollaborationReviewerActionTarget = {
+  kind: string;
+  id: string;
+};
+
+export interface CollaborationReviewerAction {
+  actionId: string;
+  caseId: string;
+  reviewerId: string;
+  kind: CollaborationReviewerActionKind;
+  target: CollaborationReviewerActionTarget;
+  rationale: string;
+  confidence: number;
+  derivedFrom: string[];
+  ambiguityMarkers: string[];
+  timestamp: string;
+}
+
+export type CollaborationDisagreementPositionHolderKind = typeof CollaborationDisagreementPositionHolderKind[keyof typeof CollaborationDisagreementPositionHolderKind];
+
+
+export const CollaborationDisagreementPositionHolderKind = {
+  reviewer: 'reviewer',
+  agent: 'agent',
+} as const;
+
+export interface CollaborationDisagreementPosition {
+  positionId: string;
+  holderKind: CollaborationDisagreementPositionHolderKind;
+  holderId: string;
+  stance: string;
+  /** @minLength 1 */
+  rationale: string;
+  confidence: number;
+  derivedFrom: string[];
+  recordedAt: string;
+}
+
+export type CollaborationDisagreementSeverity = typeof CollaborationDisagreementSeverity[keyof typeof CollaborationDisagreementSeverity];
+
+
+export const CollaborationDisagreementSeverity = {
+  minor: 'minor',
+  moderate: 'moderate',
+  major: 'major',
+  blocking: 'blocking',
+} as const;
+
+export interface CollaborationDisagreement {
+  disagreementId: string;
+  caseId: string;
+  topic: string;
+  positions: CollaborationDisagreementPosition[];
+  severity: CollaborationDisagreementSeverity;
+  severityScore: number;
+  resolvedAt: string | null;
+  resolutionSummary: string | null;
+}
+
+export interface CollaborationDisagreementCluster {
+  clusterId: string;
+  label: string;
+  disagreementIds: string[];
+  recurringPatternId: string | null;
+}
+
+export type CollaborationEvidenceReviewEntryKind = typeof CollaborationEvidenceReviewEntryKind[keyof typeof CollaborationEvidenceReviewEntryKind];
+
+
+export const CollaborationEvidenceReviewEntryKind = {
+  annotation: 'annotation',
+  challenge_quality: 'challenge_quality',
+  reliability_adjust: 'reliability_adjust',
+  request_validation: 'request_validation',
+  counter_evidence: 'counter_evidence',
+  ambiguity_flag: 'ambiguity_flag',
+  provenance_flag: 'provenance_flag',
+} as const;
+
+export interface CollaborationEvidenceReviewEntry {
+  reviewId: string;
+  caseId: string;
+  evidenceId: string;
+  reviewerId: string;
+  kind: CollaborationEvidenceReviewEntryKind;
+  rationale: string;
+  reliabilityDelta: number | null;
+  counterEvidenceIds: string[];
+  ambiguityMarkers: string[];
+  timestamp: string;
+}
+
+export type CollaborationOverrideRecordDirection = typeof CollaborationOverrideRecordDirection[keyof typeof CollaborationOverrideRecordDirection];
+
+
+export const CollaborationOverrideRecordDirection = {
+  accept_against_recommendation: 'accept_against_recommendation',
+  reject_against_recommendation: 'reject_against_recommendation',
+  modify: 'modify',
+} as const;
+
+export type CollaborationOverrideRecordOutcome = typeof CollaborationOverrideRecordOutcome[keyof typeof CollaborationOverrideRecordOutcome];
+
+
+export const CollaborationOverrideRecordOutcome = {
+  pending: 'pending',
+  validated_correct: 'validated_correct',
+  validated_incorrect: 'validated_incorrect',
+  inconclusive: 'inconclusive',
+} as const;
+
+export interface CollaborationOverrideRecord {
+  overrideId: string;
+  caseId: string;
+  reviewerId: string;
+  affectedRecommendationId: string;
+  reason: string;
+  confidenceImpact: number;
+  acknowledgedRisks: string[];
+  direction: CollaborationOverrideRecordDirection;
+  issuedAt: string;
+  outcome: CollaborationOverrideRecordOutcome;
+  outcomeNote: string | null;
+}
+
+export type CollaborationAuditEntryKind = typeof CollaborationAuditEntryKind[keyof typeof CollaborationAuditEntryKind];
+
+
+export const CollaborationAuditEntryKind = {
+  case_opened: 'case_opened',
+  case_state_changed: 'case_state_changed',
+  reviewer_action: 'reviewer_action',
+  evidence_review: 'evidence_review',
+  disagreement_opened: 'disagreement_opened',
+  disagreement_resolved: 'disagreement_resolved',
+  escalation_raised: 'escalation_raised',
+  escalation_resolved: 'escalation_resolved',
+  override_issued: 'override_issued',
+  override_outcome: 'override_outcome',
+  consensus_reached: 'consensus_reached',
+  case_archived: 'case_archived',
+} as const;
+
+export type CollaborationAuditEntryBeforeAfter = {
+  field: string;
+  before: string | number | null;
+  after: string | number | null;
+} | null;
+
+export interface CollaborationAuditEntry {
+  entryId: string;
+  caseId: string;
+  kind: CollaborationAuditEntryKind;
+  actorId: string;
+  summary: string;
+  beforeAfter: CollaborationAuditEntryBeforeAfter;
+  derivedFrom: string[];
+  timestamp: string;
+}
+
+export interface CollaborationConsensusPattern {
+  patternId: string;
+  label: string;
+  description: string;
+  exampleCaseIds: string[];
+  agreementRate: number;
+  predictiveValue: number;
+  observedAt: string;
+}
+
+export type CollaborationOrganizationalReasoningMemoryOrganizationalBiasesItem = {
+  biasId: string;
+  label: string;
+  description: string;
+  confidence: number;
+  derivedFrom: string[];
+};
+
+export type CollaborationOrganizationalReasoningMemoryReviewerClustersItem = {
+  clusterId: string;
+  label: string;
+  reviewerIds: string[];
+  rationale: string;
+};
+
+export type CollaborationOrganizationalReasoningMemoryEscalationArchetypesItem = {
+  archetypeId: string;
+  label: string;
+  description: string;
+  exampleEscalationIds: string[];
+};
+
+export type CollaborationOrganizationalReasoningMemoryOverrideArchetypesItem = {
+  archetypeId: string;
+  label: string;
+  description: string;
+  exampleOverrideIds: string[];
+};
+
+export interface CollaborationOrganizationalReasoningMemory {
+  recurringDisagreements: CollaborationDisagreementCluster[];
+  organizationalBiases: CollaborationOrganizationalReasoningMemoryOrganizationalBiasesItem[];
+  reviewerClusters: CollaborationOrganizationalReasoningMemoryReviewerClustersItem[];
+  successPatterns: CollaborationConsensusPattern[];
+  failurePatterns: CollaborationConsensusPattern[];
+  escalationArchetypes: CollaborationOrganizationalReasoningMemoryEscalationArchetypesItem[];
+  overrideArchetypes: CollaborationOrganizationalReasoningMemoryOverrideArchetypesItem[];
+  computedAt: string;
+}
+
+export type CollaborationDecisionLineageNodeKind = typeof CollaborationDecisionLineageNodeKind[keyof typeof CollaborationDecisionLineageNodeKind];
+
+
+export const CollaborationDecisionLineageNodeKind = {
+  cognition_output: 'cognition_output',
+  reviewer_action: 'reviewer_action',
+  evidence_review: 'evidence_review',
+  disagreement_opened: 'disagreement_opened',
+  disagreement_resolved: 'disagreement_resolved',
+  escalation: 'escalation',
+  override: 'override',
+  recommendation_change: 'recommendation_change',
+  consensus_reached: 'consensus_reached',
+} as const;
+
+export interface CollaborationDecisionLineageNode {
+  nodeId: string;
+  caseId: string;
+  kind: CollaborationDecisionLineageNodeKind;
+  actorId: string;
+  summary: string;
+  confidenceAfter: number | null;
+  disagreementSeverityAfter: number | null;
+  derivedFrom: string[];
+  timestamp: string;
+}
+
+export type CollaborationDecisionLineageEdgeRelation = typeof CollaborationDecisionLineageEdgeRelation[keyof typeof CollaborationDecisionLineageEdgeRelation];
+
+
+export const CollaborationDecisionLineageEdgeRelation = {
+  caused: 'caused',
+  informed: 'informed',
+  contradicted: 'contradicted',
+  resolved: 'resolved',
+} as const;
+
+export interface CollaborationDecisionLineageEdge {
+  fromNodeId: string;
+  toNodeId: string;
+  relation: CollaborationDecisionLineageEdgeRelation;
+}
+
+export type CollaborationDecisionTimelineConfidenceSeriesItem = {
+  timestamp: string;
+  value: number;
+};
+
+export type CollaborationDecisionTimelineDisagreementSeriesItem = {
+  timestamp: string;
+  value: number;
+};
+
+export interface CollaborationDecisionTimeline {
+  caseId: string;
+  nodes: CollaborationDecisionLineageNode[];
+  edges: CollaborationDecisionLineageEdge[];
+  confidenceSeries: CollaborationDecisionTimelineConfidenceSeriesItem[];
+  disagreementSeries: CollaborationDecisionTimelineDisagreementSeriesItem[];
+}
+
+export type CollaborationReviewerCalibrationReportHistoricalPatternsItem = {
+  pattern: string;
+  occurrences: number;
+  note: string;
+};
+
+export interface CollaborationReviewerCalibrationReport {
+  reviewerId: string;
+  reviewerCalibration: CollaborationCalibrationProfile[];
+  reliability: number | null;
+  overconfidenceRisk: number | null;
+  disagreementValue: number | null;
+  calibrationDrift: number | null;
+  historicalPatterns: CollaborationReviewerCalibrationReportHistoricalPatternsItem[];
+  computedAt: string;
+}
+
+export interface CollaborationStateResponse {
+  reviewers: CollaborationReviewerIdentity[];
+  cases: CollaborativeCase[];
+  actions: CollaborationReviewerAction[];
+  evidenceReviews: CollaborationEvidenceReviewEntry[];
+  disagreements: CollaborationDisagreement[];
+  disagreementClusters: CollaborationDisagreementCluster[];
+  overrides: CollaborationOverrideRecord[];
+  audit: CollaborationAuditEntry[];
+  organizationalMemory: CollaborationOrganizationalReasoningMemory;
+}
+
+export interface CollaborationCaseDetail {
+  case: CollaborativeCase;
+  actions: CollaborationReviewerAction[];
+  evidenceReviews: CollaborationEvidenceReviewEntry[];
+  disagreements: CollaborationDisagreement[];
+  overrides: CollaborationOverrideRecord[];
+  audit: CollaborationAuditEntry[];
+  timeline: CollaborationDecisionTimeline;
+}
+
+export type OpenCollaborationCaseRequestSubjectKind = typeof OpenCollaborationCaseRequestSubjectKind[keyof typeof OpenCollaborationCaseRequestSubjectKind];
+
+
+export const OpenCollaborationCaseRequestSubjectKind = {
+  candidate: 'candidate',
+  role: 'role',
+  organization: 'organization',
+  pattern: 'pattern',
+} as const;
+
+export interface OpenCollaborationCaseRequest {
+  title: string;
+  subjectKind: OpenCollaborationCaseRequestSubjectKind;
+  subjectId: string;
+  subjectDisplayName: string;
+  framing: string;
+  invitedReviewers: string[];
+  anchoringRecommendation?: CollaborationAnchoringRecommendation;
+  now?: string;
+}
+
+export type CollaborationReviewRequestKind = typeof CollaborationReviewRequestKind[keyof typeof CollaborationReviewRequestKind];
+
+
+export const CollaborationReviewRequestKind = {
+  annotate_evidence: 'annotate_evidence',
+  support_hypothesis: 'support_hypothesis',
+  challenge_hypothesis: 'challenge_hypothesis',
+  attach_uncertainty: 'attach_uncertainty',
+  request_evidence: 'request_evidence',
+  mark_unresolved: 'mark_unresolved',
+  disagree_with_agent: 'disagree_with_agent',
+  disagree_with_reviewer: 'disagree_with_reviewer',
+} as const;
+
+export type CollaborationReviewRequestTarget = {
+  kind: string;
+  id: string;
+};
+
+export type CollaborationReviewRequestDisagreementPositionsItemHolderKind = typeof CollaborationReviewRequestDisagreementPositionsItemHolderKind[keyof typeof CollaborationReviewRequestDisagreementPositionsItemHolderKind];
+
+
+export const CollaborationReviewRequestDisagreementPositionsItemHolderKind = {
+  reviewer: 'reviewer',
+  agent: 'agent',
+} as const;
+
+export type CollaborationReviewRequestDisagreementPositionsItem = {
+  holderKind: CollaborationReviewRequestDisagreementPositionsItemHolderKind;
+  holderId: string;
+  stance: string;
+  /** @minLength 1 */
+  rationale: string;
+  confidence: number;
+  derivedFrom: string[];
+};
+
+export type CollaborationReviewRequestDisagreement = {
+  topic: string;
+  severityScore: number;
+  /** @minItems 2 */
+  positions: CollaborationReviewRequestDisagreementPositionsItem[];
+};
+
+export interface CollaborationReviewRequest {
+  reviewerId: string;
+  kind: CollaborationReviewRequestKind;
+  target: CollaborationReviewRequestTarget;
+  rationale: string;
+  confidence: number;
+  derivedFrom: string[];
+  ambiguityMarkers?: string[];
+  disagreement?: CollaborationReviewRequestDisagreement;
+  transitionTo?: CollaborationCaseState;
+  now?: string;
+}
+
+export interface CollaborationReviewResult {
+  action: CollaborationReviewerAction;
+  disagreement?: CollaborationDisagreement;
+  case: CollaborativeCase;
+}
+
+export type CollaborationOverrideRequestDirection = typeof CollaborationOverrideRequestDirection[keyof typeof CollaborationOverrideRequestDirection];
+
+
+export const CollaborationOverrideRequestDirection = {
+  accept_against_recommendation: 'accept_against_recommendation',
+  reject_against_recommendation: 'reject_against_recommendation',
+  modify: 'modify',
+} as const;
+
+export interface CollaborationOverrideRequest {
+  reviewerId: string;
+  affectedRecommendationId: string;
+  reason: string;
+  confidenceImpact: number;
+  acknowledgedRisks: string[];
+  direction: CollaborationOverrideRequestDirection;
+  now?: string;
+}
+
+export type CollaborationEvidenceReviewRequestKind = typeof CollaborationEvidenceReviewRequestKind[keyof typeof CollaborationEvidenceReviewRequestKind];
+
+
+export const CollaborationEvidenceReviewRequestKind = {
+  annotation: 'annotation',
+  challenge_quality: 'challenge_quality',
+  reliability_adjust: 'reliability_adjust',
+  request_validation: 'request_validation',
+  counter_evidence: 'counter_evidence',
+  ambiguity_flag: 'ambiguity_flag',
+  provenance_flag: 'provenance_flag',
+} as const;
+
+export interface CollaborationEvidenceReviewRequest {
+  evidenceId: string;
+  reviewerId: string;
+  kind: CollaborationEvidenceReviewRequestKind;
+  rationale: string;
+  reliabilityDelta?: number;
+  counterEvidenceIds?: string[];
+  ambiguityMarkers?: string[];
+  now?: string;
+}
+
+export interface CollaborationAuditBundle {
+  caseId: string;
+  entries: CollaborationAuditEntry[];
+}
+

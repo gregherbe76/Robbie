@@ -30,6 +30,17 @@ import type {
   CandidateOrganizationFitResult,
   CandidatePipelineResult,
   CognitiveSynthesis,
+  CollaborationAuditBundle,
+  CollaborationCaseDetail,
+  CollaborationEvidenceReviewEntry,
+  CollaborationEvidenceReviewRequest,
+  CollaborationOverrideRecord,
+  CollaborationOverrideRequest,
+  CollaborationReviewRequest,
+  CollaborationReviewResult,
+  CollaborationReviewerCalibrationReport,
+  CollaborationStateResponse,
+  CollaborativeCase,
   EvaluationReport,
   GraphSnapshot,
   HealthStatus,
@@ -41,6 +52,7 @@ import type {
   IngestionStateResponse,
   IntelligenceCase,
   MemoryEntry,
+  OpenCollaborationCaseRequest,
   OperationsReport,
   OrganizationContext,
   OrganizationIntelligenceReport,
@@ -2426,6 +2438,601 @@ export function useGetIngestionAudit<TData = Awaited<ReturnType<typeof getIngest
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetIngestionAuditQueryOptions(candidateId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetCollaborationStateUrl = () => {
+
+
+
+
+  return `/api/collaboration/state`
+}
+
+/**
+ * @summary Full collaboration snapshot — reviewers, cases, disagreements, overrides, audit, organizational memory
+ */
+export const getCollaborationState = async ( options?: RequestInit): Promise<CollaborationStateResponse> => {
+
+  return customFetch<CollaborationStateResponse>(getGetCollaborationStateUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCollaborationStateQueryKey = () => {
+    return [
+    `/api/collaboration/state`
+    ] as const;
+    }
+
+
+export const getGetCollaborationStateQueryOptions = <TData = Awaited<ReturnType<typeof getCollaborationState>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCollaborationState>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCollaborationStateQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCollaborationState>>> = ({ signal }) => getCollaborationState({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCollaborationState>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCollaborationStateQueryResult = NonNullable<Awaited<ReturnType<typeof getCollaborationState>>>
+export type GetCollaborationStateQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Full collaboration snapshot — reviewers, cases, disagreements, overrides, audit, organizational memory
+ */
+
+export function useGetCollaborationState<TData = Awaited<ReturnType<typeof getCollaborationState>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCollaborationState>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCollaborationStateQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getOpenCollaborationCaseUrl = () => {
+
+
+
+
+  return `/api/collaboration/cases`
+}
+
+/**
+ * @summary Open a new collaborative case
+ */
+export const openCollaborationCase = async (openCollaborationCaseRequest: OpenCollaborationCaseRequest, options?: RequestInit): Promise<CollaborativeCase> => {
+
+  return customFetch<CollaborativeCase>(getOpenCollaborationCaseUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      openCollaborationCaseRequest,)
+  }
+);}
+
+
+
+
+export const getOpenCollaborationCaseMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof openCollaborationCase>>, TError,{data: BodyType<OpenCollaborationCaseRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof openCollaborationCase>>, TError,{data: BodyType<OpenCollaborationCaseRequest>}, TContext> => {
+
+const mutationKey = ['openCollaborationCase'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof openCollaborationCase>>, {data: BodyType<OpenCollaborationCaseRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  openCollaborationCase(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OpenCollaborationCaseMutationResult = NonNullable<Awaited<ReturnType<typeof openCollaborationCase>>>
+    export type OpenCollaborationCaseMutationBody = BodyType<OpenCollaborationCaseRequest>
+    export type OpenCollaborationCaseMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Open a new collaborative case
+ */
+export const useOpenCollaborationCase = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof openCollaborationCase>>, TError,{data: BodyType<OpenCollaborationCaseRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof openCollaborationCase>>,
+        TError,
+        {data: BodyType<OpenCollaborationCaseRequest>},
+        TContext
+      > => {
+      return useMutation(getOpenCollaborationCaseMutationOptions(options));
+    }
+
+export const getGetCollaborationCaseUrl = (id: string,) => {
+
+
+
+
+  return `/api/collaboration/cases/${id}`
+}
+
+/**
+ * @summary Get a collaborative case with its full reasoning bundle
+ */
+export const getCollaborationCase = async (id: string, options?: RequestInit): Promise<CollaborationCaseDetail> => {
+
+  return customFetch<CollaborationCaseDetail>(getGetCollaborationCaseUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCollaborationCaseQueryKey = (id: string,) => {
+    return [
+    `/api/collaboration/cases/${id}`
+    ] as const;
+    }
+
+
+export const getGetCollaborationCaseQueryOptions = <TData = Awaited<ReturnType<typeof getCollaborationCase>>, TError = ErrorType<void>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCollaborationCase>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCollaborationCaseQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCollaborationCase>>> = ({ signal }) => getCollaborationCase(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCollaborationCase>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCollaborationCaseQueryResult = NonNullable<Awaited<ReturnType<typeof getCollaborationCase>>>
+export type GetCollaborationCaseQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get a collaborative case with its full reasoning bundle
+ */
+
+export function useGetCollaborationCase<TData = Awaited<ReturnType<typeof getCollaborationCase>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCollaborationCase>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCollaborationCaseQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getRecordCollaborationReviewUrl = (id: string,) => {
+
+
+
+
+  return `/api/collaboration/cases/${id}/review`
+}
+
+/**
+ * @summary Record a reviewer action against a case
+ */
+export const recordCollaborationReview = async (id: string,
+    collaborationReviewRequest: CollaborationReviewRequest, options?: RequestInit): Promise<CollaborationReviewResult> => {
+
+  return customFetch<CollaborationReviewResult>(getRecordCollaborationReviewUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      collaborationReviewRequest,)
+  }
+);}
+
+
+
+
+export const getRecordCollaborationReviewMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordCollaborationReview>>, TError,{id: string;data: BodyType<CollaborationReviewRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof recordCollaborationReview>>, TError,{id: string;data: BodyType<CollaborationReviewRequest>}, TContext> => {
+
+const mutationKey = ['recordCollaborationReview'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordCollaborationReview>>, {id: string;data: BodyType<CollaborationReviewRequest>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  recordCollaborationReview(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordCollaborationReviewMutationResult = NonNullable<Awaited<ReturnType<typeof recordCollaborationReview>>>
+    export type RecordCollaborationReviewMutationBody = BodyType<CollaborationReviewRequest>
+    export type RecordCollaborationReviewMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Record a reviewer action against a case
+ */
+export const useRecordCollaborationReview = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordCollaborationReview>>, TError,{id: string;data: BodyType<CollaborationReviewRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof recordCollaborationReview>>,
+        TError,
+        {id: string;data: BodyType<CollaborationReviewRequest>},
+        TContext
+      > => {
+      return useMutation(getRecordCollaborationReviewMutationOptions(options));
+    }
+
+export const getRecordCollaborationOverrideUrl = (id: string,) => {
+
+
+
+
+  return `/api/collaboration/cases/${id}/override`
+}
+
+/**
+ * @summary Issue an explicit override against a case recommendation
+ */
+export const recordCollaborationOverride = async (id: string,
+    collaborationOverrideRequest: CollaborationOverrideRequest, options?: RequestInit): Promise<CollaborationOverrideRecord> => {
+
+  return customFetch<CollaborationOverrideRecord>(getRecordCollaborationOverrideUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      collaborationOverrideRequest,)
+  }
+);}
+
+
+
+
+export const getRecordCollaborationOverrideMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordCollaborationOverride>>, TError,{id: string;data: BodyType<CollaborationOverrideRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof recordCollaborationOverride>>, TError,{id: string;data: BodyType<CollaborationOverrideRequest>}, TContext> => {
+
+const mutationKey = ['recordCollaborationOverride'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordCollaborationOverride>>, {id: string;data: BodyType<CollaborationOverrideRequest>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  recordCollaborationOverride(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordCollaborationOverrideMutationResult = NonNullable<Awaited<ReturnType<typeof recordCollaborationOverride>>>
+    export type RecordCollaborationOverrideMutationBody = BodyType<CollaborationOverrideRequest>
+    export type RecordCollaborationOverrideMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Issue an explicit override against a case recommendation
+ */
+export const useRecordCollaborationOverride = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordCollaborationOverride>>, TError,{id: string;data: BodyType<CollaborationOverrideRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof recordCollaborationOverride>>,
+        TError,
+        {id: string;data: BodyType<CollaborationOverrideRequest>},
+        TContext
+      > => {
+      return useMutation(getRecordCollaborationOverrideMutationOptions(options));
+    }
+
+export const getRecordCollaborationEvidenceReviewUrl = (id: string,) => {
+
+
+
+
+  return `/api/collaboration/cases/${id}/evidence-review`
+}
+
+/**
+ * @summary Annotate, challenge, or adjust reliability of a piece of evidence in the context of a case
+ */
+export const recordCollaborationEvidenceReview = async (id: string,
+    collaborationEvidenceReviewRequest: CollaborationEvidenceReviewRequest, options?: RequestInit): Promise<CollaborationEvidenceReviewEntry> => {
+
+  return customFetch<CollaborationEvidenceReviewEntry>(getRecordCollaborationEvidenceReviewUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      collaborationEvidenceReviewRequest,)
+  }
+);}
+
+
+
+
+export const getRecordCollaborationEvidenceReviewMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordCollaborationEvidenceReview>>, TError,{id: string;data: BodyType<CollaborationEvidenceReviewRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof recordCollaborationEvidenceReview>>, TError,{id: string;data: BodyType<CollaborationEvidenceReviewRequest>}, TContext> => {
+
+const mutationKey = ['recordCollaborationEvidenceReview'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordCollaborationEvidenceReview>>, {id: string;data: BodyType<CollaborationEvidenceReviewRequest>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  recordCollaborationEvidenceReview(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordCollaborationEvidenceReviewMutationResult = NonNullable<Awaited<ReturnType<typeof recordCollaborationEvidenceReview>>>
+    export type RecordCollaborationEvidenceReviewMutationBody = BodyType<CollaborationEvidenceReviewRequest>
+    export type RecordCollaborationEvidenceReviewMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Annotate, challenge, or adjust reliability of a piece of evidence in the context of a case
+ */
+export const useRecordCollaborationEvidenceReview = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordCollaborationEvidenceReview>>, TError,{id: string;data: BodyType<CollaborationEvidenceReviewRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof recordCollaborationEvidenceReview>>,
+        TError,
+        {id: string;data: BodyType<CollaborationEvidenceReviewRequest>},
+        TContext
+      > => {
+      return useMutation(getRecordCollaborationEvidenceReviewMutationOptions(options));
+    }
+
+export const getGetCollaborationReviewerCalibrationUrl = (id: string,) => {
+
+
+
+
+  return `/api/collaboration/reviewer/${id}/calibration`
+}
+
+/**
+ * @summary Reviewer calibration report (contextual, per-domain)
+ */
+export const getCollaborationReviewerCalibration = async (id: string, options?: RequestInit): Promise<CollaborationReviewerCalibrationReport> => {
+
+  return customFetch<CollaborationReviewerCalibrationReport>(getGetCollaborationReviewerCalibrationUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCollaborationReviewerCalibrationQueryKey = (id: string,) => {
+    return [
+    `/api/collaboration/reviewer/${id}/calibration`
+    ] as const;
+    }
+
+
+export const getGetCollaborationReviewerCalibrationQueryOptions = <TData = Awaited<ReturnType<typeof getCollaborationReviewerCalibration>>, TError = ErrorType<void>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCollaborationReviewerCalibration>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCollaborationReviewerCalibrationQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCollaborationReviewerCalibration>>> = ({ signal }) => getCollaborationReviewerCalibration(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCollaborationReviewerCalibration>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCollaborationReviewerCalibrationQueryResult = NonNullable<Awaited<ReturnType<typeof getCollaborationReviewerCalibration>>>
+export type GetCollaborationReviewerCalibrationQueryError = ErrorType<void>
+
+
+/**
+ * @summary Reviewer calibration report (contextual, per-domain)
+ */
+
+export function useGetCollaborationReviewerCalibration<TData = Awaited<ReturnType<typeof getCollaborationReviewerCalibration>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCollaborationReviewerCalibration>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCollaborationReviewerCalibrationQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetCollaborationAuditUrl = (caseId: string,) => {
+
+
+
+
+  return `/api/collaboration/audit/${caseId}`
+}
+
+/**
+ * @summary Append-only collaboration audit bundle for a case
+ */
+export const getCollaborationAudit = async (caseId: string, options?: RequestInit): Promise<CollaborationAuditBundle> => {
+
+  return customFetch<CollaborationAuditBundle>(getGetCollaborationAuditUrl(caseId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCollaborationAuditQueryKey = (caseId: string,) => {
+    return [
+    `/api/collaboration/audit/${caseId}`
+    ] as const;
+    }
+
+
+export const getGetCollaborationAuditQueryOptions = <TData = Awaited<ReturnType<typeof getCollaborationAudit>>, TError = ErrorType<void>>(caseId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCollaborationAudit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCollaborationAuditQueryKey(caseId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCollaborationAudit>>> = ({ signal }) => getCollaborationAudit(caseId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(caseId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCollaborationAudit>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCollaborationAuditQueryResult = NonNullable<Awaited<ReturnType<typeof getCollaborationAudit>>>
+export type GetCollaborationAuditQueryError = ErrorType<void>
+
+
+/**
+ * @summary Append-only collaboration audit bundle for a case
+ */
+
+export function useGetCollaborationAudit<TData = Awaited<ReturnType<typeof getCollaborationAudit>>, TError = ErrorType<void>>(
+ caseId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCollaborationAudit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCollaborationAuditQueryOptions(caseId,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

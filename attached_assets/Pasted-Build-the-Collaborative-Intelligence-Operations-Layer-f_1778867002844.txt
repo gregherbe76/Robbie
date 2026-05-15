@@ -1,0 +1,391 @@
+Build the Collaborative Intelligence Operations Layer for the Recruiting Intelligence Framework.
+
+IMPORTANT:
+The framework already has:
+- real-world ingestion
+- candidate intelligence
+- cross-agent cognition
+- organization intelligence
+- calibration/evaluation
+- intelligence operations
+- deterministic benchmark infrastructure
+- provenance-first architecture
+
+The next phase is:
+- collaborative reasoning,
+- multi-reviewer investigations,
+- structured disagreement,
+- organizational decision memory,
+- operational intelligence workflows.
+
+This is NOT:
+- ATS collaboration
+- recruiting pipelines
+- hiring-stage management
+
+This IS:
+- collaborative epistemic operations infrastructure.
+
+--------------------------------------------------
+Core Thesis
+--------------------------------------------------
+
+High-quality hiring decisions emerge from:
+- multiple perspectives,
+- structured disagreement,
+- explicit uncertainty,
+- collaborative investigation,
+- longitudinal organizational memory.
+
+The framework must support:
+- multiple reviewers,
+- conflicting interpretations,
+- collaborative evidence review,
+- structured escalation,
+- decision lineage,
+- reviewer calibration,
+- persistent intelligence cases.
+
+--------------------------------------------------
+Build These Components
+--------------------------------------------------
+
+Create:
+
+lib/framework/src/collaboration/
+
+Required components:
+
+1. ReviewerIdentitySystem
+2. CollaborativeCaseEngine
+3. ReviewerReasoningLayer
+4. StructuredDisagreementEngine
+5. CollaborativeEvidenceReview
+6. OverrideAndExceptionSystem
+7. ReviewerCalibrationEngine
+8. DecisionLineageTracker
+9. OrganizationalConsensusMemory
+10. CollaborationAuditEngine
+
+--------------------------------------------------
+1. ReviewerIdentitySystem
+--------------------------------------------------
+
+Build reviewer identity primitives.
+
+Supported reviewer types:
+- recruiter
+- founder
+- hiring_manager
+- technical_reviewer
+- executive
+- external_advisor
+
+Each reviewer must contain:
+- reviewerId
+- reviewerType
+- expertiseAreas
+- calibrationProfile
+- confidencePatterns
+- historicalDecisionStats
+
+IMPORTANT:
+This is NOT RBAC/auth yet.
+This is reasoning identity infrastructure.
+
+--------------------------------------------------
+2. CollaborativeCaseEngine
+--------------------------------------------------
+
+Extend intelligence cases into collaborative cases.
+
+Each case must support:
+- multiple reviewers
+- reviewer reasoning threads
+- evidence annotations
+- unresolved tensions
+- collaborative investigations
+- escalation chains
+- override tracking
+- temporal decision evolution
+
+Case states:
+- under_investigation
+- awaiting_review
+- disagreement_active
+- escalation_required
+- consensus_reached
+- unresolved
+- archived
+
+Cases must remain:
+- replayable
+- deterministic
+- provenance-complete
+
+--------------------------------------------------
+3. ReviewerReasoningLayer
+--------------------------------------------------
+
+Build reviewer reasoning primitives.
+
+Each reviewer can:
+- annotate evidence
+- support hypotheses
+- challenge hypotheses
+- attach uncertainty
+- request evidence
+- mark unresolved concerns
+- disagree with agents
+- disagree with other reviewers
+
+Every reviewer action must contain:
+- rationale
+- confidence
+- provenance
+- timestamp
+- derivedFrom evidence
+
+No silent annotations.
+
+--------------------------------------------------
+4. StructuredDisagreementEngine
+--------------------------------------------------
+
+Build explicit disagreement modeling.
+
+The system must preserve:
+- reviewer disagreements
+- reviewer vs agent disagreements
+- conflicting evidence interpretations
+- unresolved uncertainty
+
+Examples:
+Founder:
+"High agency signal"
+
+Technical reviewer:
+"Shallow systems depth"
+
+Recruiter:
+"Trajectory unusually strong"
+
+The system must:
+- preserve all positions
+- cluster disagreements
+- identify unresolved tensions
+- estimate disagreement severity
+- track disagreement resolution over time
+
+IMPORTANT:
+Do NOT flatten disagreement into voting.
+
+--------------------------------------------------
+5. CollaborativeEvidenceReview
+--------------------------------------------------
+
+Build collaborative evidence review.
+
+Reviewers must be able to:
+- annotate evidence
+- challenge evidence quality
+- increase/decrease reliability
+- request validation
+- attach counter-evidence
+- flag ambiguity
+- flag provenance concerns
+
+Evidence review history must remain immutable.
+
+--------------------------------------------------
+6. OverrideAndExceptionSystem
+--------------------------------------------------
+
+Support explicit overrides.
+
+Examples:
+- reviewer overrides recommendation
+- founder accepts high-risk candidate
+- technical reviewer blocks candidate
+- escalation bypass
+
+Every override MUST contain:
+- override reason
+- affected recommendation
+- reviewer identity
+- confidence impact
+- acknowledged risks
+- timestamp
+
+No silent overrides.
+
+Track:
+- override outcomes longitudinally
+- override calibration quality
+- reviewer override patterns
+
+--------------------------------------------------
+7. ReviewerCalibrationEngine
+--------------------------------------------------
+
+Track reviewer calibration over time.
+
+Measure:
+- reviewer prediction accuracy
+- reviewer overconfidence
+- disagreement predictive value
+- override success/failure
+- calibration drift
+- uncertainty quality
+
+Output:
+{
+  reviewerCalibration,
+  reliability,
+  overconfidenceRisk,
+  disagreementValue,
+  historicalPatterns
+}
+
+IMPORTANT:
+Do NOT reduce reviewers to scores only.
+Calibration must remain contextual.
+
+--------------------------------------------------
+8. DecisionLineageTracker
+--------------------------------------------------
+
+Track the full evolution of decisions.
+
+Track:
+- original cognition outputs
+- reviewer interactions
+- escalations
+- overrides
+- evidence additions
+- recommendation changes
+- uncertainty evolution
+- disagreement evolution
+
+Generate:
+- replayable decision timelines
+- decision lineage graphs
+- reasoning evolution maps
+
+--------------------------------------------------
+9. OrganizationalConsensusMemory
+--------------------------------------------------
+
+Persist collaborative organizational reasoning.
+
+Track:
+- recurring disagreements
+- organizational biases
+- reviewer clusters
+- successful consensus patterns
+- failed consensus patterns
+- escalation archetypes
+- override archetypes
+
+The system should learn:
+- how THIS organization reasons,
+- where THIS organization disagrees,
+- what tensions predict success/failure.
+
+--------------------------------------------------
+10. CollaborationAuditEngine
+--------------------------------------------------
+
+Build full collaborative auditability.
+
+Track:
+- who changed what
+- why
+- confidence changes
+- evidence reliability changes
+- escalation history
+- unresolved tensions
+- override chains
+- disagreement evolution
+
+Generate:
+- replayable collaboration audits
+- reviewer reasoning maps
+- organizational reasoning lineage
+- epistemic accountability traces
+
+--------------------------------------------------
+API Requirements
+--------------------------------------------------
+
+Add endpoints:
+
+POST /collaboration/cases
+GET /collaboration/cases/{id}
+POST /collaboration/cases/{id}/review
+POST /collaboration/cases/{id}/override
+POST /collaboration/cases/{id}/evidence-review
+GET /collaboration/reviewer/{id}/calibration
+GET /collaboration/audit/{caseId}
+
+OpenAPI-first.
+Generate hooks + Zod validators.
+
+--------------------------------------------------
+Console Requirements
+--------------------------------------------------
+
+Add:
+/collaboration
+
+Main sections:
+- active collaborative cases
+- reviewer reasoning threads
+- disagreement explorer
+- evidence review workspace
+- override history
+- reviewer calibration panel
+- consensus evolution timeline
+- organizational reasoning patterns
+- collaborative audit explorer
+
+UI philosophy:
+- intelligence operations center
+- collaborative investigation workspace
+- epistemic reasoning environment
+
+NOT:
+- ATS collaboration
+- hiring-stage workflow
+- recruiting CRM
+
+--------------------------------------------------
+Critical Constraints
+--------------------------------------------------
+
+Maintain:
+- deterministic execution
+- provenance-first architecture
+- explicit uncertainty
+- disagreement preservation
+- replayability
+- auditability
+
+Do NOT:
+- collapse disagreements into votes
+- silently mutate recommendations
+- hide overrides
+- hide uncertainty
+- flatten reviewer reasoning
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+The framework should evolve from:
+"a recruiting intelligence system"
+
+into:
+
+"a collaborative organizational intelligence operating system
+for hiring decisions under uncertainty."
