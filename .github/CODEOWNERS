@@ -1,0 +1,54 @@
+# Code owners for the Recruiting Intelligence Framework.
+#
+# Each line below maps a path or glob to its required reviewers.
+# Until human maintainers are appointed, the @maintainers placeholder applies.
+# When real owners exist, replace the placeholders with GitHub handles.
+
+# Catch-all
+*                                @maintainers
+
+# Framework — module stewards
+/lib/framework/src/security/             @maintainers
+/lib/framework/src/cognition/            @maintainers
+/lib/framework/src/ingestion/            @maintainers
+/lib/framework/src/evaluation/           @maintainers
+/lib/framework/src/intelligence_operations/  @maintainers
+/lib/framework/src/collaboration/        @maintainers
+/lib/framework/src/organization_intelligence/  @maintainers
+/lib/framework/src/agents/               @maintainers
+/lib/framework/src/skills/               @maintainers
+/lib/framework/src/providers/            @maintainers
+/lib/framework/src/memory/               @maintainers
+/lib/framework/src/orchestrator/         @maintainers
+/lib/framework/src/workflows/            @maintainers
+/lib/framework/src/candidate_graph/      @maintainers
+/lib/framework/src/organization_graph/   @maintainers
+/lib/framework/src/reports/              @maintainers
+/lib/framework/src/registry/             @maintainers
+/lib/framework/src/benchmarks/           @maintainers
+/lib/framework/src/shared/               @maintainers
+
+# HTTP contract — changes ripple through generated clients
+/lib/api-spec/                           @maintainers
+
+# Generated artifacts — do not hand-edit; PRs touching these must explain why.
+/lib/api-client-react/src/generated/     @maintainers
+/lib/api-zod/src/generated/              @maintainers
+
+# Runtime surfaces
+/artifacts/api-server/                   @maintainers
+/artifacts/console/                      @maintainers
+
+# Benchmark runners
+/scripts/                                @maintainers
+
+# Governance / project metadata
+/README.md                               @maintainers
+/ARCHITECTURE.md                         @maintainers
+/CONTRIBUTING.md                         @maintainers
+/GOVERNANCE.md                           @maintainers
+/SECURITY.md                             @maintainers
+/ROADMAP.md                              @maintainers
+/CHANGELOG.md                            @maintainers
+/.github/                                @maintainers
+/docs/                                   @maintainers

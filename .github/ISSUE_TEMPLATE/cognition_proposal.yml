@@ -1,0 +1,89 @@
+name: Cognition / architecture proposal
+description: Propose a new cognition behavior, agent, skill, ingestion adapter, or architectural change.
+labels: ["proposal", "design"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Architectural and cognition proposals are how the framework grows. The bar is high — please bring a benchmark scenario along with the proposal, not just a description.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Proposal kind
+      options:
+        - new cognition module / behavior
+        - new agent
+        - new skill
+        - new ingestion adapter
+        - new evaluation / calibration rule
+        - new collaboration flow
+        - new security capability / action
+        - architectural change (module boundaries / public exports / OpenAPI)
+        - benchmark expansion
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What reasoning gap or limitation does this address? Be concrete.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: |
+        Describe the change. Include:
+        - module(s) affected
+        - public surface added / changed
+        - data shapes (signal types, capability tokens, etc.)
+        - interaction with existing modules
+    validations:
+      required: true
+  - type: textarea
+    id: invariants
+    attributes:
+      label: Invariants
+      description: |
+        Confirm explicitly which framework invariants the proposal preserves and how:
+        - deterministic execution
+        - mandatory provenance
+        - explicit uncertainty
+        - capability-based authorization
+        - append-only audit
+        - multi-tenant isolation
+        - benchmark coverage
+    validations:
+      required: true
+  - type: textarea
+    id: benchmark
+    attributes:
+      label: Benchmark scenario
+      description: |
+        Sketch the benchmark scenario(s) that would exercise this behavior.
+        For cognition proposals: input world, expected output shape, which guards it stresses.
+        For security proposals: action, capability gap, expected denial reason.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Explicitly out of scope
+      description: What this proposal is NOT doing.
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmations
+      options:
+        - label: I have read CONTRIBUTING.md and the framework invariants.
+          required: true
+        - label: This proposal does not introduce ATS / pipeline / kanban abstractions.
+          required: true
+        - label: This proposal does not introduce reviewer-type RBAC.
+          required: true

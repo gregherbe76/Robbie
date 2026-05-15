@@ -1,0 +1,72 @@
+name: Benchmark regression
+description: A previously passing benchmark scenario now fails, or a guard category regressed.
+labels: ["benchmark", "regression", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Benchmarks are reproducibility contracts. A regression means the framework's behavior drifted — this is taken seriously.
+  - type: input
+    id: commit
+    attributes:
+      label: Commit / version at which the regression appeared
+      placeholder: e.g. 6af9612 or the PR number
+    validations:
+      required: true
+  - type: dropdown
+    id: suite
+    attributes:
+      label: Which suite regressed?
+      options:
+        - cognition (pnpm benchmark:cognition)
+        - cognitive smoke (pnpm test:cognitive-smoke)
+        - security (in api-server bootstrap)
+    validations:
+      required: true
+  - type: input
+    id: scenario
+    attributes:
+      label: Failing scenario id
+      placeholder: e.g. inflated_senior, cross_org_access_attempt
+    validations:
+      required: true
+  - type: dropdown
+    id: guard
+    attributes:
+      label: Failing guard category (cognition only)
+      options:
+        - determinism
+        - provenance
+        - calibration
+        - snapshot
+        - guards
+        - n/a (security suite)
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Full benchmark output
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: diff
+    attributes:
+      label: Snapshot diff (if snapshot failure)
+      description: Paste the diff between the committed snapshot and the new output, or attach as a file.
+      render: diff
+  - type: textarea
+    id: suspected
+    attributes:
+      label: Suspected cause
+      description: If you have a hypothesis (e.g. "PR #123 changed the synthesis ordering"), share it here.
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmations
+      options:
+        - label: I have confirmed this is a regression (not an intentional snapshot update without justification).
+          required: true
+        - label: I have not silently regenerated the snapshot.
+          required: true

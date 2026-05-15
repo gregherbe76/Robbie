@@ -1,0 +1,101 @@
+name: Bug report
+description: Report a reproducible bug in the framework, API, or console.
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please give us enough detail to reproduce the bug deterministically — this framework values reproducibility above almost everything else.
+  - type: input
+    id: version
+    attributes:
+      label: Framework version / commit
+      description: Output of `git rev-parse --short HEAD` or the release tag.
+      placeholder: e.g. v0.1.0 or 6af9612
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      multiple: true
+      options:
+        - cognition
+        - ingestion
+        - organization_intelligence
+        - evaluation
+        - intelligence_operations
+        - collaboration
+        - security
+        - agents
+        - skills
+        - providers
+        - memory
+        - orchestrator
+        - workflows
+        - candidate_graph
+        - organization_graph
+        - reports
+        - registry
+        - benchmarks
+        - api-server
+        - console
+        - openapi / codegen
+        - tooling / scripts
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Exact steps. Code snippets, inputs, and expected vs. actual outputs.
+      placeholder: |
+        1. `pnpm install`
+        2. `pnpm benchmark:cognition`
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs / output
+      render: shell
+  - type: dropdown
+    id: invariants
+    attributes:
+      label: Does this bug touch any framework invariant?
+      multiple: true
+      options:
+        - determinism
+        - provenance
+        - confidence / uncertainty
+        - capability-based authorization
+        - audit immutability
+        - multi-tenant isolation
+        - benchmark reproducibility
+        - none of the above
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmations
+      options:
+        - label: I have searched existing issues and discussions.
+          required: true
+        - label: I have run `pnpm run typecheck` and the output is reflected above.
+          required: false
+        - label: This bug is reproducible from a clean clone.
+          required: false
