@@ -183,3 +183,185 @@ export interface Report {
   evidence: ReportEvidence[];
 }
 
+export interface ReasoningStep {
+  step: string;
+  detail: string;
+  /** @nullable */
+  value?: number | null;
+  derivedFrom?: string[];
+}
+
+export interface AgentReasoningEnvelope {
+  agentId: string;
+  candidateId: string;
+  confidence: number;
+  reasoning: ReasoningStep[];
+  evidenceChain: string[];
+  provenance: Provenance;
+}
+
+export type BayesianFitResultSupportingEvidenceItem = {
+  id: string;
+  weight: number;
+  summary: string;
+};
+
+export type BayesianFitResultRefutingEvidenceItem = {
+  id: string;
+  weight: number;
+  summary: string;
+};
+
+export type BayesianFitResultPerDomainItem = {
+  domain: string;
+  supporting: number;
+  refuting: number;
+  logOddsDelta: number;
+};
+
+export interface BayesianFitResult {
+  fitScore: number;
+  prior: number;
+  evidenceStrength: number;
+  uncertaintyLevel: number;
+  supportingEvidence: BayesianFitResultSupportingEvidenceItem[];
+  refutingEvidence: BayesianFitResultRefutingEvidenceItem[];
+  missingEvidence: string[];
+  perDomain: BayesianFitResultPerDomainItem[];
+}
+
+export type ContradictionKind = typeof ContradictionKind[keyof typeof ContradictionKind];
+
+
+export const ContradictionKind = {
+  'unsupported-claim': 'unsupported-claim',
+  'cross-source': 'cross-source',
+  'shallow-reasoning': 'shallow-reasoning',
+  'vocabulary-without-depth': 'vocabulary-without-depth',
+  'fake-seniority': 'fake-seniority',
+} as const;
+
+export type ContradictionSeverity = typeof ContradictionSeverity[keyof typeof ContradictionSeverity];
+
+
+export const ContradictionSeverity = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+export interface Contradiction {
+  id: string;
+  kind: ContradictionKind;
+  severity: ContradictionSeverity;
+  domain: string;
+  summary: string;
+  derivedFrom: string[];
+}
+
+export type ContradictionResultUnsupportedClaimsItem = {
+  claimId: string;
+  summary: string;
+};
+
+export type ContradictionResultWeakSignalsItem = {
+  id: string;
+  summary: string;
+};
+
+export type ContradictionResultVerifiedSignalsItem = {
+  id: string;
+  summary: string;
+};
+
+export interface ContradictionResult {
+  contradictionScore: number;
+  contradictions: Contradiction[];
+  unsupportedClaims: ContradictionResultUnsupportedClaimsItem[];
+  weakSignals: ContradictionResultWeakSignalsItem[];
+  verifiedSignals: ContradictionResultVerifiedSignalsItem[];
+}
+
+export type TrajectorySignalId = typeof TrajectorySignalId[keyof typeof TrajectorySignalId];
+
+
+export const TrajectorySignalId = {
+  'accelerating-builder': 'accelerating-builder',
+  'plateau-detected': 'plateau-detected',
+  'emerging-elite': 'emerging-elite',
+  'unusually-fast-progression': 'unusually-fast-progression',
+  'high-ownership-momentum': 'high-ownership-momentum',
+  'complexity-growth': 'complexity-growth',
+} as const;
+
+export interface TrajectorySignal {
+  id: TrajectorySignalId;
+  rationale: string;
+  derivedFrom: string[];
+}
+
+export type TrajectoryRiskId = typeof TrajectoryRiskId[keyof typeof TrajectoryRiskId];
+
+
+export const TrajectoryRiskId = {
+  plateau: 'plateau',
+  volatility: 'volatility',
+  'single-data-point': 'single-data-point',
+  'ownership-stagnation': 'ownership-stagnation',
+} as const;
+
+export type TrajectoryRiskSeverity = typeof TrajectoryRiskSeverity[keyof typeof TrajectoryRiskSeverity];
+
+
+export const TrajectoryRiskSeverity = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+export interface TrajectoryRisk {
+  id: TrajectoryRiskId;
+  severity: TrajectoryRiskSeverity;
+  rationale: string;
+}
+
+export type TrajectoryResultComplexityCurveItem = {
+  roleId: string;
+  title: string;
+  year: number;
+  composite: number;
+};
+
+export interface TrajectoryResult {
+  trajectoryScore: number;
+  growthVelocity: number;
+  acceleration: number;
+  momentum: number;
+  founderPotential: number;
+  complexityCurve: TrajectoryResultComplexityCurveItem[];
+  trajectorySignals: TrajectorySignal[];
+  risks: TrajectoryRisk[];
+}
+
+export type BayesianReasoning = AgentReasoningEnvelope & {
+  result: BayesianFitResult;
+};
+
+export type ContradictionReasoning = AgentReasoningEnvelope & {
+  result: ContradictionResult;
+};
+
+export type TrajectoryReasoning = AgentReasoningEnvelope & {
+  result: TrajectoryResult;
+};
+
+export interface CandidateAnalysis {
+  candidateId: string;
+  candidateName: string;
+  targetRole: string;
+  createdAt: string;
+  bayesian: BayesianReasoning;
+  contradiction: ContradictionReasoning;
+  trajectory: TrajectoryReasoning;
+}
+

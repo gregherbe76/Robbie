@@ -1,104 +1,97 @@
 /**
- * Bootstraps an in-process `FrameworkRegistry` and seeds a small amount of
- * reference data so the control plane is never empty on first boot.
+ * Bootstraps an in-process `FrameworkRegistry` and seeds:
+ *  - the three flagship intelligence agents (Bayesian, Contradiction, Trajectory)
+ *  - reference skills, providers, and workflows
+ *  - reference memory entries, graph snapshots, and reports
+ *  - pre-computed candidate analyses (running all 3 flagship agents on the
+ *    sample dossiers, deterministically, so the introspection UI is populated).
  *
- * This is intentionally light — the framework's purpose is to be a foundation
- * for higher-level recruiting intelligence products, not to ship recruiting
- * features itself. Real plugins replace these seeds.
+ * Real plugins replace these seeds.
  */
 
 import {
   createFrameworkRegistry,
   type FrameworkRegistry,
 } from "@workspace/framework/registry";
-import type { Agent } from "@workspace/framework/agents";
 import type { Skill } from "@workspace/framework/skills";
 import type { LLMProvider } from "@workspace/framework/providers";
 import type { Workflow } from "@workspace/framework/workflows";
+import {
+  BayesianScoringAgent,
+  ContradictionAgent,
+  TrajectoryAgent,
+  SAMPLE_DOSSIERS,
+  type AgentReasoning,
+  type BayesianFitResult,
+  type ContradictionResult,
+  type TrajectoryResult,
+  type CandidateDossier,
+} from "@workspace/framework/agents/flagship";
 
 const startedAt = Date.now();
 
+export interface CandidateAnalysis {
+  candidateId: string;
+  candidateName: string;
+  targetRole: string;
+  createdAt: string;
+  bayesian: AgentReasoning<BayesianFitResult>;
+  contradiction: AgentReasoning<ContradictionResult>;
+  trajectory: AgentReasoning<TrajectoryResult>;
+}
+
+const bayesian = new BayesianScoringAgent();
+const contradiction = new ContradictionAgent();
+const trajectory = new TrajectoryAgent();
+
+const analyses = new Map<string, CandidateAnalysis>();
+const dossiers = new Map<string, CandidateDossier>();
+
 function seedAgents(registry: FrameworkRegistry): void {
-  const agents: Agent[] = [
-    {
-      manifest: {
-        id: "trajectory-analyst",
-        name: "Trajectory Analyst",
-        role: "career-trajectory",
-        description:
-          "Reasons about a candidate's velocity, scope changes, and trajectory inflection points across roles.",
-        capabilities: ["graph-walk", "temporal-reasoning", "signal-extraction"],
-        allowedSkills: ["extract-trajectory", "score-velocity"],
-        defaultProvider: "openai",
-      },
-      status: "active",
-      async handle() {
-        return { signals: [], rationale: "stub" };
-      },
-    },
-    {
-      manifest: {
-        id: "reference-triangulator",
-        name: "Reference Triangulator",
-        role: "evidence-corroboration",
-        description:
-          "Cross-checks claims against multiple sources and flags inconsistencies with confidence scores.",
-        capabilities: ["cross-source-check", "inconsistency-detection"],
-        allowedSkills: ["verify-claim", "score-source-credibility"],
-        defaultProvider: "anthropic",
-      },
-      status: "active",
-      async handle() {
-        return { signals: [], rationale: "stub" };
-      },
-    },
-    {
-      manifest: {
-        id: "bias-auditor",
-        name: "Bias Auditor",
-        role: "fairness-audit",
-        description:
-          "Audits other agents' outputs for proxy bias, calibration drift, and decision skew.",
-        capabilities: ["calibration-check", "proxy-detection"],
-        allowedSkills: ["audit-decision"],
-        defaultProvider: "anthropic",
-      },
-      status: "idle",
-      async handle() {
-        return { signals: [], rationale: "stub" };
-      },
-    },
-    {
-      manifest: {
-        id: "fit-synthesizer",
-        name: "Fit Synthesizer",
-        role: "bidirectional-fit",
-        description:
-          "Synthesises candidate-graph and organization-graph signals into a bidirectional fit narrative.",
-        capabilities: ["graph-join", "narrative-synthesis"],
-        allowedSkills: ["compute-fit", "synthesize-report"],
-        defaultProvider: "openai",
-      },
-      status: "active",
-      async handle() {
-        return { signals: [], rationale: "stub" };
-      },
-    },
-  ];
-  for (const a of agents) registry.agents.register(a);
+  registry.agents.register(bayesian);
+  registry.agents.register(contradiction);
+  registry.agents.register(trajectory);
 }
 
 function seedSkills(registry: FrameworkRegistry): void {
   const skills: Skill[] = [
     {
       manifest: {
-        id: "extract-trajectory",
-        name: "Extract Trajectory",
+        id: "weight-evidence",
+        name: "Weight Evidence",
+        category: "scoring",
+        description:
+          "Apply per-source credibility and per-domain importance to raw evidence weights.",
+        inputs: ["evidence", "organizationContext"],
+        outputs: ["weightedEvidence"],
+      },
+      async execute() {
+        return { output: {}, signals: [], rationale: "stub" };
+      },
+    },
+    {
+      manifest: {
+        id: "compute-posterior",
+        name: "Compute Posterior",
+        category: "scoring",
+        description:
+          "Combine prior with weighted evidence via Bayesian log-odds to produce a posterior fit probability.",
+        inputs: ["prior", "weightedEvidence"],
+        outputs: ["fitScore", "uncertainty"],
+      },
+      async execute() {
+        return { output: {}, signals: [], rationale: "stub" };
+      },
+    },
+    {
+      manifest: {
+        id: "extract-claims",
+        name: "Extract Claims",
         category: "extraction",
         description:
-          "Parses a candidate's history into a sequence of scope changes with velocity and inflection annotations.",
+          "Parse CV and interview transcripts into normalised, domain-tagged claims.",
         inputs: ["candidateProfile"],
-        outputs: ["trajectoryGraph", "velocitySignals"],
+        outputs: ["claims"],
       },
       async execute() {
         return { output: {}, signals: [], rationale: "stub" };
@@ -106,27 +99,13 @@ function seedSkills(registry: FrameworkRegistry): void {
     },
     {
       manifest: {
-        id: "score-velocity",
-        name: "Score Velocity",
-        category: "scoring",
-        description:
-          "Produces a probabilistic velocity score for a trajectory segment.",
-        inputs: ["trajectoryGraph"],
-        outputs: ["velocityScore"],
-      },
-      async execute() {
-        return { output: {}, signals: [], rationale: "stub" };
-      },
-    },
-    {
-      manifest: {
-        id: "verify-claim",
-        name: "Verify Claim",
+        id: "cross-source-compare",
+        name: "Cross-Source Compare",
         category: "verification",
         description:
-          "Triangulates a candidate claim against independent sources and returns confidence + evidence.",
-        inputs: ["claim", "sources"],
-        outputs: ["verifiedClaim"],
+          "Compare claims against evidence drawn from independent sources and flag disagreement patterns.",
+        inputs: ["claims", "evidence"],
+        outputs: ["contradictions", "verifiedSignals"],
       },
       async execute() {
         return { output: {}, signals: [], rationale: "stub" };
@@ -134,41 +113,27 @@ function seedSkills(registry: FrameworkRegistry): void {
     },
     {
       manifest: {
-        id: "score-source-credibility",
-        name: "Score Source Credibility",
-        category: "scoring",
-        description:
-          "Estimates the credibility weight to apply to a given source for a given claim type.",
-        inputs: ["source", "claimType"],
-        outputs: ["credibility"],
-      },
-      async execute() {
-        return { output: {}, signals: [], rationale: "stub" };
-      },
-    },
-    {
-      manifest: {
-        id: "audit-decision",
-        name: "Audit Decision",
-        category: "reasoning",
-        description:
-          "Reviews a decision's evidence chain and flags proxy-bias risks or calibration drift.",
-        inputs: ["decision", "evidence"],
-        outputs: ["auditReport"],
-      },
-      async execute() {
-        return { output: {}, signals: [], rationale: "stub" };
-      },
-    },
-    {
-      manifest: {
-        id: "compute-fit",
-        name: "Compute Fit",
+        id: "model-trajectory",
+        name: "Model Trajectory",
         category: "synthesis",
         description:
-          "Joins candidate-graph and organization-graph subgraphs into a bidirectional fit estimate.",
-        inputs: ["candidateGraph", "organizationGraph"],
-        outputs: ["fitVector"],
+          "Compute velocity, acceleration, and momentum across a chronological role history.",
+        inputs: ["roleHistory", "githubSnapshot"],
+        outputs: ["trajectoryScore", "trajectorySignals"],
+      },
+      async execute() {
+        return { output: {}, signals: [], rationale: "stub" };
+      },
+    },
+    {
+      manifest: {
+        id: "calibrate-confidence",
+        name: "Calibrate Confidence",
+        category: "reasoning",
+        description:
+          "Calibrate an agent's confidence from evidence strength, source diversity, and average weight.",
+        inputs: ["signals"],
+        outputs: ["confidence"],
       },
       async execute() {
         return { output: {}, signals: [], rationale: "stub" };
@@ -180,7 +145,7 @@ function seedSkills(registry: FrameworkRegistry): void {
         name: "Synthesize Report",
         category: "synthesis",
         description:
-          "Produces an auditable report with full evidence chain from a set of signals.",
+          "Produce an auditable report with full evidence chain from a set of signals.",
         inputs: ["signals"],
         outputs: ["report"],
       },
@@ -220,35 +185,35 @@ function seedWorkflows(registry: FrameworkRegistry): void {
   const workflows: Workflow[] = [
     {
       manifest: {
-        id: "profile-ingested",
-        name: "Profile Ingested",
+        id: "candidate-analysis",
+        name: "Candidate Analysis",
         description:
-          "On profile ingestion, run trajectory analysis, reference triangulation, and bias audit, then synthesize a report.",
-        trigger: "profile.ingested",
+          "On dossier ingestion, run trajectory modeling, contradiction detection, and Bayesian scoring, then synthesize a report.",
+        trigger: "dossier.ingested",
         steps: [
           {
-            id: "extract",
-            agentId: "trajectory-analyst",
-            skillId: "extract-trajectory",
-            description: "Build trajectory graph from profile",
+            id: "trajectory",
+            agentId: "trajectory-modeler",
+            skillId: "model-trajectory",
+            description: "Model trajectory and momentum from role history.",
           },
           {
-            id: "verify",
-            agentId: "reference-triangulator",
-            skillId: "verify-claim",
-            description: "Triangulate top claims",
+            id: "contradictions",
+            agentId: "contradiction-detector",
+            skillId: "cross-source-compare",
+            description: "Cross-check claims against multi-source evidence.",
           },
           {
-            id: "audit",
-            agentId: "bias-auditor",
-            skillId: "audit-decision",
-            description: "Audit pipeline outputs for proxy bias",
+            id: "bayesian",
+            agentId: "bayesian-scorer",
+            skillId: "compute-posterior",
+            description: "Compute posterior fit probability with calibrated confidence.",
           },
           {
             id: "synthesize",
-            agentId: "fit-synthesizer",
+            agentId: "bayesian-scorer",
             skillId: "synthesize-report",
-            description: "Synthesize auditable report",
+            description: "Synthesize an auditable report with full evidence chain.",
           },
         ],
       },
@@ -265,10 +230,10 @@ function seedWorkflows(registry: FrameworkRegistry): void {
         trigger: "role.opened",
         steps: [
           {
-            id: "fit",
-            agentId: "fit-synthesizer",
-            skillId: "compute-fit",
-            description: "Pre-compute fit vector baseline",
+            id: "calibrate",
+            agentId: "bayesian-scorer",
+            skillId: "calibrate-confidence",
+            description: "Pre-compute confidence calibration baseline.",
           },
         ],
       },
@@ -280,90 +245,46 @@ function seedWorkflows(registry: FrameworkRegistry): void {
   for (const w of workflows) registry.workflows.register(w);
 }
 
-async function seedMemory(registry: FrameworkRegistry): Promise<void> {
-  const now = new Date().toISOString();
-  await registry.memory.put({
-    id: "mem-1",
-    scope: "candidate",
-    subjectId: "cand-001",
-    key: "trajectory.inflection",
-    value: { from: "IC", to: "TL", delta_months: 18 },
-    summary: "Sharp scope expansion at month 18; consistent across sources.",
-    confidence: 0.82,
-    provenance: {
-      producedBy: "trajectory-analyst",
-      producedAt: now,
-      rationale: "Two independent endorsements + project shipped at TL scope.",
-    },
-    createdAt: now,
-    tags: ["trajectory"],
-  });
-  await registry.memory.put({
-    id: "mem-2",
-    scope: "organization",
-    subjectId: "org-001",
-    key: "calibration.platform-eng",
-    value: { p50_velocity: 0.6 },
-    summary:
-      "Org platform-eng calibration drifted +0.1 velocity vs last quarter.",
-    confidence: 0.71,
-    provenance: { producedBy: "bias-auditor", producedAt: now },
-    createdAt: now,
-    tags: ["calibration"],
-  });
-  await registry.memory.put({
-    id: "mem-3",
-    scope: "role",
-    subjectId: "role-014",
-    key: "requirement.evidence-density",
-    value: { distributed_systems: 0.65 },
-    summary: "Role expects measurable signal density in distributed systems.",
-    confidence: 0.9,
-    provenance: { producedBy: "fit-synthesizer", producedAt: now },
-    createdAt: now,
-    tags: ["requirement"],
-  });
-}
-
 async function seedGraphs(registry: FrameworkRegistry): Promise<void> {
   await registry.candidateGraph.upsertNode({
     id: "cand-001",
     type: "candidate",
-    label: "Candidate 001",
+    label: "Avery Park",
   });
   await registry.candidateGraph.upsertNode({
-    id: "role-eng-1",
+    id: "role-staff",
     type: "role",
-    label: "Staff Engineer",
-  });
-  await registry.candidateGraph.upsertNode({
-    id: "comp-acme",
-    type: "company",
-    label: "Acme Systems",
+    label: "Staff Platform Engineer",
   });
   await registry.candidateGraph.upsertNode({
     id: "skill-dist",
     type: "skill",
     label: "Distributed Systems",
-    weight: 0.78,
+    weight: 0.85,
+  });
+  await registry.candidateGraph.upsertNode({
+    id: "skill-rel",
+    type: "skill",
+    label: "Reliability",
+    weight: 0.65,
   });
   await registry.candidateGraph.upsertEdge({
     from: "cand-001",
-    to: "role-eng-1",
+    to: "role-staff",
     relation: "held_role",
-    weight: 1,
-  });
-  await registry.candidateGraph.upsertEdge({
-    from: "role-eng-1",
-    to: "comp-acme",
-    relation: "worked_at",
     weight: 1,
   });
   await registry.candidateGraph.upsertEdge({
     from: "cand-001",
     to: "skill-dist",
     relation: "demonstrates",
-    weight: 0.78,
+    weight: 0.85,
+  });
+  await registry.candidateGraph.upsertEdge({
+    from: "cand-001",
+    to: "skill-rel",
+    relation: "demonstrates",
+    weight: 0.65,
   });
 
   await registry.organizationGraph.upsertNode({
@@ -407,54 +328,121 @@ async function seedGraphs(registry: FrameworkRegistry): Promise<void> {
   });
 }
 
-async function seedReports(registry: FrameworkRegistry): Promise<void> {
+async function seedAnalyses(registry: FrameworkRegistry): Promise<void> {
   const now = new Date().toISOString();
-  await registry.reports.put({
-    id: "rep-001",
-    title: "Candidate 001 — Trajectory Synthesis",
-    kind: "candidate",
-    createdAt: now,
-    summary:
-      "Trajectory analyst + reference triangulator agree on a sustained scope expansion. Confidence is bound by a single missing reference.",
-    confidence: 0.74,
-    sections: [
-      {
-        heading: "Trajectory",
-        body: "Two scope inflections in 36 months; both corroborated by shipped artifacts.",
-      },
-      {
-        heading: "Risks",
-        body: "One claimed credential lacks an independent source.",
-      },
-    ],
-    evidence: [],
-  });
-  await registry.reports.put({
-    id: "rep-002",
-    title: "Northwind — Platform Eng Calibration Drift",
-    kind: "organization",
-    createdAt: now,
-    summary:
-      "Bias auditor detected +0.1 velocity drift vs last quarter; recalibrate before next loop.",
-    confidence: 0.71,
-    sections: [
-      {
-        heading: "Drift",
-        body: "Velocity expectations have crept above the calibrated p50.",
-      },
-    ],
-    evidence: [],
-  });
+  for (const dossier of SAMPLE_DOSSIERS) {
+    dossiers.set(dossier.candidateId, dossier);
+    const b = bayesian.run(dossier);
+    const c = contradiction.run(dossier);
+    const t = trajectory.run(dossier);
+
+    const analysis: CandidateAnalysis = {
+      candidateId: dossier.candidateId,
+      candidateName: dossier.name,
+      targetRole: dossier.targetRole,
+      createdAt: now,
+      bayesian: b,
+      contradiction: c,
+      trajectory: t,
+    };
+    analyses.set(dossier.candidateId, analysis);
+
+    // Persist summary memory entries (one per agent output) so the
+    // memory introspection page reflects real reasoning artefacts.
+    await registry.memory.put({
+      id: `mem:${dossier.candidateId}:bayesian`,
+      scope: "candidate",
+      subjectId: dossier.candidateId,
+      key: "bayesian.fit",
+      value: b.result,
+      summary: `P(hire)=${b.result.fitScore} for ${dossier.targetRole}; uncertainty ${b.result.uncertaintyLevel}.`,
+      confidence: b.confidence,
+      provenance: b.provenance,
+      createdAt: now,
+      tags: ["bayesian", "fit"],
+    });
+    await registry.memory.put({
+      id: `mem:${dossier.candidateId}:contradiction`,
+      scope: "candidate",
+      subjectId: dossier.candidateId,
+      key: "contradiction.summary",
+      value: c.result,
+      summary: `${c.result.contradictions.length} contradiction(s), ${c.result.unsupportedClaims.length} unsupported claim(s).`,
+      confidence: c.confidence,
+      provenance: c.provenance,
+      createdAt: now,
+      tags: ["contradictions"],
+    });
+    await registry.memory.put({
+      id: `mem:${dossier.candidateId}:trajectory`,
+      scope: "candidate",
+      subjectId: dossier.candidateId,
+      key: "trajectory.summary",
+      value: t.result,
+      summary: `Trajectory ${t.result.trajectoryScore}; momentum ${t.result.momentum}; ${t.result.trajectorySignals.length} signal(s).`,
+      confidence: t.confidence,
+      provenance: t.provenance,
+      createdAt: now,
+      tags: ["trajectory"],
+    });
+
+    // Persist an audit-friendly report per candidate.
+    await registry.reports.put({
+      id: `rep:${dossier.candidateId}`,
+      title: `${dossier.name} — Intelligence Synthesis`,
+      kind: "candidate",
+      createdAt: now,
+      summary: `Bayesian fit ${b.result.fitScore} (conf ${b.confidence.toFixed(2)}); ${c.result.contradictions.length} contradiction(s); trajectory ${t.result.trajectoryScore}.`,
+      confidence: Math.min(b.confidence, c.confidence, t.confidence),
+      sections: [
+        {
+          heading: "Fit",
+          body: b.provenance.rationale ?? "",
+        },
+        {
+          heading: "Contradictions",
+          body:
+            c.result.contradictions.length === 0
+              ? "No contradictions detected; all strong claims have corroborating evidence."
+              : c.result.contradictions
+                  .map((x) => `[${x.severity}] ${x.summary}`)
+                  .join("\n"),
+        },
+        {
+          heading: "Trajectory",
+          body: t.provenance.rationale ?? "",
+        },
+      ],
+      evidence: [
+        {
+          id: `sig:${dossier.candidateId}:fit`,
+          kind: "bayesian-fit",
+          value: b.result.fitScore,
+          confidence: b.confidence,
+          provenance: b.provenance,
+        },
+        {
+          id: `sig:${dossier.candidateId}:contradictions`,
+          kind: "contradiction-score",
+          value: c.result.contradictionScore,
+          confidence: c.confidence,
+          provenance: c.provenance,
+        },
+        {
+          id: `sig:${dossier.candidateId}:trajectory`,
+          kind: "trajectory-score",
+          value: t.result.trajectoryScore,
+          confidence: t.confidence,
+          provenance: t.provenance,
+        },
+      ],
+    });
+  }
 }
 
 let cached: FrameworkRegistry | null = null;
 let initPromise: Promise<FrameworkRegistry> | null = null;
 
-/**
- * Eagerly initialize the framework and seed all in-memory registries.
- * The server awaits this before accepting traffic so introspection routes
- * never observe partially-seeded state.
- */
 export function initFramework(): Promise<FrameworkRegistry> {
   if (initPromise) return initPromise;
   initPromise = (async () => {
@@ -463,9 +451,8 @@ export function initFramework(): Promise<FrameworkRegistry> {
     seedSkills(registry);
     seedProviders(registry);
     seedWorkflows(registry);
-    await seedMemory(registry);
     await seedGraphs(registry);
-    await seedReports(registry);
+    await seedAnalyses(registry);
     cached = registry;
     return registry;
   })();
@@ -479,6 +466,18 @@ export function getFramework(): FrameworkRegistry {
     );
   }
   return cached;
+}
+
+export function getAnalyses(): CandidateAnalysis[] {
+  return Array.from(analyses.values());
+}
+
+export function getAnalysis(candidateId: string): CandidateAnalysis | null {
+  return analyses.get(candidateId) ?? null;
+}
+
+export function getDossier(candidateId: string): CandidateDossier | null {
+  return dossiers.get(candidateId) ?? null;
 }
 
 export function getUptimeSeconds(): number {

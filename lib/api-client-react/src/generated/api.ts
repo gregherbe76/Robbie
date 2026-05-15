@@ -20,6 +20,7 @@ import type {
 
 import type {
   Agent,
+  CandidateAnalysis,
   GraphSnapshot,
   HealthStatus,
   MemoryEntry,
@@ -725,6 +726,165 @@ export function useGetOrganizationGraph<TData = Awaited<ReturnType<typeof getOrg
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetOrganizationGraphQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListIntelligenceAnalysesUrl = () => {
+
+
+
+
+  return `/api/intelligence/analyses`
+}
+
+/**
+ * Returns all candidate analyses pre-computed by the flagship agents
+(Bayesian scoring, contradiction detection, trajectory modeling).
+Each analysis carries reasoning chains, evidence attribution, and
+provenance for full auditability.
+
+ * @summary List candidate intelligence analyses
+ */
+export const listIntelligenceAnalyses = async ( options?: RequestInit): Promise<CandidateAnalysis[]> => {
+
+  return customFetch<CandidateAnalysis[]>(getListIntelligenceAnalysesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListIntelligenceAnalysesQueryKey = () => {
+    return [
+    `/api/intelligence/analyses`
+    ] as const;
+    }
+
+
+export const getListIntelligenceAnalysesQueryOptions = <TData = Awaited<ReturnType<typeof listIntelligenceAnalyses>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listIntelligenceAnalyses>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListIntelligenceAnalysesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listIntelligenceAnalyses>>> = ({ signal }) => listIntelligenceAnalyses({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listIntelligenceAnalyses>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListIntelligenceAnalysesQueryResult = NonNullable<Awaited<ReturnType<typeof listIntelligenceAnalyses>>>
+export type ListIntelligenceAnalysesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List candidate intelligence analyses
+ */
+
+export function useListIntelligenceAnalyses<TData = Awaited<ReturnType<typeof listIntelligenceAnalyses>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listIntelligenceAnalyses>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListIntelligenceAnalysesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetIntelligenceAnalysisUrl = (candidateId: string,) => {
+
+
+
+
+  return `/api/intelligence/analyses/${candidateId}`
+}
+
+/**
+ * @summary Get a single candidate analysis
+ */
+export const getIntelligenceAnalysis = async (candidateId: string, options?: RequestInit): Promise<CandidateAnalysis> => {
+
+  return customFetch<CandidateAnalysis>(getGetIntelligenceAnalysisUrl(candidateId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetIntelligenceAnalysisQueryKey = (candidateId: string,) => {
+    return [
+    `/api/intelligence/analyses/${candidateId}`
+    ] as const;
+    }
+
+
+export const getGetIntelligenceAnalysisQueryOptions = <TData = Awaited<ReturnType<typeof getIntelligenceAnalysis>>, TError = ErrorType<void>>(candidateId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIntelligenceAnalysis>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIntelligenceAnalysisQueryKey(candidateId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIntelligenceAnalysis>>> = ({ signal }) => getIntelligenceAnalysis(candidateId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(candidateId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIntelligenceAnalysis>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetIntelligenceAnalysisQueryResult = NonNullable<Awaited<ReturnType<typeof getIntelligenceAnalysis>>>
+export type GetIntelligenceAnalysisQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get a single candidate analysis
+ */
+
+export function useGetIntelligenceAnalysis<TData = Awaited<ReturnType<typeof getIntelligenceAnalysis>>, TError = ErrorType<void>>(
+ candidateId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIntelligenceAnalysis>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetIntelligenceAnalysisQueryOptions(candidateId,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

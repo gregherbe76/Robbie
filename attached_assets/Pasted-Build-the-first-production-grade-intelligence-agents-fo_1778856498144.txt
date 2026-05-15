@@ -1,0 +1,216 @@
+Build the first production-grade intelligence agents for the Recruiting Intelligence Framework.
+
+IMPORTANT:
+Do NOT build generic AI wrappers.
+Do NOT build keyword scoring.
+Do NOT build black-box ranking.
+
+The goal is:
+- evidence-backed reasoning,
+- uncertainty-aware recruiting intelligence,
+- explainable agent cognition.
+
+Implement these 3 flagship agents deeply and properly:
+
+1. BayesianScoringAgent
+2. ContradictionAgent
+3. TrajectoryAgent
+
+--------------------------------------------------
+1. BayesianScoringAgent
+--------------------------------------------------
+
+Purpose:
+Estimate hiring probability using probabilistic evidence weighting.
+
+Inputs:
+- normalized candidate profile
+- extracted signals
+- interview evidence
+- GitHub signals
+- organization context
+
+The agent must:
+- distinguish strong vs weak evidence
+- compute confidence-aware scoring
+- support uncertainty
+- expose reasoning
+
+Implement:
+- weighted signal model
+- prior probability support
+- posterior score computation
+- evidence weighting engine
+- confidence calibration
+
+Output:
+{
+  fitScore,
+  confidenceScore,
+  evidenceStrength,
+  uncertaintyLevel,
+  supportingEvidence,
+  missingEvidence,
+  reasoning
+}
+
+IMPORTANT:
+The reasoning must remain fully explainable.
+Every score must trace back to evidence.
+
+--------------------------------------------------
+2. ContradictionAgent
+--------------------------------------------------
+
+Purpose:
+Detect inconsistencies, unsupported claims, and narrative inflation.
+
+The system must identify:
+- unsupported expertise claims
+- contradictions between CV/interview/GitHub
+- shallow technical reasoning
+- fake seniority patterns
+- inconsistent timelines
+- vocabulary without demonstrated depth
+
+Build:
+- contradiction scoring engine
+- claim extraction system
+- evidence validation layer
+- cross-source comparison engine
+
+Example:
+Claim:
+"Distributed systems expert"
+
+But:
+- no distributed systems evidence
+- weak technical explanations
+- no scaling examples
+
+=> contradiction score increases.
+
+Output:
+{
+  contradictionScore,
+  contradictions,
+  unsupportedClaims,
+  weakSignals,
+  verifiedSignals,
+  confidence,
+  reasoning
+}
+
+IMPORTANT:
+Do NOT hallucinate contradictions.
+Only evidence-backed contradictions are allowed.
+
+--------------------------------------------------
+3. TrajectoryAgent
+--------------------------------------------------
+
+Purpose:
+Model future candidate trajectory rather than static pedigree.
+
+The system must estimate:
+- learning velocity
+- acceleration
+- complexity growth
+- ownership progression
+- adaptability
+- founder potential
+- trajectory momentum
+
+Inputs:
+- chronological experience
+- project complexity evolution
+- OSS contribution evolution
+- role progression
+- learning patterns
+
+Build:
+- trajectory modeling engine
+- progression scoring
+- momentum analysis
+- complexity evolution analysis
+- temporal reasoning layer
+
+The system should detect:
+- accelerating builders
+- plateaued candidates
+- emerging elite talent
+- unusually fast progression
+
+Output:
+{
+  trajectoryScore,
+  growthVelocity,
+  acceleration,
+  momentum,
+  founderPotential,
+  trajectorySignals,
+  risks,
+  reasoning
+}
+
+--------------------------------------------------
+Shared Agent Requirements
+--------------------------------------------------
+
+All agents must:
+- extend BaseAgent
+- support provenance
+- support memory integration
+- expose reasoning chains
+- expose evidence attribution
+- support deterministic execution
+- emit structured logs
+- expose confidence levels
+
+All outputs must include:
+- producedBy
+- producedAt
+- rationale
+- derivedFrom
+- evidenceChain
+
+--------------------------------------------------
+Frontend Integration
+--------------------------------------------------
+
+Update the console UI to visualize:
+- confidence levels
+- contradictions
+- trajectory evolution
+- evidence chains
+- agent disagreements
+- uncertainty indicators
+
+The UI must remain:
+- intelligence-oriented
+- analytical
+- explainable
+- audit-friendly
+
+--------------------------------------------------
+Architecture Constraints
+--------------------------------------------------
+
+Do NOT:
+- introduce ATS concepts
+- introduce recruiting pipelines
+- introduce Kanban workflows
+- hide reasoning behind embeddings-only scoring
+
+Maintain:
+- open-source architecture
+- deterministic initialization
+- auditability
+- provenance-first philosophy
+- intelligence-system orientation
+
+This phase should transform the framework from:
+"agent infrastructure"
+
+into:
+"a real recruiting intelligence system."

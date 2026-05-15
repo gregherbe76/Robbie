@@ -14,6 +14,10 @@
       "types": "./dist/agents/index.d.ts",
       "import": "./dist/agents/index.js"
     },
+    "./agents/flagship": {
+      "types": "./dist/agents/flagship/index.d.ts",
+      "import": "./dist/agents/flagship/index.js"
+    },
     "./skills": {
       "types": "./dist/skills/index.d.ts",
       "import": "./dist/skills/index.js"

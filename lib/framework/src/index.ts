@@ -1,4 +1,5 @@
 export * as agents from "./agents/index.js";
+export * as flagship from "./agents/flagship/index.js";
 export * as skills from "./skills/index.js";
 export * as memory from "./memory/index.js";
 export * as orchestrator from "./orchestrator/index.js";

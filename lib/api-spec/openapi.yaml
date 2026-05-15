@@ -23,6 +23,8 @@ tags:
     description: Candidate and organization graph snapshots
   - name: reports
     description: Generated reports and explanations
+  - name: intelligence
+    description: Flagship intelligence agent analyses
 paths:
   /healthz:
     get:
@@ -144,6 +146,44 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GraphSnapshot"
+  /intelligence/analyses:
+    get:
+      operationId: listIntelligenceAnalyses
+      tags: [intelligence]
+      summary: List candidate intelligence analyses
+      description: |
+        Returns all candidate analyses pre-computed by the flagship agents
+        (Bayesian scoring, contradiction detection, trajectory modeling).
+        Each analysis carries reasoning chains, evidence attribution, and
+        provenance for full auditability.
+      responses:
+        "200":
+          description: Analyses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CandidateAnalysis"
+  /intelligence/analyses/{candidateId}:
+    get:
+      operationId: getIntelligenceAnalysis
+      tags: [intelligence]
+      summary: Get a single candidate analysis
+      parameters:
+        - in: path
+          name: candidateId
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateAnalysis"
+        "404":
+          description: Not found
   /reports:
     get:
       operationId: listReports
@@ -366,3 +406,257 @@ components:
         summary: { type: string }
         confidence: { type: number }
         producedBy: { type: string }
+    ReasoningStep:
+      type: object
+      required: [step, detail]
+      properties:
+        step: { type: string }
+        detail: { type: string }
+        value:
+          type: ["number", "null"]
+        derivedFrom:
+          type: array
+          items: { type: string }
+    AgentReasoningEnvelope:
+      type: object
+      required:
+        [agentId, candidateId, confidence, reasoning, evidenceChain, provenance]
+      properties:
+        agentId: { type: string }
+        candidateId: { type: string }
+        confidence: { type: number }
+        reasoning:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReasoningStep"
+        evidenceChain:
+          type: array
+          items: { type: string }
+        provenance:
+          $ref: "#/components/schemas/Provenance"
+    BayesianFitResult:
+      type: object
+      required:
+        [
+          fitScore,
+          prior,
+          evidenceStrength,
+          uncertaintyLevel,
+          supportingEvidence,
+          refutingEvidence,
+          missingEvidence,
+          perDomain,
+        ]
+      properties:
+        fitScore: { type: number }
+        prior: { type: number }
+        evidenceStrength: { type: number }
+        uncertaintyLevel: { type: number }
+        supportingEvidence:
+          type: array
+          items:
+            type: object
+            required: [id, weight, summary]
+            properties:
+              id: { type: string }
+              weight: { type: number }
+              summary: { type: string }
+        refutingEvidence:
+          type: array
+          items:
+            type: object
+            required: [id, weight, summary]
+            properties:
+              id: { type: string }
+              weight: { type: number }
+              summary: { type: string }
+        missingEvidence:
+          type: array
+          items: { type: string }
+        perDomain:
+          type: array
+          items:
+            type: object
+            required: [domain, supporting, refuting, logOddsDelta]
+            properties:
+              domain: { type: string }
+              supporting: { type: integer }
+              refuting: { type: integer }
+              logOddsDelta: { type: number }
+    Contradiction:
+      type: object
+      required: [id, kind, severity, domain, summary, derivedFrom]
+      properties:
+        id: { type: string }
+        kind:
+          type: string
+          enum:
+            [
+              unsupported-claim,
+              cross-source,
+              shallow-reasoning,
+              vocabulary-without-depth,
+              fake-seniority,
+            ]
+        severity:
+          type: string
+          enum: [low, medium, high]
+        domain: { type: string }
+        summary: { type: string }
+        derivedFrom:
+          type: array
+          items: { type: string }
+    ContradictionResult:
+      type: object
+      required:
+        [
+          contradictionScore,
+          contradictions,
+          unsupportedClaims,
+          weakSignals,
+          verifiedSignals,
+        ]
+      properties:
+        contradictionScore: { type: number }
+        contradictions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Contradiction"
+        unsupportedClaims:
+          type: array
+          items:
+            type: object
+            required: [claimId, summary]
+            properties:
+              claimId: { type: string }
+              summary: { type: string }
+        weakSignals:
+          type: array
+          items:
+            type: object
+            required: [id, summary]
+            properties:
+              id: { type: string }
+              summary: { type: string }
+        verifiedSignals:
+          type: array
+          items:
+            type: object
+            required: [id, summary]
+            properties:
+              id: { type: string }
+              summary: { type: string }
+    TrajectorySignal:
+      type: object
+      required: [id, rationale, derivedFrom]
+      properties:
+        id:
+          type: string
+          enum:
+            [
+              accelerating-builder,
+              plateau-detected,
+              emerging-elite,
+              unusually-fast-progression,
+              high-ownership-momentum,
+              complexity-growth,
+            ]
+        rationale: { type: string }
+        derivedFrom:
+          type: array
+          items: { type: string }
+    TrajectoryRisk:
+      type: object
+      required: [id, severity, rationale]
+      properties:
+        id:
+          type: string
+          enum: [plateau, volatility, single-data-point, ownership-stagnation]
+        severity:
+          type: string
+          enum: [low, medium, high]
+        rationale: { type: string }
+    TrajectoryResult:
+      type: object
+      required:
+        [
+          trajectoryScore,
+          growthVelocity,
+          acceleration,
+          momentum,
+          founderPotential,
+          complexityCurve,
+          trajectorySignals,
+          risks,
+        ]
+      properties:
+        trajectoryScore: { type: number }
+        growthVelocity: { type: number }
+        acceleration: { type: number }
+        momentum: { type: number }
+        founderPotential: { type: number }
+        complexityCurve:
+          type: array
+          items:
+            type: object
+            required: [roleId, title, year, composite]
+            properties:
+              roleId: { type: string }
+              title: { type: string }
+              year: { type: number }
+              composite: { type: number }
+        trajectorySignals:
+          type: array
+          items:
+            $ref: "#/components/schemas/TrajectorySignal"
+        risks:
+          type: array
+          items:
+            $ref: "#/components/schemas/TrajectoryRisk"
+    BayesianReasoning:
+      allOf:
+        - $ref: "#/components/schemas/AgentReasoningEnvelope"
+        - type: object
+          required: [result]
+          properties:
+            result:
+              $ref: "#/components/schemas/BayesianFitResult"
+    ContradictionReasoning:
+      allOf:
+        - $ref: "#/components/schemas/AgentReasoningEnvelope"
+        - type: object
+          required: [result]
+          properties:
+            result:
+              $ref: "#/components/schemas/ContradictionResult"
+    TrajectoryReasoning:
+      allOf:
+        - $ref: "#/components/schemas/AgentReasoningEnvelope"
+        - type: object
+          required: [result]
+          properties:
+            result:
+              $ref: "#/components/schemas/TrajectoryResult"
+    CandidateAnalysis:
+      type: object
+      required:
+        [
+          candidateId,
+          candidateName,
+          targetRole,
+          createdAt,
+          bayesian,
+          contradiction,
+          trajectory,
+        ]
+      properties:
+        candidateId: { type: string }
+        candidateName: { type: string }
+        targetRole: { type: string }
+        createdAt: { type: string, format: date-time }
+        bayesian:
+          $ref: "#/components/schemas/BayesianReasoning"
+        contradiction:
+          $ref: "#/components/schemas/ContradictionReasoning"
+        trajectory:
+          $ref: "#/components/schemas/TrajectoryReasoning"

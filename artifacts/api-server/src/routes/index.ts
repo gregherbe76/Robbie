@@ -5,6 +5,7 @@ import registryRouter from "./registry";
 import memoryRouter from "./memory";
 import graphRouter from "./graph";
 import reportsRouter from "./reports";
+import intelligenceRouter from "./intelligence";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(registryRouter);
 router.use(memoryRouter);
 router.use(graphRouter);
 router.use(reportsRouter);
+router.use(intelligenceRouter);
 
 export default router;

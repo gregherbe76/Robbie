@@ -14,6 +14,7 @@ import { Providers } from "@/pages/providers";
 import { Workflows } from "@/pages/workflows";
 import { Memory } from "@/pages/memory";
 import { Reports } from "@/pages/reports";
+import { Intelligence } from "@/pages/intelligence";
 import { CandidateGraph } from "@/pages/graph/candidate";
 import { OrganizationGraph } from "@/pages/graph/organization";
 
@@ -23,6 +24,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Overview} />
+      <Route path="/intelligence" component={Intelligence} />
       <Route path="/agents" component={Agents} />
       <Route path="/skills" component={Skills} />
       <Route path="/providers" component={Providers} />

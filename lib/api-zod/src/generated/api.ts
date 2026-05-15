@@ -160,6 +160,290 @@ export const GetOrganizationGraphResponse = zod.object({
 
 
 /**
+ * Returns all candidate analyses pre-computed by the flagship agents
+(Bayesian scoring, contradiction detection, trajectory modeling).
+Each analysis carries reasoning chains, evidence attribution, and
+provenance for full auditability.
+
+ * @summary List candidate intelligence analyses
+ */
+export const ListIntelligenceAnalysesResponseItem = zod.object({
+  "candidateId": zod.string(),
+  "candidateName": zod.string(),
+  "targetRole": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "bayesian": zod.object({
+  "agentId": zod.string(),
+  "candidateId": zod.string(),
+  "confidence": zod.number(),
+  "reasoning": zod.array(zod.object({
+  "step": zod.string(),
+  "detail": zod.string(),
+  "value": zod.number().nullish(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})),
+  "evidenceChain": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().nullish(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})
+}).and(zod.object({
+  "result": zod.object({
+  "fitScore": zod.number(),
+  "prior": zod.number(),
+  "evidenceStrength": zod.number(),
+  "uncertaintyLevel": zod.number(),
+  "supportingEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "weight": zod.number(),
+  "summary": zod.string()
+})),
+  "refutingEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "weight": zod.number(),
+  "summary": zod.string()
+})),
+  "missingEvidence": zod.array(zod.string()),
+  "perDomain": zod.array(zod.object({
+  "domain": zod.string(),
+  "supporting": zod.number(),
+  "refuting": zod.number(),
+  "logOddsDelta": zod.number()
+}))
+})
+})),
+  "contradiction": zod.object({
+  "agentId": zod.string(),
+  "candidateId": zod.string(),
+  "confidence": zod.number(),
+  "reasoning": zod.array(zod.object({
+  "step": zod.string(),
+  "detail": zod.string(),
+  "value": zod.number().nullish(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})),
+  "evidenceChain": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().nullish(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})
+}).and(zod.object({
+  "result": zod.object({
+  "contradictionScore": zod.number(),
+  "contradictions": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['unsupported-claim', 'cross-source', 'shallow-reasoning', 'vocabulary-without-depth', 'fake-seniority']),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "domain": zod.string(),
+  "summary": zod.string(),
+  "derivedFrom": zod.array(zod.string())
+})),
+  "unsupportedClaims": zod.array(zod.object({
+  "claimId": zod.string(),
+  "summary": zod.string()
+})),
+  "weakSignals": zod.array(zod.object({
+  "id": zod.string(),
+  "summary": zod.string()
+})),
+  "verifiedSignals": zod.array(zod.object({
+  "id": zod.string(),
+  "summary": zod.string()
+}))
+})
+})),
+  "trajectory": zod.object({
+  "agentId": zod.string(),
+  "candidateId": zod.string(),
+  "confidence": zod.number(),
+  "reasoning": zod.array(zod.object({
+  "step": zod.string(),
+  "detail": zod.string(),
+  "value": zod.number().nullish(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})),
+  "evidenceChain": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().nullish(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})
+}).and(zod.object({
+  "result": zod.object({
+  "trajectoryScore": zod.number(),
+  "growthVelocity": zod.number(),
+  "acceleration": zod.number(),
+  "momentum": zod.number(),
+  "founderPotential": zod.number(),
+  "complexityCurve": zod.array(zod.object({
+  "roleId": zod.string(),
+  "title": zod.string(),
+  "year": zod.number(),
+  "composite": zod.number()
+})),
+  "trajectorySignals": zod.array(zod.object({
+  "id": zod.enum(['accelerating-builder', 'plateau-detected', 'emerging-elite', 'unusually-fast-progression', 'high-ownership-momentum', 'complexity-growth']),
+  "rationale": zod.string(),
+  "derivedFrom": zod.array(zod.string())
+})),
+  "risks": zod.array(zod.object({
+  "id": zod.enum(['plateau', 'volatility', 'single-data-point', 'ownership-stagnation']),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "rationale": zod.string()
+}))
+})
+}))
+})
+export const ListIntelligenceAnalysesResponse = zod.array(ListIntelligenceAnalysesResponseItem)
+
+
+/**
+ * @summary Get a single candidate analysis
+ */
+export const GetIntelligenceAnalysisParams = zod.object({
+  "candidateId": zod.coerce.string()
+})
+
+export const GetIntelligenceAnalysisResponse = zod.object({
+  "candidateId": zod.string(),
+  "candidateName": zod.string(),
+  "targetRole": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "bayesian": zod.object({
+  "agentId": zod.string(),
+  "candidateId": zod.string(),
+  "confidence": zod.number(),
+  "reasoning": zod.array(zod.object({
+  "step": zod.string(),
+  "detail": zod.string(),
+  "value": zod.number().nullish(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})),
+  "evidenceChain": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().nullish(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})
+}).and(zod.object({
+  "result": zod.object({
+  "fitScore": zod.number(),
+  "prior": zod.number(),
+  "evidenceStrength": zod.number(),
+  "uncertaintyLevel": zod.number(),
+  "supportingEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "weight": zod.number(),
+  "summary": zod.string()
+})),
+  "refutingEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "weight": zod.number(),
+  "summary": zod.string()
+})),
+  "missingEvidence": zod.array(zod.string()),
+  "perDomain": zod.array(zod.object({
+  "domain": zod.string(),
+  "supporting": zod.number(),
+  "refuting": zod.number(),
+  "logOddsDelta": zod.number()
+}))
+})
+})),
+  "contradiction": zod.object({
+  "agentId": zod.string(),
+  "candidateId": zod.string(),
+  "confidence": zod.number(),
+  "reasoning": zod.array(zod.object({
+  "step": zod.string(),
+  "detail": zod.string(),
+  "value": zod.number().nullish(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})),
+  "evidenceChain": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().nullish(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})
+}).and(zod.object({
+  "result": zod.object({
+  "contradictionScore": zod.number(),
+  "contradictions": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['unsupported-claim', 'cross-source', 'shallow-reasoning', 'vocabulary-without-depth', 'fake-seniority']),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "domain": zod.string(),
+  "summary": zod.string(),
+  "derivedFrom": zod.array(zod.string())
+})),
+  "unsupportedClaims": zod.array(zod.object({
+  "claimId": zod.string(),
+  "summary": zod.string()
+})),
+  "weakSignals": zod.array(zod.object({
+  "id": zod.string(),
+  "summary": zod.string()
+})),
+  "verifiedSignals": zod.array(zod.object({
+  "id": zod.string(),
+  "summary": zod.string()
+}))
+})
+})),
+  "trajectory": zod.object({
+  "agentId": zod.string(),
+  "candidateId": zod.string(),
+  "confidence": zod.number(),
+  "reasoning": zod.array(zod.object({
+  "step": zod.string(),
+  "detail": zod.string(),
+  "value": zod.number().nullish(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})),
+  "evidenceChain": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().nullish(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})
+}).and(zod.object({
+  "result": zod.object({
+  "trajectoryScore": zod.number(),
+  "growthVelocity": zod.number(),
+  "acceleration": zod.number(),
+  "momentum": zod.number(),
+  "founderPotential": zod.number(),
+  "complexityCurve": zod.array(zod.object({
+  "roleId": zod.string(),
+  "title": zod.string(),
+  "year": zod.number(),
+  "composite": zod.number()
+})),
+  "trajectorySignals": zod.array(zod.object({
+  "id": zod.enum(['accelerating-builder', 'plateau-detected', 'emerging-elite', 'unusually-fast-progression', 'high-ownership-momentum', 'complexity-growth']),
+  "rationale": zod.string(),
+  "derivedFrom": zod.array(zod.string())
+})),
+  "risks": zod.array(zod.object({
+  "id": zod.enum(['plateau', 'volatility', 'single-data-point', 'ownership-stagnation']),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "rationale": zod.string()
+}))
+})
+}))
+})
+
+
+/**
  * @summary List generated reports
  */
 export const ListReportsResponseItem = zod.object({
