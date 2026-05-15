@@ -1644,3 +1644,797 @@ export const GetBenchmarkReportResponse = zod.object({
 })
 
 
+/**
+ * @summary Full ingestion state (jobs, candidate results, organization results)
+ */
+export const GetIngestionStateResponse = zod.object({
+  "jobs": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['candidate', 'organization', 'transcript']),
+  "status": zod.enum(['queued', 'running', 'succeeded', 'failed']),
+  "subjectId": zod.string(),
+  "submittedBy": zod.string(),
+  "submittedAt": zod.coerce.date(),
+  "completedAt": zod.coerce.date(),
+  "sourceKinds": zod.array(zod.string()),
+  "evidenceCount": zod.number(),
+  "conflictCount": zod.number(),
+  "warningCount": zod.number(),
+  "reliabilityAverage": zod.number()
+})),
+  "candidates": zod.array(zod.object({
+  "jobId": zod.string(),
+  "candidateId": zod.string(),
+  "normalizedCandidate": zod.object({
+  "candidateId": zod.string(),
+  "displayName": zod.string(),
+  "headline": zod.string().optional(),
+  "roles": zod.array(zod.object({
+  "title": zod.string(),
+  "organization": zod.string(),
+  "startedAt": zod.string().optional(),
+  "endedAt": zod.string().optional(),
+  "confidence": zod.number(),
+  "ambiguity": zod.array(zod.string())
+})),
+  "skills": zod.array(zod.object({
+  "name": zod.string(),
+  "confidence": zod.number(),
+  "sources": zod.array(zod.string())
+})),
+  "education": zod.array(zod.object({
+  "institution": zod.string(),
+  "credential": zod.string().optional(),
+  "confidence": zod.number()
+})),
+  "unknowns": zod.array(zod.string())
+}),
+  "extractedEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['explicit_claim', 'demonstrated_behavior', 'contradiction_signal', 'uncertainty_signal', 'ownership_signal', 'trajectory_signal', 'organizational_signal']),
+  "claim": zod.string(),
+  "subjectId": zod.string(),
+  "attributes": zod.record(zod.string(), zod.unknown()),
+  "confidence": zod.number(),
+  "reliability": zod.number(),
+  "ambiguity": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+}),
+  "rawReference": zod.object({
+  "locator": zod.string(),
+  "excerpt": zod.string().optional()
+}),
+  "derivedFromEvidenceIds": zod.array(zod.string()).optional()
+})),
+  "sourceReliability": zod.array(zod.object({
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "reliabilityScore": zod.number(),
+  "reliabilityFactors": zod.array(zod.object({
+  "factor": zod.string(),
+  "delta": zod.number(),
+  "rationale": zod.string()
+})),
+  "uncertainty": zod.array(zod.string()),
+  "conflictsDetected": zod.number(),
+  "rationale": zod.string()
+})),
+  "conflicts": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "impactedEvidenceIds": zod.array(zod.string()),
+  "unresolvedQuestions": zod.array(zod.string()),
+  "recommendedInvestigation": zod.string(),
+  "detectedAt": zod.coerce.date()
+})),
+  "ingestionWarnings": zod.array(zod.object({
+  "code": zod.string(),
+  "detail": zod.string(),
+  "severity": zod.enum(['info', 'warn', 'error'])
+})),
+  "provenanceChain": zod.array(zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})),
+  "audit": zod.array(zod.object({
+  "id": zod.string(),
+  "jobId": zod.string(),
+  "type": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "detail": zod.string(),
+  "data": zod.record(zod.string(), zod.unknown()).optional()
+}))
+})),
+  "organizations": zod.array(zod.object({
+  "jobId": zod.string(),
+  "organizationId": zod.string(),
+  "normalizedOrganization": zod.object({
+  "organizationId": zod.string(),
+  "displayName": zod.string(),
+  "fields": zod.array(zod.object({
+  "field": zod.string(),
+  "value": zod.string(),
+  "confidence": zod.number(),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})
+})),
+  "unknowns": zod.array(zod.string())
+}),
+  "extractedEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['explicit_claim', 'demonstrated_behavior', 'contradiction_signal', 'uncertainty_signal', 'ownership_signal', 'trajectory_signal', 'organizational_signal']),
+  "claim": zod.string(),
+  "subjectId": zod.string(),
+  "attributes": zod.record(zod.string(), zod.unknown()),
+  "confidence": zod.number(),
+  "reliability": zod.number(),
+  "ambiguity": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+}),
+  "rawReference": zod.object({
+  "locator": zod.string(),
+  "excerpt": zod.string().optional()
+}),
+  "derivedFromEvidenceIds": zod.array(zod.string()).optional()
+})),
+  "sourceReliability": zod.array(zod.object({
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "reliabilityScore": zod.number(),
+  "reliabilityFactors": zod.array(zod.object({
+  "factor": zod.string(),
+  "delta": zod.number(),
+  "rationale": zod.string()
+})),
+  "uncertainty": zod.array(zod.string()),
+  "conflictsDetected": zod.number(),
+  "rationale": zod.string()
+})),
+  "conflicts": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "impactedEvidenceIds": zod.array(zod.string()),
+  "unresolvedQuestions": zod.array(zod.string()),
+  "recommendedInvestigation": zod.string(),
+  "detectedAt": zod.coerce.date()
+})),
+  "ingestionWarnings": zod.array(zod.object({
+  "code": zod.string(),
+  "detail": zod.string(),
+  "severity": zod.enum(['info', 'warn', 'error'])
+})),
+  "provenanceChain": zod.array(zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})),
+  "audit": zod.array(zod.object({
+  "id": zod.string(),
+  "jobId": zod.string(),
+  "type": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "detail": zod.string(),
+  "data": zod.record(zod.string(), zod.unknown()).optional()
+}))
+})),
+  "supportedSourceKinds": zod.array(zod.string())
+})
+
+
+/**
+ * @summary Ingest candidate evidence from one or more raw sources
+ */
+export const IngestCandidateBody = zod.object({
+  "candidateId": zod.string(),
+  "candidateDisplayName": zod.string(),
+  "envelopes": zod.array(zod.object({
+  "rawId": zod.string(),
+  "sourceKind": zod.enum(['resume', 'github', 'linkedin', 'interview_transcript', 'portfolio', 'organization_context', 'references', 'notes', 'external_evidence']),
+  "mediaType": zod.string(),
+  "sourceUri": zod.string().optional(),
+  "submittedBy": zod.string(),
+  "submittedAt": zod.coerce.date(),
+  "payload": zod.unknown()
+})),
+  "submittedBy": zod.string(),
+  "now": zod.coerce.date().optional()
+})
+
+export const IngestCandidateResponse = zod.object({
+  "jobId": zod.string(),
+  "candidateId": zod.string(),
+  "normalizedCandidate": zod.object({
+  "candidateId": zod.string(),
+  "displayName": zod.string(),
+  "headline": zod.string().optional(),
+  "roles": zod.array(zod.object({
+  "title": zod.string(),
+  "organization": zod.string(),
+  "startedAt": zod.string().optional(),
+  "endedAt": zod.string().optional(),
+  "confidence": zod.number(),
+  "ambiguity": zod.array(zod.string())
+})),
+  "skills": zod.array(zod.object({
+  "name": zod.string(),
+  "confidence": zod.number(),
+  "sources": zod.array(zod.string())
+})),
+  "education": zod.array(zod.object({
+  "institution": zod.string(),
+  "credential": zod.string().optional(),
+  "confidence": zod.number()
+})),
+  "unknowns": zod.array(zod.string())
+}),
+  "extractedEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['explicit_claim', 'demonstrated_behavior', 'contradiction_signal', 'uncertainty_signal', 'ownership_signal', 'trajectory_signal', 'organizational_signal']),
+  "claim": zod.string(),
+  "subjectId": zod.string(),
+  "attributes": zod.record(zod.string(), zod.unknown()),
+  "confidence": zod.number(),
+  "reliability": zod.number(),
+  "ambiguity": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+}),
+  "rawReference": zod.object({
+  "locator": zod.string(),
+  "excerpt": zod.string().optional()
+}),
+  "derivedFromEvidenceIds": zod.array(zod.string()).optional()
+})),
+  "sourceReliability": zod.array(zod.object({
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "reliabilityScore": zod.number(),
+  "reliabilityFactors": zod.array(zod.object({
+  "factor": zod.string(),
+  "delta": zod.number(),
+  "rationale": zod.string()
+})),
+  "uncertainty": zod.array(zod.string()),
+  "conflictsDetected": zod.number(),
+  "rationale": zod.string()
+})),
+  "conflicts": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "impactedEvidenceIds": zod.array(zod.string()),
+  "unresolvedQuestions": zod.array(zod.string()),
+  "recommendedInvestigation": zod.string(),
+  "detectedAt": zod.coerce.date()
+})),
+  "ingestionWarnings": zod.array(zod.object({
+  "code": zod.string(),
+  "detail": zod.string(),
+  "severity": zod.enum(['info', 'warn', 'error'])
+})),
+  "provenanceChain": zod.array(zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})),
+  "audit": zod.array(zod.object({
+  "id": zod.string(),
+  "jobId": zod.string(),
+  "type": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "detail": zod.string(),
+  "data": zod.record(zod.string(), zod.unknown()).optional()
+}))
+})
+
+
+/**
+ * @summary Ingest organization context from one or more sources
+ */
+export const IngestOrganizationBody = zod.object({
+  "organizationId": zod.string(),
+  "organizationName": zod.string(),
+  "sources": zod.array(zod.object({
+  "rawId": zod.string(),
+  "kind": zod.enum(['structured_profile', 'founder_notes', 'role_description', 'operating_principles', 'engineering_culture', 'interview_rubrics', 'survey']),
+  "submittedBy": zod.string(),
+  "fields": zod.array(zod.object({
+  "field": zod.string(),
+  "value": zod.string().nullish(),
+  "confidence": zod.number(),
+  "rationale": zod.string().optional()
+}))
+})),
+  "submittedBy": zod.string(),
+  "now": zod.coerce.date().optional()
+})
+
+export const IngestOrganizationResponse = zod.object({
+  "jobId": zod.string(),
+  "organizationId": zod.string(),
+  "normalizedOrganization": zod.object({
+  "organizationId": zod.string(),
+  "displayName": zod.string(),
+  "fields": zod.array(zod.object({
+  "field": zod.string(),
+  "value": zod.string(),
+  "confidence": zod.number(),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})
+})),
+  "unknowns": zod.array(zod.string())
+}),
+  "extractedEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['explicit_claim', 'demonstrated_behavior', 'contradiction_signal', 'uncertainty_signal', 'ownership_signal', 'trajectory_signal', 'organizational_signal']),
+  "claim": zod.string(),
+  "subjectId": zod.string(),
+  "attributes": zod.record(zod.string(), zod.unknown()),
+  "confidence": zod.number(),
+  "reliability": zod.number(),
+  "ambiguity": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+}),
+  "rawReference": zod.object({
+  "locator": zod.string(),
+  "excerpt": zod.string().optional()
+}),
+  "derivedFromEvidenceIds": zod.array(zod.string()).optional()
+})),
+  "sourceReliability": zod.array(zod.object({
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "reliabilityScore": zod.number(),
+  "reliabilityFactors": zod.array(zod.object({
+  "factor": zod.string(),
+  "delta": zod.number(),
+  "rationale": zod.string()
+})),
+  "uncertainty": zod.array(zod.string()),
+  "conflictsDetected": zod.number(),
+  "rationale": zod.string()
+})),
+  "conflicts": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "impactedEvidenceIds": zod.array(zod.string()),
+  "unresolvedQuestions": zod.array(zod.string()),
+  "recommendedInvestigation": zod.string(),
+  "detectedAt": zod.coerce.date()
+})),
+  "ingestionWarnings": zod.array(zod.object({
+  "code": zod.string(),
+  "detail": zod.string(),
+  "severity": zod.enum(['info', 'warn', 'error'])
+})),
+  "provenanceChain": zod.array(zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})),
+  "audit": zod.array(zod.object({
+  "id": zod.string(),
+  "jobId": zod.string(),
+  "type": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "detail": zod.string(),
+  "data": zod.record(zod.string(), zod.unknown()).optional()
+}))
+})
+
+
+/**
+ * @summary Ingest a single interview transcript for a candidate
+ */
+export const IngestTranscriptBody = zod.object({
+  "candidateId": zod.string(),
+  "envelope": zod.object({
+  "rawId": zod.string(),
+  "sourceKind": zod.enum(['resume', 'github', 'linkedin', 'interview_transcript', 'portfolio', 'organization_context', 'references', 'notes', 'external_evidence']),
+  "mediaType": zod.string(),
+  "sourceUri": zod.string().optional(),
+  "submittedBy": zod.string(),
+  "submittedAt": zod.coerce.date(),
+  "payload": zod.unknown()
+}),
+  "submittedBy": zod.string(),
+  "now": zod.coerce.date().optional()
+})
+
+export const IngestTranscriptResponse = zod.object({
+  "jobId": zod.string(),
+  "candidateId": zod.string(),
+  "normalizedCandidate": zod.object({
+  "candidateId": zod.string(),
+  "displayName": zod.string(),
+  "headline": zod.string().optional(),
+  "roles": zod.array(zod.object({
+  "title": zod.string(),
+  "organization": zod.string(),
+  "startedAt": zod.string().optional(),
+  "endedAt": zod.string().optional(),
+  "confidence": zod.number(),
+  "ambiguity": zod.array(zod.string())
+})),
+  "skills": zod.array(zod.object({
+  "name": zod.string(),
+  "confidence": zod.number(),
+  "sources": zod.array(zod.string())
+})),
+  "education": zod.array(zod.object({
+  "institution": zod.string(),
+  "credential": zod.string().optional(),
+  "confidence": zod.number()
+})),
+  "unknowns": zod.array(zod.string())
+}),
+  "extractedEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['explicit_claim', 'demonstrated_behavior', 'contradiction_signal', 'uncertainty_signal', 'ownership_signal', 'trajectory_signal', 'organizational_signal']),
+  "claim": zod.string(),
+  "subjectId": zod.string(),
+  "attributes": zod.record(zod.string(), zod.unknown()),
+  "confidence": zod.number(),
+  "reliability": zod.number(),
+  "ambiguity": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+}),
+  "rawReference": zod.object({
+  "locator": zod.string(),
+  "excerpt": zod.string().optional()
+}),
+  "derivedFromEvidenceIds": zod.array(zod.string()).optional()
+})),
+  "sourceReliability": zod.array(zod.object({
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "reliabilityScore": zod.number(),
+  "reliabilityFactors": zod.array(zod.object({
+  "factor": zod.string(),
+  "delta": zod.number(),
+  "rationale": zod.string()
+})),
+  "uncertainty": zod.array(zod.string()),
+  "conflictsDetected": zod.number(),
+  "rationale": zod.string()
+})),
+  "conflicts": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "impactedEvidenceIds": zod.array(zod.string()),
+  "unresolvedQuestions": zod.array(zod.string()),
+  "recommendedInvestigation": zod.string(),
+  "detectedAt": zod.coerce.date()
+})),
+  "ingestionWarnings": zod.array(zod.object({
+  "code": zod.string(),
+  "detail": zod.string(),
+  "severity": zod.enum(['info', 'warn', 'error'])
+})),
+  "provenanceChain": zod.array(zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})),
+  "audit": zod.array(zod.object({
+  "id": zod.string(),
+  "jobId": zod.string(),
+  "type": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "detail": zod.string(),
+  "data": zod.record(zod.string(), zod.unknown()).optional()
+}))
+})
+
+
+/**
+ * @summary Retrieve a single ingestion job and its full pipeline result
+ */
+export const GetIngestionEventParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetIngestionEventResponse = zod.object({
+  "job": zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['candidate', 'organization', 'transcript']),
+  "status": zod.enum(['queued', 'running', 'succeeded', 'failed']),
+  "subjectId": zod.string(),
+  "submittedBy": zod.string(),
+  "submittedAt": zod.coerce.date(),
+  "completedAt": zod.coerce.date(),
+  "sourceKinds": zod.array(zod.string()),
+  "evidenceCount": zod.number(),
+  "conflictCount": zod.number(),
+  "warningCount": zod.number(),
+  "reliabilityAverage": zod.number()
+}),
+  "result": zod.union([zod.object({
+  "jobId": zod.string(),
+  "candidateId": zod.string(),
+  "normalizedCandidate": zod.object({
+  "candidateId": zod.string(),
+  "displayName": zod.string(),
+  "headline": zod.string().optional(),
+  "roles": zod.array(zod.object({
+  "title": zod.string(),
+  "organization": zod.string(),
+  "startedAt": zod.string().optional(),
+  "endedAt": zod.string().optional(),
+  "confidence": zod.number(),
+  "ambiguity": zod.array(zod.string())
+})),
+  "skills": zod.array(zod.object({
+  "name": zod.string(),
+  "confidence": zod.number(),
+  "sources": zod.array(zod.string())
+})),
+  "education": zod.array(zod.object({
+  "institution": zod.string(),
+  "credential": zod.string().optional(),
+  "confidence": zod.number()
+})),
+  "unknowns": zod.array(zod.string())
+}),
+  "extractedEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['explicit_claim', 'demonstrated_behavior', 'contradiction_signal', 'uncertainty_signal', 'ownership_signal', 'trajectory_signal', 'organizational_signal']),
+  "claim": zod.string(),
+  "subjectId": zod.string(),
+  "attributes": zod.record(zod.string(), zod.unknown()),
+  "confidence": zod.number(),
+  "reliability": zod.number(),
+  "ambiguity": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+}),
+  "rawReference": zod.object({
+  "locator": zod.string(),
+  "excerpt": zod.string().optional()
+}),
+  "derivedFromEvidenceIds": zod.array(zod.string()).optional()
+})),
+  "sourceReliability": zod.array(zod.object({
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "reliabilityScore": zod.number(),
+  "reliabilityFactors": zod.array(zod.object({
+  "factor": zod.string(),
+  "delta": zod.number(),
+  "rationale": zod.string()
+})),
+  "uncertainty": zod.array(zod.string()),
+  "conflictsDetected": zod.number(),
+  "rationale": zod.string()
+})),
+  "conflicts": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "impactedEvidenceIds": zod.array(zod.string()),
+  "unresolvedQuestions": zod.array(zod.string()),
+  "recommendedInvestigation": zod.string(),
+  "detectedAt": zod.coerce.date()
+})),
+  "ingestionWarnings": zod.array(zod.object({
+  "code": zod.string(),
+  "detail": zod.string(),
+  "severity": zod.enum(['info', 'warn', 'error'])
+})),
+  "provenanceChain": zod.array(zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})),
+  "audit": zod.array(zod.object({
+  "id": zod.string(),
+  "jobId": zod.string(),
+  "type": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "detail": zod.string(),
+  "data": zod.record(zod.string(), zod.unknown()).optional()
+}))
+}),zod.object({
+  "jobId": zod.string(),
+  "organizationId": zod.string(),
+  "normalizedOrganization": zod.object({
+  "organizationId": zod.string(),
+  "displayName": zod.string(),
+  "fields": zod.array(zod.object({
+  "field": zod.string(),
+  "value": zod.string(),
+  "confidence": zod.number(),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})
+})),
+  "unknowns": zod.array(zod.string())
+}),
+  "extractedEvidence": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['explicit_claim', 'demonstrated_behavior', 'contradiction_signal', 'uncertainty_signal', 'ownership_signal', 'trajectory_signal', 'organizational_signal']),
+  "claim": zod.string(),
+  "subjectId": zod.string(),
+  "attributes": zod.record(zod.string(), zod.unknown()),
+  "confidence": zod.number(),
+  "reliability": zod.number(),
+  "ambiguity": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+}),
+  "rawReference": zod.object({
+  "locator": zod.string(),
+  "excerpt": zod.string().optional()
+}),
+  "derivedFromEvidenceIds": zod.array(zod.string()).optional()
+})),
+  "sourceReliability": zod.array(zod.object({
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "reliabilityScore": zod.number(),
+  "reliabilityFactors": zod.array(zod.object({
+  "factor": zod.string(),
+  "delta": zod.number(),
+  "rationale": zod.string()
+})),
+  "uncertainty": zod.array(zod.string()),
+  "conflictsDetected": zod.number(),
+  "rationale": zod.string()
+})),
+  "conflicts": zod.array(zod.object({
+  "id": zod.string(),
+  "description": zod.string(),
+  "severity": zod.enum(['low', 'medium', 'high']),
+  "impactedEvidenceIds": zod.array(zod.string()),
+  "unresolvedQuestions": zod.array(zod.string()),
+  "recommendedInvestigation": zod.string(),
+  "detectedAt": zod.coerce.date()
+})),
+  "ingestionWarnings": zod.array(zod.object({
+  "code": zod.string(),
+  "detail": zod.string(),
+  "severity": zod.enum(['info', 'warn', 'error'])
+})),
+  "provenanceChain": zod.array(zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+})),
+  "audit": zod.array(zod.object({
+  "id": zod.string(),
+  "jobId": zod.string(),
+  "type": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "detail": zod.string(),
+  "data": zod.record(zod.string(), zod.unknown()).optional()
+}))
+})])
+})
+
+
+/**
+ * @summary Replayable ingestion audit log + evidence lineage for a subject
+ */
+export const GetIngestionAuditParams = zod.object({
+  "candidateId": zod.coerce.string()
+})
+
+export const GetIngestionAuditResponse = zod.object({
+  "subjectId": zod.string(),
+  "jobs": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['candidate', 'organization', 'transcript']),
+  "status": zod.enum(['queued', 'running', 'succeeded', 'failed']),
+  "subjectId": zod.string(),
+  "submittedBy": zod.string(),
+  "submittedAt": zod.coerce.date(),
+  "completedAt": zod.coerce.date(),
+  "sourceKinds": zod.array(zod.string()),
+  "evidenceCount": zod.number(),
+  "conflictCount": zod.number(),
+  "warningCount": zod.number(),
+  "reliabilityAverage": zod.number()
+})),
+  "evidence": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['explicit_claim', 'demonstrated_behavior', 'contradiction_signal', 'uncertainty_signal', 'ownership_signal', 'trajectory_signal', 'organizational_signal']),
+  "claim": zod.string(),
+  "subjectId": zod.string(),
+  "attributes": zod.record(zod.string(), zod.unknown()),
+  "confidence": zod.number(),
+  "reliability": zod.number(),
+  "ambiguity": zod.array(zod.string()),
+  "provenance": zod.object({
+  "producedBy": zod.string(),
+  "producedAt": zod.coerce.date(),
+  "rationale": zod.string().optional(),
+  "derivedFrom": zod.array(zod.string()).optional()
+}),
+  "rawReference": zod.object({
+  "locator": zod.string(),
+  "excerpt": zod.string().optional()
+}),
+  "derivedFromEvidenceIds": zod.array(zod.string()).optional()
+})),
+  "lineage": zod.array(zod.object({
+  "evidenceId": zod.string(),
+  "kind": zod.string(),
+  "claim": zod.string(),
+  "producedBy": zod.string(),
+  "derivedFrom": zod.array(zod.string())
+})),
+  "auditEntries": zod.array(zod.object({
+  "id": zod.string(),
+  "jobId": zod.string(),
+  "type": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "sourceKind": zod.string(),
+  "rawId": zod.string(),
+  "detail": zod.string(),
+  "data": zod.record(zod.string(), zod.unknown()).optional()
+}))
+})
+
+

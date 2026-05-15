@@ -1,0 +1,437 @@
+Build the Real-World Ingestion Layer for the Recruiting Intelligence Framework.
+
+IMPORTANT:
+The framework already has:
+- candidate intelligence
+- cross-agent cognition
+- organization intelligence
+- evaluation/calibration
+- intelligence operations
+- deterministic benchmark infrastructure
+- OSS publication readiness
+
+Now connect the framework to real-world signals.
+
+This phase is NOT about:
+- ATS workflows
+- CRM functionality
+- automation spam
+- generic sourcing
+
+This phase is about:
+- trustworthy intelligence ingestion,
+- provenance-preserving evidence acquisition,
+- real signal normalization,
+- live organizational cognition inputs.
+
+--------------------------------------------------
+Core Thesis
+--------------------------------------------------
+
+The quality of recruiting intelligence depends on:
+- evidence quality,
+- provenance quality,
+- signal normalization,
+- source reliability,
+- explicit uncertainty.
+
+The ingestion layer must:
+- preserve provenance,
+- preserve uncertainty,
+- preserve source attribution,
+- avoid hidden inference,
+- avoid hallucinated enrichment.
+
+--------------------------------------------------
+Build These Components
+--------------------------------------------------
+
+Create:
+
+lib/framework/src/ingestion/
+
+Required components:
+
+1. IngestionGateway
+2. CandidateEvidenceIngestionPipeline
+3. OrganizationContextIngestionPipeline
+4. GitHubEvidenceAdapter
+5. LinkedInProfileAdapter
+6. ResumeParsingAdapter
+7. InterviewTranscriptAdapter
+8. EvidenceNormalizationEngine
+9. SourceReliabilityEngine
+10. ProvenanceCaptureEngine
+11. EvidenceConflictDetector
+12. IngestionAuditEngine
+
+--------------------------------------------------
+1. IngestionGateway
+--------------------------------------------------
+
+Build the main ingestion orchestration layer.
+
+Supported ingestion types:
+- resume
+- github
+- linkedin
+- interview_transcript
+- portfolio
+- organization_context
+- references
+- notes
+- external_evidence
+
+The gateway must:
+- orchestrate adapters
+- normalize evidence
+- attach provenance
+- preserve uncertainty
+- deduplicate evidence
+- avoid silent overwrites
+
+Every ingestion operation must create:
+- deterministic ingestion event
+- provenance chain
+- ingestion audit log
+
+--------------------------------------------------
+2. CandidateEvidenceIngestionPipeline
+--------------------------------------------------
+
+Build the candidate ingestion pipeline.
+
+Pipeline stages:
+- raw ingestion
+- parsing
+- normalization
+- evidence extraction
+- provenance attachment
+- contradiction pre-check
+- evidence graph insertion
+
+Inputs:
+- PDF resume
+- markdown
+- plain text
+- GitHub profile
+- LinkedIn export
+- interview transcript
+
+Output:
+{
+  normalizedCandidate,
+  extractedEvidence,
+  sourceReliability,
+  ingestionWarnings,
+  provenance
+}
+
+--------------------------------------------------
+3. OrganizationContextIngestionPipeline
+--------------------------------------------------
+
+Build organization ingestion.
+
+Supported sources:
+- structured org profile
+- founder notes
+- role description
+- operating principles
+- engineering culture docs
+- interview rubrics
+- organizational surveys
+
+The system must:
+- preserve explicit unknowns
+- preserve confidence levels
+- avoid hidden interpolation
+- attach provenance to every org field
+
+--------------------------------------------------
+4. GitHubEvidenceAdapter
+--------------------------------------------------
+
+Build a real GitHub ingestion adapter.
+
+Supported:
+- repositories
+- contribution activity
+- commit density
+- language distribution
+- README evidence
+- OSS participation
+- collaboration graph
+
+Extract evidence:
+- ownership signals
+- project complexity
+- consistency
+- maintenance patterns
+- architecture indicators
+
+IMPORTANT:
+Do NOT reduce GitHub to:
+- stars,
+- follower count,
+- vanity metrics.
+
+Preserve:
+- evidence granularity
+- source URLs
+- commit provenance
+- extraction timestamps
+
+--------------------------------------------------
+5. LinkedInProfileAdapter
+--------------------------------------------------
+
+Build LinkedIn ingestion.
+
+Supported:
+- exported profile JSON
+- structured scraping result
+- manual profile import
+
+Extract:
+- role progression
+- company trajectory
+- title inflation signals
+- timeline consistency
+- network indicators
+- ambiguity markers
+
+IMPORTANT:
+Preserve uncertainty.
+Do NOT silently infer seniority.
+
+--------------------------------------------------
+6. ResumeParsingAdapter
+--------------------------------------------------
+
+Build deterministic resume parsing.
+
+Requirements:
+- section extraction
+- chronology extraction
+- skill extraction
+- education extraction
+- experience normalization
+- ambiguity detection
+
+Detect:
+- vague descriptions
+- unsupported scope claims
+- timeline gaps
+- duplicated phrasing
+- keyword stuffing patterns
+
+IMPORTANT:
+Do NOT hallucinate structure.
+Unknown sections remain unknown.
+
+--------------------------------------------------
+7. InterviewTranscriptAdapter
+--------------------------------------------------
+
+Build interview transcript ingestion.
+
+Supported:
+- plain transcript
+- diarized transcript
+- structured QA transcript
+
+Extract:
+- reasoning depth evidence
+- contradiction evidence
+- uncertainty indicators
+- communication style
+- ownership indicators
+- technical depth signals
+
+Preserve:
+- speaker attribution
+- timestamps
+- quote provenance
+- evidence references
+
+--------------------------------------------------
+8. EvidenceNormalizationEngine
+--------------------------------------------------
+
+Normalize all evidence into unified structures.
+
+Evidence types:
+- explicit_claim
+- demonstrated_behavior
+- contradiction_signal
+- uncertainty_signal
+- ownership_signal
+- trajectory_signal
+- organizational_signal
+
+Every normalized evidence item must contain:
+- source
+- timestamp
+- confidence
+- reliability
+- extractedBy
+- derivedFrom
+- rawReference
+
+--------------------------------------------------
+9. SourceReliabilityEngine
+--------------------------------------------------
+
+Estimate source reliability.
+
+Examples:
+- direct GitHub evidence → high reliability
+- self-description → medium
+- unsupported claim → low
+- contradictory evidence → degraded reliability
+
+Output:
+{
+  reliabilityScore,
+  reliabilityFactors,
+  uncertainty,
+  conflicts
+}
+
+IMPORTANT:
+Reliability must remain explainable.
+
+--------------------------------------------------
+10. ProvenanceCaptureEngine
+--------------------------------------------------
+
+Attach provenance everywhere.
+
+Every evidence item must contain:
+- producedBy
+- producedAt
+- ingestionSource
+- extractionMethod
+- derivedFrom
+- rawReference
+- confidence
+
+No evidence without provenance.
+
+--------------------------------------------------
+11. EvidenceConflictDetector
+--------------------------------------------------
+
+Detect ingestion conflicts.
+
+Examples:
+- LinkedIn says "Staff Engineer"
+- GitHub evidence suggests junior-level contributions
+
+Or:
+- timeline inconsistencies
+- overlapping employment
+- unsupported scope inflation
+
+Output:
+{
+  conflicts,
+  severity,
+  impactedEvidence,
+  unresolvedQuestions,
+  recommendedInvestigation
+}
+
+--------------------------------------------------
+12. IngestionAuditEngine
+--------------------------------------------------
+
+Track:
+- ingestion events
+- evidence transformations
+- normalization steps
+- provenance lineage
+- source reliability changes
+- conflict detections
+
+Generate:
+- replayable ingestion logs
+- ingestion provenance graphs
+- evidence lineage traces
+
+--------------------------------------------------
+API Requirements
+--------------------------------------------------
+
+Add endpoints:
+
+POST /ingestion/candidate
+POST /ingestion/organization
+POST /ingestion/transcript
+GET /ingestion/events/{id}
+GET /ingestion/audit/{candidateId}
+
+OpenAPI-first.
+Generate hooks + Zod validators.
+
+--------------------------------------------------
+Console Requirements
+--------------------------------------------------
+
+Add:
+/ingestion
+
+Sections:
+- ingestion jobs
+- raw evidence explorer
+- normalized evidence graph
+- source reliability panel
+- ingestion conflicts
+- provenance explorer
+- evidence lineage
+- transcript evidence extraction
+- GitHub evidence explorer
+
+UI philosophy:
+- forensic intelligence ingestion console
+- evidence-centric
+- provenance-visible
+- audit-friendly
+
+NOT:
+- ATS import wizard
+- resume upload dashboard
+
+--------------------------------------------------
+Critical Constraints
+--------------------------------------------------
+
+Maintain:
+- deterministic ingestion
+- provenance-first architecture
+- explicit uncertainty
+- auditability
+- replayability
+
+Do NOT:
+- hallucinate missing structure
+- silently infer seniority
+- overwrite evidence silently
+- flatten conflicting evidence
+- hide uncertainty
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+The framework should evolve from:
+"synthetic recruiting cognition system"
+
+into:
+
+"a real-world recruiting intelligence infrastructure
+capable of ingesting live evidence
+while preserving provenance,
+uncertainty,
+and auditability."

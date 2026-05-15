@@ -1513,3 +1513,313 @@ export interface BenchmarkReport {
   recommendations: string[];
 }
 
+export interface IngestionProvenance {
+  producedBy: string;
+  producedAt: string;
+  rationale?: string;
+  derivedFrom?: string[];
+}
+
+export interface IngestionRawReference {
+  locator: string;
+  excerpt?: string;
+}
+
+export type IngestionEvidenceItemKind = typeof IngestionEvidenceItemKind[keyof typeof IngestionEvidenceItemKind];
+
+
+export const IngestionEvidenceItemKind = {
+  explicit_claim: 'explicit_claim',
+  demonstrated_behavior: 'demonstrated_behavior',
+  contradiction_signal: 'contradiction_signal',
+  uncertainty_signal: 'uncertainty_signal',
+  ownership_signal: 'ownership_signal',
+  trajectory_signal: 'trajectory_signal',
+  organizational_signal: 'organizational_signal',
+} as const;
+
+export type IngestionEvidenceItemAttributes = { [key: string]: unknown };
+
+export interface IngestionEvidenceItem {
+  id: string;
+  kind: IngestionEvidenceItemKind;
+  claim: string;
+  subjectId: string;
+  attributes: IngestionEvidenceItemAttributes;
+  confidence: number;
+  reliability: number;
+  ambiguity: string[];
+  provenance: IngestionProvenance;
+  rawReference: IngestionRawReference;
+  derivedFromEvidenceIds?: string[];
+}
+
+export interface IngestionReliabilityFactor {
+  factor: string;
+  delta: number;
+  rationale: string;
+}
+
+export interface IngestionSourceReliability {
+  sourceKind: string;
+  rawId: string;
+  reliabilityScore: number;
+  reliabilityFactors: IngestionReliabilityFactor[];
+  uncertainty: string[];
+  conflictsDetected: number;
+  rationale: string;
+}
+
+export type IngestionEvidenceConflictSeverity = typeof IngestionEvidenceConflictSeverity[keyof typeof IngestionEvidenceConflictSeverity];
+
+
+export const IngestionEvidenceConflictSeverity = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+export interface IngestionEvidenceConflict {
+  id: string;
+  description: string;
+  severity: IngestionEvidenceConflictSeverity;
+  impactedEvidenceIds: string[];
+  unresolvedQuestions: string[];
+  recommendedInvestigation: string;
+  detectedAt: string;
+}
+
+export type IngestionWarningSeverity = typeof IngestionWarningSeverity[keyof typeof IngestionWarningSeverity];
+
+
+export const IngestionWarningSeverity = {
+  info: 'info',
+  warn: 'warn',
+  error: 'error',
+} as const;
+
+export interface IngestionWarning {
+  code: string;
+  detail: string;
+  severity: IngestionWarningSeverity;
+}
+
+export type IngestionAuditEntryData = { [key: string]: unknown };
+
+export interface IngestionAuditEntry {
+  id: string;
+  jobId: string;
+  type: string;
+  occurredAt: string;
+  sourceKind: string;
+  rawId: string;
+  detail: string;
+  data?: IngestionAuditEntryData;
+}
+
+export interface IngestionNormalizedCandidateRole {
+  title: string;
+  organization: string;
+  startedAt?: string;
+  endedAt?: string;
+  confidence: number;
+  ambiguity: string[];
+}
+
+export interface IngestionNormalizedCandidateSkill {
+  name: string;
+  confidence: number;
+  sources: string[];
+}
+
+export interface IngestionNormalizedCandidateEducation {
+  institution: string;
+  credential?: string;
+  confidence: number;
+}
+
+export interface IngestionNormalizedCandidate {
+  candidateId: string;
+  displayName: string;
+  headline?: string;
+  roles: IngestionNormalizedCandidateRole[];
+  skills: IngestionNormalizedCandidateSkill[];
+  education: IngestionNormalizedCandidateEducation[];
+  unknowns: string[];
+}
+
+export interface IngestionNormalizedOrgField {
+  field: string;
+  value: string;
+  confidence: number;
+  provenance: IngestionProvenance;
+}
+
+export interface IngestionNormalizedOrganization {
+  organizationId: string;
+  displayName: string;
+  fields: IngestionNormalizedOrgField[];
+  unknowns: string[];
+}
+
+export type IngestionJobKind = typeof IngestionJobKind[keyof typeof IngestionJobKind];
+
+
+export const IngestionJobKind = {
+  candidate: 'candidate',
+  organization: 'organization',
+  transcript: 'transcript',
+} as const;
+
+export type IngestionJobStatus = typeof IngestionJobStatus[keyof typeof IngestionJobStatus];
+
+
+export const IngestionJobStatus = {
+  queued: 'queued',
+  running: 'running',
+  succeeded: 'succeeded',
+  failed: 'failed',
+} as const;
+
+export interface IngestionJob {
+  id: string;
+  kind: IngestionJobKind;
+  status: IngestionJobStatus;
+  subjectId: string;
+  submittedBy: string;
+  submittedAt: string;
+  completedAt: string;
+  sourceKinds: string[];
+  evidenceCount: number;
+  conflictCount: number;
+  warningCount: number;
+  reliabilityAverage: number;
+}
+
+export interface CandidatePipelineResult {
+  jobId: string;
+  candidateId: string;
+  normalizedCandidate: IngestionNormalizedCandidate;
+  extractedEvidence: IngestionEvidenceItem[];
+  sourceReliability: IngestionSourceReliability[];
+  conflicts: IngestionEvidenceConflict[];
+  ingestionWarnings: IngestionWarning[];
+  provenanceChain: IngestionProvenance[];
+  audit: IngestionAuditEntry[];
+}
+
+export interface OrganizationPipelineResult {
+  jobId: string;
+  organizationId: string;
+  normalizedOrganization: IngestionNormalizedOrganization;
+  extractedEvidence: IngestionEvidenceItem[];
+  sourceReliability: IngestionSourceReliability[];
+  conflicts: IngestionEvidenceConflict[];
+  ingestionWarnings: IngestionWarning[];
+  provenanceChain: IngestionProvenance[];
+  audit: IngestionAuditEntry[];
+}
+
+export type IngestionRawInputEnvelopeSourceKind = typeof IngestionRawInputEnvelopeSourceKind[keyof typeof IngestionRawInputEnvelopeSourceKind];
+
+
+export const IngestionRawInputEnvelopeSourceKind = {
+  resume: 'resume',
+  github: 'github',
+  linkedin: 'linkedin',
+  interview_transcript: 'interview_transcript',
+  portfolio: 'portfolio',
+  organization_context: 'organization_context',
+  references: 'references',
+  notes: 'notes',
+  external_evidence: 'external_evidence',
+} as const;
+
+export interface IngestionRawInputEnvelope {
+  rawId: string;
+  sourceKind: IngestionRawInputEnvelopeSourceKind;
+  mediaType: string;
+  sourceUri?: string;
+  submittedBy: string;
+  submittedAt: string;
+  payload: unknown;
+}
+
+export interface IngestCandidateRequest {
+  candidateId: string;
+  candidateDisplayName: string;
+  envelopes: IngestionRawInputEnvelope[];
+  submittedBy: string;
+  now?: string;
+}
+
+export interface IngestOrganizationSourceField {
+  field: string;
+  value?: string | null;
+  confidence: number;
+  rationale?: string;
+}
+
+export type IngestOrganizationSourceKind = typeof IngestOrganizationSourceKind[keyof typeof IngestOrganizationSourceKind];
+
+
+export const IngestOrganizationSourceKind = {
+  structured_profile: 'structured_profile',
+  founder_notes: 'founder_notes',
+  role_description: 'role_description',
+  operating_principles: 'operating_principles',
+  engineering_culture: 'engineering_culture',
+  interview_rubrics: 'interview_rubrics',
+  survey: 'survey',
+} as const;
+
+export interface IngestOrganizationSource {
+  rawId: string;
+  kind: IngestOrganizationSourceKind;
+  submittedBy: string;
+  fields: IngestOrganizationSourceField[];
+}
+
+export interface IngestOrganizationRequest {
+  organizationId: string;
+  organizationName: string;
+  sources: IngestOrganizationSource[];
+  submittedBy: string;
+  now?: string;
+}
+
+export interface IngestTranscriptRequest {
+  candidateId: string;
+  envelope: IngestionRawInputEnvelope;
+  submittedBy: string;
+  now?: string;
+}
+
+export interface IngestionStateResponse {
+  jobs: IngestionJob[];
+  candidates: CandidatePipelineResult[];
+  organizations: OrganizationPipelineResult[];
+  supportedSourceKinds: string[];
+}
+
+export interface IngestionEventDetail {
+  job: IngestionJob;
+  result: CandidatePipelineResult | OrganizationPipelineResult;
+}
+
+export interface IngestionEvidenceLineageNode {
+  evidenceId: string;
+  kind: string;
+  claim: string;
+  producedBy: string;
+  derivedFrom: string[];
+}
+
+export interface IngestionAuditBundle {
+  subjectId: string;
+  jobs: IngestionJob[];
+  evidence: IngestionEvidenceItem[];
+  lineage: IngestionEvidenceLineageNode[];
+  auditEntries: IngestionAuditEntry[];
+}
+

@@ -9,11 +9,15 @@ graph snapshots, reports and the system overview used by the console.
  * OpenAPI spec version: 0.1.0
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
@@ -24,15 +28,23 @@ import type {
   BenchmarkReport,
   CandidateAnalysis,
   CandidateOrganizationFitResult,
+  CandidatePipelineResult,
   CognitiveSynthesis,
   EvaluationReport,
   GraphSnapshot,
   HealthStatus,
+  IngestCandidateRequest,
+  IngestOrganizationRequest,
+  IngestTranscriptRequest,
+  IngestionAuditBundle,
+  IngestionEventDetail,
+  IngestionStateResponse,
   IntelligenceCase,
   MemoryEntry,
   OperationsReport,
   OrganizationContext,
   OrganizationIntelligenceReport,
+  OrganizationPipelineResult,
   OutcomeEvent,
   PredictionRecord,
   Provider,
@@ -43,7 +55,7 @@ import type {
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
-import type { ErrorType } from '../custom-fetch';
+import type { ErrorType , BodyType } from '../custom-fetch';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -1970,6 +1982,450 @@ export function useGetBenchmarkReport<TData = Awaited<ReturnType<typeof getBench
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetBenchmarkReportQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetIngestionStateUrl = () => {
+
+
+
+
+  return `/api/ingestion/state`
+}
+
+/**
+ * @summary Full ingestion state (jobs, candidate results, organization results)
+ */
+export const getIngestionState = async ( options?: RequestInit): Promise<IngestionStateResponse> => {
+
+  return customFetch<IngestionStateResponse>(getGetIngestionStateUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetIngestionStateQueryKey = () => {
+    return [
+    `/api/ingestion/state`
+    ] as const;
+    }
+
+
+export const getGetIngestionStateQueryOptions = <TData = Awaited<ReturnType<typeof getIngestionState>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIngestionState>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIngestionStateQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIngestionState>>> = ({ signal }) => getIngestionState({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIngestionState>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetIngestionStateQueryResult = NonNullable<Awaited<ReturnType<typeof getIngestionState>>>
+export type GetIngestionStateQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Full ingestion state (jobs, candidate results, organization results)
+ */
+
+export function useGetIngestionState<TData = Awaited<ReturnType<typeof getIngestionState>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIngestionState>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetIngestionStateQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getIngestCandidateUrl = () => {
+
+
+
+
+  return `/api/ingestion/candidate`
+}
+
+/**
+ * @summary Ingest candidate evidence from one or more raw sources
+ */
+export const ingestCandidate = async (ingestCandidateRequest: IngestCandidateRequest, options?: RequestInit): Promise<CandidatePipelineResult> => {
+
+  return customFetch<CandidatePipelineResult>(getIngestCandidateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      ingestCandidateRequest,)
+  }
+);}
+
+
+
+
+export const getIngestCandidateMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ingestCandidate>>, TError,{data: BodyType<IngestCandidateRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof ingestCandidate>>, TError,{data: BodyType<IngestCandidateRequest>}, TContext> => {
+
+const mutationKey = ['ingestCandidate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ingestCandidate>>, {data: BodyType<IngestCandidateRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  ingestCandidate(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type IngestCandidateMutationResult = NonNullable<Awaited<ReturnType<typeof ingestCandidate>>>
+    export type IngestCandidateMutationBody = BodyType<IngestCandidateRequest>
+    export type IngestCandidateMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Ingest candidate evidence from one or more raw sources
+ */
+export const useIngestCandidate = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ingestCandidate>>, TError,{data: BodyType<IngestCandidateRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof ingestCandidate>>,
+        TError,
+        {data: BodyType<IngestCandidateRequest>},
+        TContext
+      > => {
+      return useMutation(getIngestCandidateMutationOptions(options));
+    }
+
+export const getIngestOrganizationUrl = () => {
+
+
+
+
+  return `/api/ingestion/organization`
+}
+
+/**
+ * @summary Ingest organization context from one or more sources
+ */
+export const ingestOrganization = async (ingestOrganizationRequest: IngestOrganizationRequest, options?: RequestInit): Promise<OrganizationPipelineResult> => {
+
+  return customFetch<OrganizationPipelineResult>(getIngestOrganizationUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      ingestOrganizationRequest,)
+  }
+);}
+
+
+
+
+export const getIngestOrganizationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ingestOrganization>>, TError,{data: BodyType<IngestOrganizationRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof ingestOrganization>>, TError,{data: BodyType<IngestOrganizationRequest>}, TContext> => {
+
+const mutationKey = ['ingestOrganization'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ingestOrganization>>, {data: BodyType<IngestOrganizationRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  ingestOrganization(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type IngestOrganizationMutationResult = NonNullable<Awaited<ReturnType<typeof ingestOrganization>>>
+    export type IngestOrganizationMutationBody = BodyType<IngestOrganizationRequest>
+    export type IngestOrganizationMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Ingest organization context from one or more sources
+ */
+export const useIngestOrganization = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ingestOrganization>>, TError,{data: BodyType<IngestOrganizationRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof ingestOrganization>>,
+        TError,
+        {data: BodyType<IngestOrganizationRequest>},
+        TContext
+      > => {
+      return useMutation(getIngestOrganizationMutationOptions(options));
+    }
+
+export const getIngestTranscriptUrl = () => {
+
+
+
+
+  return `/api/ingestion/transcript`
+}
+
+/**
+ * @summary Ingest a single interview transcript for a candidate
+ */
+export const ingestTranscript = async (ingestTranscriptRequest: IngestTranscriptRequest, options?: RequestInit): Promise<CandidatePipelineResult> => {
+
+  return customFetch<CandidatePipelineResult>(getIngestTranscriptUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      ingestTranscriptRequest,)
+  }
+);}
+
+
+
+
+export const getIngestTranscriptMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ingestTranscript>>, TError,{data: BodyType<IngestTranscriptRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof ingestTranscript>>, TError,{data: BodyType<IngestTranscriptRequest>}, TContext> => {
+
+const mutationKey = ['ingestTranscript'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ingestTranscript>>, {data: BodyType<IngestTranscriptRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  ingestTranscript(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type IngestTranscriptMutationResult = NonNullable<Awaited<ReturnType<typeof ingestTranscript>>>
+    export type IngestTranscriptMutationBody = BodyType<IngestTranscriptRequest>
+    export type IngestTranscriptMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Ingest a single interview transcript for a candidate
+ */
+export const useIngestTranscript = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ingestTranscript>>, TError,{data: BodyType<IngestTranscriptRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof ingestTranscript>>,
+        TError,
+        {data: BodyType<IngestTranscriptRequest>},
+        TContext
+      > => {
+      return useMutation(getIngestTranscriptMutationOptions(options));
+    }
+
+export const getGetIngestionEventUrl = (id: string,) => {
+
+
+
+
+  return `/api/ingestion/events/${id}`
+}
+
+/**
+ * @summary Retrieve a single ingestion job and its full pipeline result
+ */
+export const getIngestionEvent = async (id: string, options?: RequestInit): Promise<IngestionEventDetail> => {
+
+  return customFetch<IngestionEventDetail>(getGetIngestionEventUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetIngestionEventQueryKey = (id: string,) => {
+    return [
+    `/api/ingestion/events/${id}`
+    ] as const;
+    }
+
+
+export const getGetIngestionEventQueryOptions = <TData = Awaited<ReturnType<typeof getIngestionEvent>>, TError = ErrorType<void>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIngestionEvent>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIngestionEventQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIngestionEvent>>> = ({ signal }) => getIngestionEvent(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIngestionEvent>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetIngestionEventQueryResult = NonNullable<Awaited<ReturnType<typeof getIngestionEvent>>>
+export type GetIngestionEventQueryError = ErrorType<void>
+
+
+/**
+ * @summary Retrieve a single ingestion job and its full pipeline result
+ */
+
+export function useGetIngestionEvent<TData = Awaited<ReturnType<typeof getIngestionEvent>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIngestionEvent>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetIngestionEventQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetIngestionAuditUrl = (candidateId: string,) => {
+
+
+
+
+  return `/api/ingestion/audit/${candidateId}`
+}
+
+/**
+ * @summary Replayable ingestion audit log + evidence lineage for a subject
+ */
+export const getIngestionAudit = async (candidateId: string, options?: RequestInit): Promise<IngestionAuditBundle> => {
+
+  return customFetch<IngestionAuditBundle>(getGetIngestionAuditUrl(candidateId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetIngestionAuditQueryKey = (candidateId: string,) => {
+    return [
+    `/api/ingestion/audit/${candidateId}`
+    ] as const;
+    }
+
+
+export const getGetIngestionAuditQueryOptions = <TData = Awaited<ReturnType<typeof getIngestionAudit>>, TError = ErrorType<unknown>>(candidateId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIngestionAudit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIngestionAuditQueryKey(candidateId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIngestionAudit>>> = ({ signal }) => getIngestionAudit(candidateId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(candidateId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIngestionAudit>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetIngestionAuditQueryResult = NonNullable<Awaited<ReturnType<typeof getIngestionAudit>>>
+export type GetIngestionAuditQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Replayable ingestion audit log + evidence lineage for a subject
+ */
+
+export function useGetIngestionAudit<TData = Awaited<ReturnType<typeof getIngestionAudit>>, TError = ErrorType<unknown>>(
+ candidateId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIngestionAudit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetIngestionAuditQueryOptions(candidateId,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

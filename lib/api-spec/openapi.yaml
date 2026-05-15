@@ -390,6 +390,110 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BenchmarkReport"
+  /ingestion/state:
+    get:
+      operationId: getIngestionState
+      tags: [ingestion]
+      summary: Full ingestion state (jobs, candidate results, organization results)
+      responses:
+        "200":
+          description: Gateway state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestionStateResponse"
+  /ingestion/candidate:
+    post:
+      operationId: ingestCandidate
+      tags: [ingestion]
+      summary: Ingest candidate evidence from one or more raw sources
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IngestCandidateRequest"
+      responses:
+        "200":
+          description: Candidate pipeline result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidatePipelineResult"
+  /ingestion/organization:
+    post:
+      operationId: ingestOrganization
+      tags: [ingestion]
+      summary: Ingest organization context from one or more sources
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IngestOrganizationRequest"
+      responses:
+        "200":
+          description: Organization pipeline result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrganizationPipelineResult"
+  /ingestion/transcript:
+    post:
+      operationId: ingestTranscript
+      tags: [ingestion]
+      summary: Ingest a single interview transcript for a candidate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IngestTranscriptRequest"
+      responses:
+        "200":
+          description: Candidate pipeline result (transcript-only run)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidatePipelineResult"
+  /ingestion/events/{id}:
+    get:
+      operationId: getIngestionEvent
+      tags: [ingestion]
+      summary: Retrieve a single ingestion job and its full pipeline result
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ingestion event detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestionEventDetail"
+        "404":
+          description: Not found
+  /ingestion/audit/{candidateId}:
+    get:
+      operationId: getIngestionAudit
+      tags: [ingestion]
+      summary: Replayable ingestion audit log + evidence lineage for a subject
+      parameters:
+        - name: candidateId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ingestion audit bundle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestionAuditBundle"
 components:
   schemas:
     HealthStatus:
@@ -2342,3 +2446,397 @@ components:
         recommendations:
           type: array
           items: { type: string }
+    IngestionProvenance:
+      type: object
+      required: [producedBy, producedAt]
+      properties:
+        producedBy: { type: string }
+        producedAt: { type: string, format: date-time }
+        rationale: { type: string }
+        derivedFrom:
+          type: array
+          items: { type: string }
+    IngestionRawReference:
+      type: object
+      required: [locator]
+      properties:
+        locator: { type: string }
+        excerpt: { type: string }
+    IngestionEvidenceItem:
+      type: object
+      required:
+        [id, kind, claim, subjectId, attributes, confidence, reliability,
+         ambiguity, provenance, rawReference]
+      properties:
+        id: { type: string }
+        kind:
+          type: string
+          enum:
+            - explicit_claim
+            - demonstrated_behavior
+            - contradiction_signal
+            - uncertainty_signal
+            - ownership_signal
+            - trajectory_signal
+            - organizational_signal
+        claim: { type: string }
+        subjectId: { type: string }
+        attributes:
+          type: object
+          additionalProperties: true
+        confidence: { type: number }
+        reliability: { type: number }
+        ambiguity:
+          type: array
+          items: { type: string }
+        provenance: { $ref: "#/components/schemas/IngestionProvenance" }
+        rawReference: { $ref: "#/components/schemas/IngestionRawReference" }
+        derivedFromEvidenceIds:
+          type: array
+          items: { type: string }
+    IngestionReliabilityFactor:
+      type: object
+      required: [factor, delta, rationale]
+      properties:
+        factor: { type: string }
+        delta: { type: number }
+        rationale: { type: string }
+    IngestionSourceReliability:
+      type: object
+      required:
+        [sourceKind, rawId, reliabilityScore, reliabilityFactors, uncertainty,
+         conflictsDetected, rationale]
+      properties:
+        sourceKind: { type: string }
+        rawId: { type: string }
+        reliabilityScore: { type: number }
+        reliabilityFactors:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionReliabilityFactor" }
+        uncertainty:
+          type: array
+          items: { type: string }
+        conflictsDetected: { type: integer }
+        rationale: { type: string }
+    IngestionEvidenceConflict:
+      type: object
+      required:
+        [id, description, severity, impactedEvidenceIds, unresolvedQuestions,
+         recommendedInvestigation, detectedAt]
+      properties:
+        id: { type: string }
+        description: { type: string }
+        severity:
+          type: string
+          enum: [low, medium, high]
+        impactedEvidenceIds:
+          type: array
+          items: { type: string }
+        unresolvedQuestions:
+          type: array
+          items: { type: string }
+        recommendedInvestigation: { type: string }
+        detectedAt: { type: string, format: date-time }
+    IngestionWarning:
+      type: object
+      required: [code, detail, severity]
+      properties:
+        code: { type: string }
+        detail: { type: string }
+        severity:
+          type: string
+          enum: [info, warn, error]
+    IngestionAuditEntry:
+      type: object
+      required: [id, jobId, type, occurredAt, sourceKind, rawId, detail]
+      properties:
+        id: { type: string }
+        jobId: { type: string }
+        type: { type: string }
+        occurredAt: { type: string, format: date-time }
+        sourceKind: { type: string }
+        rawId: { type: string }
+        detail: { type: string }
+        data:
+          type: object
+          additionalProperties: true
+    IngestionNormalizedCandidateRole:
+      type: object
+      required: [title, organization, confidence, ambiguity]
+      properties:
+        title: { type: string }
+        organization: { type: string }
+        startedAt: { type: string }
+        endedAt: { type: string }
+        confidence: { type: number }
+        ambiguity:
+          type: array
+          items: { type: string }
+    IngestionNormalizedCandidateSkill:
+      type: object
+      required: [name, confidence, sources]
+      properties:
+        name: { type: string }
+        confidence: { type: number }
+        sources:
+          type: array
+          items: { type: string }
+    IngestionNormalizedCandidateEducation:
+      type: object
+      required: [institution, confidence]
+      properties:
+        institution: { type: string }
+        credential: { type: string }
+        confidence: { type: number }
+    IngestionNormalizedCandidate:
+      type: object
+      required: [candidateId, displayName, roles, skills, education, unknowns]
+      properties:
+        candidateId: { type: string }
+        displayName: { type: string }
+        headline: { type: string }
+        roles:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionNormalizedCandidateRole" }
+        skills:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionNormalizedCandidateSkill" }
+        education:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionNormalizedCandidateEducation" }
+        unknowns:
+          type: array
+          items: { type: string }
+    IngestionNormalizedOrgField:
+      type: object
+      required: [field, value, confidence, provenance]
+      properties:
+        field: { type: string }
+        value: { type: string }
+        confidence: { type: number }
+        provenance: { $ref: "#/components/schemas/IngestionProvenance" }
+    IngestionNormalizedOrganization:
+      type: object
+      required: [organizationId, displayName, fields, unknowns]
+      properties:
+        organizationId: { type: string }
+        displayName: { type: string }
+        fields:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionNormalizedOrgField" }
+        unknowns:
+          type: array
+          items: { type: string }
+    IngestionJob:
+      type: object
+      required:
+        [id, kind, status, subjectId, submittedBy, submittedAt, completedAt,
+         sourceKinds, evidenceCount, conflictCount, warningCount,
+         reliabilityAverage]
+      properties:
+        id: { type: string }
+        kind:
+          type: string
+          enum: [candidate, organization, transcript]
+        status:
+          type: string
+          enum: [queued, running, succeeded, failed]
+        subjectId: { type: string }
+        submittedBy: { type: string }
+        submittedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time }
+        sourceKinds:
+          type: array
+          items: { type: string }
+        evidenceCount: { type: integer }
+        conflictCount: { type: integer }
+        warningCount: { type: integer }
+        reliabilityAverage: { type: number }
+    CandidatePipelineResult:
+      type: object
+      required:
+        [jobId, candidateId, normalizedCandidate, extractedEvidence,
+         sourceReliability, conflicts, ingestionWarnings, provenanceChain, audit]
+      properties:
+        jobId: { type: string }
+        candidateId: { type: string }
+        normalizedCandidate: { $ref: "#/components/schemas/IngestionNormalizedCandidate" }
+        extractedEvidence:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionEvidenceItem" }
+        sourceReliability:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionSourceReliability" }
+        conflicts:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionEvidenceConflict" }
+        ingestionWarnings:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionWarning" }
+        provenanceChain:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionProvenance" }
+        audit:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionAuditEntry" }
+    OrganizationPipelineResult:
+      type: object
+      required:
+        [jobId, organizationId, normalizedOrganization, extractedEvidence,
+         sourceReliability, conflicts, ingestionWarnings, provenanceChain, audit]
+      properties:
+        jobId: { type: string }
+        organizationId: { type: string }
+        normalizedOrganization: { $ref: "#/components/schemas/IngestionNormalizedOrganization" }
+        extractedEvidence:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionEvidenceItem" }
+        sourceReliability:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionSourceReliability" }
+        conflicts:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionEvidenceConflict" }
+        ingestionWarnings:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionWarning" }
+        provenanceChain:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionProvenance" }
+        audit:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionAuditEntry" }
+    IngestionRawInputEnvelope:
+      type: object
+      required: [rawId, sourceKind, mediaType, submittedBy, submittedAt, payload]
+      properties:
+        rawId: { type: string }
+        sourceKind:
+          type: string
+          enum:
+            - resume
+            - github
+            - linkedin
+            - interview_transcript
+            - portfolio
+            - organization_context
+            - references
+            - notes
+            - external_evidence
+        mediaType: { type: string }
+        sourceUri: { type: string }
+        submittedBy: { type: string }
+        submittedAt: { type: string, format: date-time }
+        payload: {}
+    IngestCandidateRequest:
+      type: object
+      required: [candidateId, candidateDisplayName, envelopes, submittedBy]
+      properties:
+        candidateId: { type: string }
+        candidateDisplayName: { type: string }
+        envelopes:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionRawInputEnvelope" }
+        submittedBy: { type: string }
+        now: { type: string, format: date-time }
+    IngestOrganizationSourceField:
+      type: object
+      required: [field, confidence]
+      properties:
+        field: { type: string }
+        value:
+          type: string
+          nullable: true
+        confidence: { type: number }
+        rationale: { type: string }
+    IngestOrganizationSource:
+      type: object
+      required: [rawId, kind, submittedBy, fields]
+      properties:
+        rawId: { type: string }
+        kind:
+          type: string
+          enum:
+            - structured_profile
+            - founder_notes
+            - role_description
+            - operating_principles
+            - engineering_culture
+            - interview_rubrics
+            - survey
+        submittedBy: { type: string }
+        fields:
+          type: array
+          items: { $ref: "#/components/schemas/IngestOrganizationSourceField" }
+    IngestOrganizationRequest:
+      type: object
+      required: [organizationId, organizationName, sources, submittedBy]
+      properties:
+        organizationId: { type: string }
+        organizationName: { type: string }
+        sources:
+          type: array
+          items: { $ref: "#/components/schemas/IngestOrganizationSource" }
+        submittedBy: { type: string }
+        now: { type: string, format: date-time }
+    IngestTranscriptRequest:
+      type: object
+      required: [candidateId, envelope, submittedBy]
+      properties:
+        candidateId: { type: string }
+        envelope: { $ref: "#/components/schemas/IngestionRawInputEnvelope" }
+        submittedBy: { type: string }
+        now: { type: string, format: date-time }
+    IngestionStateResponse:
+      type: object
+      required: [jobs, candidates, organizations, supportedSourceKinds]
+      properties:
+        jobs:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionJob" }
+        candidates:
+          type: array
+          items: { $ref: "#/components/schemas/CandidatePipelineResult" }
+        organizations:
+          type: array
+          items: { $ref: "#/components/schemas/OrganizationPipelineResult" }
+        supportedSourceKinds:
+          type: array
+          items: { type: string }
+    IngestionEventDetail:
+      type: object
+      required: [job, result]
+      properties:
+        job: { $ref: "#/components/schemas/IngestionJob" }
+        result:
+          oneOf:
+            - $ref: "#/components/schemas/CandidatePipelineResult"
+            - $ref: "#/components/schemas/OrganizationPipelineResult"
+    IngestionEvidenceLineageNode:
+      type: object
+      required: [evidenceId, kind, claim, producedBy, derivedFrom]
+      properties:
+        evidenceId: { type: string }
+        kind: { type: string }
+        claim: { type: string }
+        producedBy: { type: string }
+        derivedFrom:
+          type: array
+          items: { type: string }
+    IngestionAuditBundle:
+      type: object
+      required: [subjectId, jobs, evidence, lineage, auditEntries]
+      properties:
+        subjectId: { type: string }
+        jobs:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionJob" }
+        evidence:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionEvidenceItem" }
+        lineage:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionEvidenceLineageNode" }
+        auditEntries:
+          type: array
+          items: { $ref: "#/components/schemas/IngestionAuditEntry" }

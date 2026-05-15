@@ -10,6 +10,7 @@ import organizationIntelligenceRouter from "./organization-intelligence";
 import evaluationRouter from "./evaluation";
 import operationsRouter from "./operations";
 import benchmarksRouter from "./benchmarks";
+import ingestionRouter from "./ingestion";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(organizationIntelligenceRouter);
 router.use(evaluationRouter);
 router.use(operationsRouter);
 router.use(benchmarksRouter);
+router.use(ingestionRouter);
 
 export default router;

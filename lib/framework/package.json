@@ -77,6 +77,10 @@
     "./benchmarks": {
       "types": "./dist/benchmarks/index.d.ts",
       "import": "./dist/benchmarks/index.js"
+    },
+    "./ingestion": {
+      "types": "./dist/ingestion/index.d.ts",
+      "import": "./dist/ingestion/index.js"
     }
   },
   "scripts": {
