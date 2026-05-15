@@ -9,6 +9,7 @@ import intelligenceRouter from "./intelligence";
 import organizationIntelligenceRouter from "./organization-intelligence";
 import evaluationRouter from "./evaluation";
 import operationsRouter from "./operations";
+import benchmarksRouter from "./benchmarks";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(intelligenceRouter);
 router.use(organizationIntelligenceRouter);
 router.use(evaluationRouter);
 router.use(operationsRouter);
+router.use(benchmarksRouter);
 
 export default router;

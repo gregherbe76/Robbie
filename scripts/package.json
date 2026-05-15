@@ -5,7 +5,13 @@
   "type": "module",
   "scripts": {
     "hello": "tsx ./src/hello.ts",
+    "benchmark:cognition": "tsx ./src/benchmark-cognition.ts",
+    "benchmark:cognition:update": "tsx ./src/benchmark-cognition-update.ts",
+    "test:cognitive-smoke": "tsx ./src/test-cognitive-smoke.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@workspace/framework": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",

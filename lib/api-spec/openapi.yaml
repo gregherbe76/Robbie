@@ -27,6 +27,8 @@ tags:
     description: Flagship intelligence agent analyses
   - name: cognition
     description: Cross-agent cognitive synthesis (influence, disagreement, uncertainty)
+  - name: benchmarks
+    description: Cognitive benchmark + smoke-test report (deterministic regression protection)
 paths:
   /healthz:
     get:
@@ -376,6 +378,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AuditEvent"
+  /benchmarks/report:
+    get:
+      operationId: getBenchmarkReport
+      tags: [benchmarks]
+      summary: Cognitive benchmark suite report (deterministic regression protection)
+      responses:
+        "200":
+          description: Benchmark report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BenchmarkReport"
 components:
   schemas:
     HealthStatus:
@@ -2149,3 +2163,182 @@ components:
           type: array
           items: { $ref: "#/components/schemas/AuditEvent" }
         metrics: { $ref: "#/components/schemas/OperationsMetrics" }
+    BenchmarkScenarioDigest:
+      type: object
+      required:
+        [scenarioId, candidateId, organizationId, bayesianFit, bayesianConfidence,
+         contradictionScore, contradictionCount, unsupportedClaimCount, trajectoryScore,
+         trajectoryConfidence, globalConfidence, disagreementScore, ambiguityLevel,
+         certaintyCategory, recommendationCategory, unresolvedQuestionCount,
+         influenceCount, evidenceChainCount, reasoningStepCount, archetypeMatchCount,
+         fitRecommendation, fitConfidence, overallHiringRisk, chaosFitScore,
+         evidenceRequestSignal]
+      properties:
+        scenarioId: { type: string }
+        candidateId: { type: string }
+        organizationId: { type: string }
+        bayesianFit: { type: number }
+        bayesianConfidence: { type: number }
+        contradictionScore: { type: number }
+        contradictionCount: { type: integer }
+        unsupportedClaimCount: { type: integer }
+        trajectoryScore: { type: number }
+        trajectoryConfidence: { type: number }
+        globalConfidence: { type: number }
+        disagreementScore: { type: number }
+        ambiguityLevel: { type: number }
+        certaintyCategory: { type: string }
+        recommendationCategory: { type: string }
+        unresolvedQuestionCount: { type: integer }
+        influenceCount: { type: integer }
+        evidenceChainCount: { type: integer }
+        reasoningStepCount: { type: integer }
+        archetypeMatchCount: { type: integer }
+        fitRecommendation: { type: string }
+        fitConfidence: { type: number }
+        overallHiringRisk: { type: number }
+        chaosFitScore: { type: number }
+        evidenceRequestSignal: { type: integer }
+    BenchmarkExpectationFailure:
+      type: object
+      required: [type, passed, detail]
+      properties:
+        type: { type: string }
+        path: { type: string }
+        passed: { type: boolean }
+        detail: { type: string }
+        rationale: { type: string }
+    BenchmarkDeterminismCheck:
+      type: object
+      required: [scenarioId, passed, firstHash, secondHash, drift]
+      properties:
+        scenarioId: { type: string }
+        passed: { type: boolean }
+        firstHash: { type: string }
+        secondHash: { type: string }
+        drift:
+          type: array
+          items: { type: string }
+    BenchmarkCognitionIntegrityCheck:
+      type: object
+      required: [scenarioId, passed, findings]
+      properties:
+        scenarioId: { type: string }
+        passed: { type: boolean }
+        findings:
+          type: array
+          items:
+            type: object
+            required: [ok, rule, detail]
+            properties:
+              ok: { type: boolean }
+              rule: { type: string }
+              detail: { type: string }
+    BenchmarkProvenanceCheck:
+      type: object
+      required: [ok, findings]
+      properties:
+        ok: { type: boolean }
+        findings:
+          type: array
+          items:
+            type: object
+            required: [ok, path, detail]
+            properties:
+              ok: { type: boolean }
+              path: { type: string }
+              detail: { type: string }
+    BenchmarkScenarioResult:
+      type: object
+      required:
+        [scenarioId, archetype, passed, description, determinismHash, digest,
+         failures, warnings, determinism, cognitionIntegrity, provenance]
+      properties:
+        scenarioId: { type: string }
+        archetype: { type: string }
+        description: { type: string }
+        passed: { type: boolean }
+        determinismHash: { type: string }
+        digest: { $ref: "#/components/schemas/BenchmarkScenarioDigest" }
+        failures:
+          type: array
+          items: { $ref: "#/components/schemas/BenchmarkExpectationFailure" }
+        warnings:
+          type: array
+          items: { type: string }
+        determinism: { $ref: "#/components/schemas/BenchmarkDeterminismCheck" }
+        cognitionIntegrity: { $ref: "#/components/schemas/BenchmarkCognitionIntegrityCheck" }
+        provenance: { $ref: "#/components/schemas/BenchmarkProvenanceCheck" }
+    BenchmarkSummary:
+      type: object
+      required:
+        [totalScenarios, passed, failed, determinismOk, provenanceOk,
+         calibrationOk, snapshotOk, mutationGuardsOk]
+      properties:
+        totalScenarios: { type: integer }
+        passed: { type: integer }
+        failed: { type: integer }
+        determinismOk: { type: boolean }
+        provenanceOk: { type: boolean }
+        calibrationOk: { type: boolean }
+        snapshotOk: { type: boolean }
+        mutationGuardsOk: { type: boolean }
+    BenchmarkCalibration:
+      type: object
+      required: [passed, ece, overconfidenceRisk, predictionsEvaluated, detail, reasons]
+      properties:
+        passed: { type: boolean }
+        ece: { type: number }
+        overconfidenceRisk:
+          type: string
+          enum: [low, medium, high]
+        predictionsEvaluated: { type: integer }
+        detail: { type: string }
+        reasons:
+          type: array
+          items: { type: string }
+    BenchmarkSnapshotDrift:
+      type: object
+      required: [ok, drift]
+      properties:
+        ok: { type: boolean }
+        drift:
+          type: array
+          items:
+            type: object
+            required: [scenarioId, kind, detail]
+            properties:
+              scenarioId: { type: string }
+              kind:
+                type: string
+                enum: [missing, extra, hash-changed, field-changed]
+              detail: { type: string }
+    BenchmarkMutationGuard:
+      type: object
+      required: [guardId, description, passed, scenarioId, detail]
+      properties:
+        guardId: { type: string }
+        description: { type: string }
+        passed: { type: boolean }
+        scenarioId: { type: string }
+        detail: { type: string }
+    BenchmarkReport:
+      type: object
+      required:
+        [generatedAt, generatedBy, summary, scenarios, calibration, snapshot,
+         mutationGuards, recommendations]
+      properties:
+        generatedAt: { type: string, format: date-time }
+        generatedBy: { type: string }
+        summary: { $ref: "#/components/schemas/BenchmarkSummary" }
+        scenarios:
+          type: array
+          items: { $ref: "#/components/schemas/BenchmarkScenarioResult" }
+        calibration: { $ref: "#/components/schemas/BenchmarkCalibration" }
+        snapshot: { $ref: "#/components/schemas/BenchmarkSnapshotDrift" }
+        mutationGuards:
+          type: array
+          items: { $ref: "#/components/schemas/BenchmarkMutationGuard" }
+        recommendations:
+          type: array
+          items: { type: string }

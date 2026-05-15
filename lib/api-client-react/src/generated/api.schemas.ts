@@ -1363,3 +1363,153 @@ export interface OperationsReport {
   metrics: OperationsMetrics;
 }
 
+export interface BenchmarkScenarioDigest {
+  scenarioId: string;
+  candidateId: string;
+  organizationId: string;
+  bayesianFit: number;
+  bayesianConfidence: number;
+  contradictionScore: number;
+  contradictionCount: number;
+  unsupportedClaimCount: number;
+  trajectoryScore: number;
+  trajectoryConfidence: number;
+  globalConfidence: number;
+  disagreementScore: number;
+  ambiguityLevel: number;
+  certaintyCategory: string;
+  recommendationCategory: string;
+  unresolvedQuestionCount: number;
+  influenceCount: number;
+  evidenceChainCount: number;
+  reasoningStepCount: number;
+  archetypeMatchCount: number;
+  fitRecommendation: string;
+  fitConfidence: number;
+  overallHiringRisk: number;
+  chaosFitScore: number;
+  evidenceRequestSignal: number;
+}
+
+export interface BenchmarkExpectationFailure {
+  type: string;
+  path?: string;
+  passed: boolean;
+  detail: string;
+  rationale?: string;
+}
+
+export interface BenchmarkDeterminismCheck {
+  scenarioId: string;
+  passed: boolean;
+  firstHash: string;
+  secondHash: string;
+  drift: string[];
+}
+
+export type BenchmarkCognitionIntegrityCheckFindingsItem = {
+  ok: boolean;
+  rule: string;
+  detail: string;
+};
+
+export interface BenchmarkCognitionIntegrityCheck {
+  scenarioId: string;
+  passed: boolean;
+  findings: BenchmarkCognitionIntegrityCheckFindingsItem[];
+}
+
+export type BenchmarkProvenanceCheckFindingsItem = {
+  ok: boolean;
+  path: string;
+  detail: string;
+};
+
+export interface BenchmarkProvenanceCheck {
+  ok: boolean;
+  findings: BenchmarkProvenanceCheckFindingsItem[];
+}
+
+export interface BenchmarkScenarioResult {
+  scenarioId: string;
+  archetype: string;
+  description: string;
+  passed: boolean;
+  determinismHash: string;
+  digest: BenchmarkScenarioDigest;
+  failures: BenchmarkExpectationFailure[];
+  warnings: string[];
+  determinism: BenchmarkDeterminismCheck;
+  cognitionIntegrity: BenchmarkCognitionIntegrityCheck;
+  provenance: BenchmarkProvenanceCheck;
+}
+
+export interface BenchmarkSummary {
+  totalScenarios: number;
+  passed: number;
+  failed: number;
+  determinismOk: boolean;
+  provenanceOk: boolean;
+  calibrationOk: boolean;
+  snapshotOk: boolean;
+  mutationGuardsOk: boolean;
+}
+
+export type BenchmarkCalibrationOverconfidenceRisk = typeof BenchmarkCalibrationOverconfidenceRisk[keyof typeof BenchmarkCalibrationOverconfidenceRisk];
+
+
+export const BenchmarkCalibrationOverconfidenceRisk = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+export interface BenchmarkCalibration {
+  passed: boolean;
+  ece: number;
+  overconfidenceRisk: BenchmarkCalibrationOverconfidenceRisk;
+  predictionsEvaluated: number;
+  detail: string;
+  reasons: string[];
+}
+
+export type BenchmarkSnapshotDriftDriftItemKind = typeof BenchmarkSnapshotDriftDriftItemKind[keyof typeof BenchmarkSnapshotDriftDriftItemKind];
+
+
+export const BenchmarkSnapshotDriftDriftItemKind = {
+  missing: 'missing',
+  extra: 'extra',
+  'hash-changed': 'hash-changed',
+  'field-changed': 'field-changed',
+} as const;
+
+export type BenchmarkSnapshotDriftDriftItem = {
+  scenarioId: string;
+  kind: BenchmarkSnapshotDriftDriftItemKind;
+  detail: string;
+};
+
+export interface BenchmarkSnapshotDrift {
+  ok: boolean;
+  drift: BenchmarkSnapshotDriftDriftItem[];
+}
+
+export interface BenchmarkMutationGuard {
+  guardId: string;
+  description: string;
+  passed: boolean;
+  scenarioId: string;
+  detail: string;
+}
+
+export interface BenchmarkReport {
+  generatedAt: string;
+  generatedBy: string;
+  summary: BenchmarkSummary;
+  scenarios: BenchmarkScenarioResult[];
+  calibration: BenchmarkCalibration;
+  snapshot: BenchmarkSnapshotDrift;
+  mutationGuards: BenchmarkMutationGuard[];
+  recommendations: string[];
+}
+

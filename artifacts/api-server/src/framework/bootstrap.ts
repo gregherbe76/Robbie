@@ -51,6 +51,15 @@ import type {
 import { buildEvaluationContext } from "./evaluation";
 import { buildOperationsContext } from "./operations";
 import type { OperationsReport } from "@workspace/framework/intelligence-operations";
+import {
+  runBenchmarkSuite,
+  parseSnapshot,
+  type BenchmarkReport as FrameworkBenchmarkReport,
+  type SnapshotFile,
+} from "@workspace/framework/benchmarks";
+import { toBenchmarkApiReport, type BenchmarkApiReport } from "./benchmarks";
+import { readFileSync, existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 const startedAt = Date.now();
 
@@ -78,6 +87,8 @@ let evaluationReport: EvaluationReport | null = null;
 let evaluationOutcomes: OutcomeEvent[] = [];
 let evaluationPredictions: PredictionRecord[] = [];
 let operationsReport: OperationsReport | null = null;
+let benchmarkReport: BenchmarkApiReport | null = null;
+let benchmarkReportFramework: FrameworkBenchmarkReport | null = null;
 function orgKey(orgId: string, candidateId: string): string {
   return `${orgId}::${candidateId}`;
 }
@@ -673,6 +684,23 @@ export function initFramework(): Promise<FrameworkRegistry> {
     seedWorkflows(registry);
     await seedGraphs(registry);
     await seedAnalyses(registry);
+    let baselineSnapshot: SnapshotFile | null = null;
+    try {
+      const candidates = [
+        new URL("../../../../tests/cognitive-smoke/snapshot.json", import.meta.url),
+        new URL("../../../tests/cognitive-smoke/snapshot.json", import.meta.url),
+        new URL("../../tests/cognitive-smoke/snapshot.json", import.meta.url),
+      ].map((u) => fileURLToPath(u));
+      const hit = candidates.find((p) => existsSync(p));
+      if (hit) {
+        baselineSnapshot = parseSnapshot(readFileSync(hit, "utf8"));
+      }
+    } catch {
+      baselineSnapshot = null;
+    }
+    const suite = runBenchmarkSuite({ baselineSnapshot });
+    benchmarkReportFramework = suite.report;
+    benchmarkReport = toBenchmarkApiReport(suite.report);
     cached = registry;
     return registry;
   })();
@@ -744,6 +772,14 @@ export function getEvaluationPredictions(): PredictionRecord[] {
 
 export function getOperationsReport(): OperationsReport | null {
   return operationsReport;
+}
+
+export function getBenchmarkReport(): BenchmarkApiReport | null {
+  return benchmarkReport;
+}
+
+export function getBenchmarkReportFramework(): FrameworkBenchmarkReport | null {
+  return benchmarkReportFramework;
 }
 
 export function getUptimeSeconds(): number {

@@ -21,6 +21,7 @@ import type {
 import type {
   Agent,
   AuditEvent,
+  BenchmarkReport,
   CandidateAnalysis,
   CandidateOrganizationFitResult,
   CognitiveSynthesis,
@@ -1892,6 +1893,83 @@ export function useListOperationsAudit<TData = Awaited<ReturnType<typeof listOpe
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getListOperationsAuditQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetBenchmarkReportUrl = () => {
+
+
+
+
+  return `/api/benchmarks/report`
+}
+
+/**
+ * @summary Cognitive benchmark suite report (deterministic regression protection)
+ */
+export const getBenchmarkReport = async ( options?: RequestInit): Promise<BenchmarkReport> => {
+
+  return customFetch<BenchmarkReport>(getGetBenchmarkReportUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBenchmarkReportQueryKey = () => {
+    return [
+    `/api/benchmarks/report`
+    ] as const;
+    }
+
+
+export const getGetBenchmarkReportQueryOptions = <TData = Awaited<ReturnType<typeof getBenchmarkReport>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBenchmarkReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBenchmarkReportQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBenchmarkReport>>> = ({ signal }) => getBenchmarkReport({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBenchmarkReport>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetBenchmarkReportQueryResult = NonNullable<Awaited<ReturnType<typeof getBenchmarkReport>>>
+export type GetBenchmarkReportQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Cognitive benchmark suite report (deterministic regression protection)
+ */
+
+export function useGetBenchmarkReport<TData = Awaited<ReturnType<typeof getBenchmarkReport>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBenchmarkReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetBenchmarkReportQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

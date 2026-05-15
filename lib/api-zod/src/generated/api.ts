@@ -1535,3 +1535,112 @@ export const ListOperationsAuditResponseItem = zod.object({
 export const ListOperationsAuditResponse = zod.array(ListOperationsAuditResponseItem)
 
 
+/**
+ * @summary Cognitive benchmark suite report (deterministic regression protection)
+ */
+export const GetBenchmarkReportResponse = zod.object({
+  "generatedAt": zod.coerce.date(),
+  "generatedBy": zod.string(),
+  "summary": zod.object({
+  "totalScenarios": zod.number(),
+  "passed": zod.number(),
+  "failed": zod.number(),
+  "determinismOk": zod.boolean(),
+  "provenanceOk": zod.boolean(),
+  "calibrationOk": zod.boolean(),
+  "snapshotOk": zod.boolean(),
+  "mutationGuardsOk": zod.boolean()
+}),
+  "scenarios": zod.array(zod.object({
+  "scenarioId": zod.string(),
+  "archetype": zod.string(),
+  "description": zod.string(),
+  "passed": zod.boolean(),
+  "determinismHash": zod.string(),
+  "digest": zod.object({
+  "scenarioId": zod.string(),
+  "candidateId": zod.string(),
+  "organizationId": zod.string(),
+  "bayesianFit": zod.number(),
+  "bayesianConfidence": zod.number(),
+  "contradictionScore": zod.number(),
+  "contradictionCount": zod.number(),
+  "unsupportedClaimCount": zod.number(),
+  "trajectoryScore": zod.number(),
+  "trajectoryConfidence": zod.number(),
+  "globalConfidence": zod.number(),
+  "disagreementScore": zod.number(),
+  "ambiguityLevel": zod.number(),
+  "certaintyCategory": zod.string(),
+  "recommendationCategory": zod.string(),
+  "unresolvedQuestionCount": zod.number(),
+  "influenceCount": zod.number(),
+  "evidenceChainCount": zod.number(),
+  "reasoningStepCount": zod.number(),
+  "archetypeMatchCount": zod.number(),
+  "fitRecommendation": zod.string(),
+  "fitConfidence": zod.number(),
+  "overallHiringRisk": zod.number(),
+  "chaosFitScore": zod.number(),
+  "evidenceRequestSignal": zod.number()
+}),
+  "failures": zod.array(zod.object({
+  "type": zod.string(),
+  "path": zod.string().optional(),
+  "passed": zod.boolean(),
+  "detail": zod.string(),
+  "rationale": zod.string().optional()
+})),
+  "warnings": zod.array(zod.string()),
+  "determinism": zod.object({
+  "scenarioId": zod.string(),
+  "passed": zod.boolean(),
+  "firstHash": zod.string(),
+  "secondHash": zod.string(),
+  "drift": zod.array(zod.string())
+}),
+  "cognitionIntegrity": zod.object({
+  "scenarioId": zod.string(),
+  "passed": zod.boolean(),
+  "findings": zod.array(zod.object({
+  "ok": zod.boolean(),
+  "rule": zod.string(),
+  "detail": zod.string()
+}))
+}),
+  "provenance": zod.object({
+  "ok": zod.boolean(),
+  "findings": zod.array(zod.object({
+  "ok": zod.boolean(),
+  "path": zod.string(),
+  "detail": zod.string()
+}))
+})
+})),
+  "calibration": zod.object({
+  "passed": zod.boolean(),
+  "ece": zod.number(),
+  "overconfidenceRisk": zod.enum(['low', 'medium', 'high']),
+  "predictionsEvaluated": zod.number(),
+  "detail": zod.string(),
+  "reasons": zod.array(zod.string())
+}),
+  "snapshot": zod.object({
+  "ok": zod.boolean(),
+  "drift": zod.array(zod.object({
+  "scenarioId": zod.string(),
+  "kind": zod.enum(['missing', 'extra', 'hash-changed', 'field-changed']),
+  "detail": zod.string()
+}))
+}),
+  "mutationGuards": zod.array(zod.object({
+  "guardId": zod.string(),
+  "description": zod.string(),
+  "passed": zod.boolean(),
+  "scenarioId": zod.string(),
+  "detail": zod.string()
+})),
+  "recommendations": zod.array(zod.string())
+})
+
+

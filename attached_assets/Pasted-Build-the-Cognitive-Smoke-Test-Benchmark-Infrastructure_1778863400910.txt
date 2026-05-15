@@ -1,0 +1,407 @@
+Build the Cognitive Smoke Test + Benchmark Infrastructure for the Recruiting Intelligence Framework.
+
+Goal:
+Create a deterministic test and benchmark layer that verifies the framework’s cognition remains stable, auditable, and epistemically coherent.
+
+This is NOT simple unit testing.
+This is system-level testing for recruiting cognition.
+
+The framework already has:
+- candidate intelligence
+- cross-agent cognition
+- organization intelligence
+- evaluation/calibration
+- longitudinal learning
+- provenance-first architecture
+- deterministic execution
+
+Now build regression protection.
+
+--------------------------------------------------
+Core Principle
+--------------------------------------------------
+
+The tests must verify:
+
+same input
++ same organization
++ same fixed clock
+= same cognition output
+
+And more importantly:
+
+the reasoning behavior must remain correct.
+
+--------------------------------------------------
+Create These Components
+--------------------------------------------------
+
+Create:
+
+lib/framework/src/benchmarks/
+tests/cognitive-smoke/
+
+Required components:
+
+1. BenchmarkCorpus
+2. CognitiveScenarioRunner
+3. DeterminismVerifier
+4. CognitionIntegrityVerifier
+5. ProvenanceIntegrityVerifier
+6. CalibrationSmokeVerifier
+7. ScenarioExpectationEngine
+8. BenchmarkReportEngine
+9. RegressionSnapshotEngine
+10. MutationGuardScenarios
+
+--------------------------------------------------
+1. BenchmarkCorpus
+--------------------------------------------------
+
+Create fixed benchmark dossiers:
+
+- inflated_senior
+- founder_builder
+- plateaued_staff
+- elite_ic
+- high_variance_candidate
+- ambiguous_generalist
+- fake_oss_signal
+- chaos_thriver
+- process_dependent_operator
+- underestimated_junior
+
+Each dossier must include:
+- candidate profile
+- evidence items
+- organization context
+- expected cognition behavior
+- expected contradiction behavior
+- expected trajectory behavior
+- expected org-fit behavior
+- expected escalation behavior
+- expected uncertainty behavior
+
+Important:
+Do NOT overfit absolute numeric scores.
+Prefer expected ranges and behavioral assertions.
+
+Example expectations:
+- contradictionScore should be high
+- Bayesian confidence should decrease after contradiction propagation
+- recommendation should be investigate or decline
+- unresolved questions should not be empty
+- provenance chain must be complete
+
+--------------------------------------------------
+2. CognitiveScenarioRunner
+--------------------------------------------------
+
+Build a deterministic runner that executes full-stack cognition for each benchmark dossier.
+
+For each scenario, run:
+- candidate intelligence
+- cross-agent cognition
+- organization intelligence
+- evaluation hooks where relevant
+- operations triggers if implemented
+
+Runner requirements:
+- fixed clock
+- deterministic candidate ordering
+- deterministic organization context
+- deterministic evidence ordering
+- no Math.random
+- no hidden time calls
+
+Output:
+{
+  scenarioId,
+  passed,
+  failures,
+  warnings,
+  outputs,
+  provenanceSummary,
+  determinismHash
+}
+
+--------------------------------------------------
+3. DeterminismVerifier
+--------------------------------------------------
+
+Verify:
+- same scenario run twice returns same determinism hash
+- reasoning step count is stable
+- propagated influence count is stable
+- recommendation category is stable
+- evidence chain IDs are stable
+
+Fail if:
+- timestamps drift
+- ordering changes
+- generated IDs drift
+- confidence changes unexpectedly
+- hash changes without snapshot update
+
+--------------------------------------------------
+4. CognitionIntegrityVerifier
+--------------------------------------------------
+
+Verify reasoning behavior.
+
+Assertions should include:
+
+Inflated Senior:
+- contradiction score high
+- Bayesian confidence reduced after contradiction influence
+- uncertainty increased
+- evidence requests generated
+- recommendation not strong_fit
+
+Founder Builder:
+- trajectory positive
+- chaos fit positive
+- founder/autonomy signals present
+- recommendation not decline
+
+Ambiguous Generalist:
+- insufficient context or ambiguous category
+- unresolved questions present
+- no fake certainty
+
+Fake OSS Signal:
+- unsupported OSS credibility claim flagged
+- contradiction or authenticity risk present
+- evidence request generated
+
+Process Dependent Operator:
+- chaos tolerance low in high-ambiguity org
+- org-fit risk elevated
+
+Underestimated Junior:
+- trajectory or learning velocity positive
+- confidence remains cautious
+- recommendation should preserve upside and uncertainty
+
+Do not test only numbers.
+Test expected epistemic behavior.
+
+--------------------------------------------------
+5. ProvenanceIntegrityVerifier
+--------------------------------------------------
+
+Verify every major output contains:
+
+- producedBy
+- producedAt
+- rationale
+- derivedFrom
+- evidenceChain
+- reasoning steps
+
+Also verify:
+- every propagated influence has sourceAgent
+- every influence has targetAgent or global target
+- every adjustment has before/after/adjustment
+- every adjustment references derivedFrom evidence IDs
+- no orphan reasoning nodes
+- no missing evidence attribution
+
+Fail hard on missing provenance.
+
+--------------------------------------------------
+6. CalibrationSmokeVerifier
+--------------------------------------------------
+
+Run seeded calibration scenarios.
+
+Verify:
+- ECE is computed deterministically
+- reliability buckets are stable
+- overconfidence cases are detected
+- justified confidence buckets remain justified
+- benchmark failure is visible when ECE exceeds threshold
+
+Important:
+A benchmark can intentionally fail if the corpus is seeded to demonstrate overconfidence.
+But the failure must be explicit, deterministic, and explained.
+
+--------------------------------------------------
+7. ScenarioExpectationEngine
+--------------------------------------------------
+
+Build declarative expectation files.
+
+Example:
+
+{
+  "scenarioId": "inflated_senior",
+  "expectations": [
+    {
+      "type": "range",
+      "path": "contradiction.score",
+      "min": 0.65
+    },
+    {
+      "type": "not_equals",
+      "path": "organizationFit.recommendation",
+      "value": "strong_fit"
+    },
+    {
+      "type": "non_empty",
+      "path": "operations.evidenceRequests"
+    }
+  ]
+}
+
+Support expectation types:
+- equals
+- not_equals
+- range
+- greater_than
+- less_than
+- includes
+- excludes
+- non_empty
+- empty
+- stable_hash
+- provenance_complete
+- confidence_decreased
+- uncertainty_increased
+- recommendation_in
+
+--------------------------------------------------
+8. BenchmarkReportEngine
+--------------------------------------------------
+
+Generate benchmark reports.
+
+Report sections:
+1. Overall pass/fail
+2. Scenario results
+3. Determinism verification
+4. Cognition integrity results
+5. Provenance integrity results
+6. Calibration smoke results
+7. Snapshot drift
+8. Regression warnings
+9. Recommended fixes
+
+Generate:
+- JSON report
+- markdown report
+- console-readable summary
+
+--------------------------------------------------
+9. RegressionSnapshotEngine
+--------------------------------------------------
+
+Create snapshot support.
+
+Snapshots should store:
+- scenario output hash
+- key recommendation category
+- contradiction class
+- uncertainty category
+- org-fit category
+- propagated influence count
+- evidence chain count
+- reasoning step count
+
+Do NOT snapshot full verbose LLM text.
+Snapshot stable structural outputs only.
+
+Support:
+- update snapshots intentionally
+- compare snapshots
+- explain snapshot drift
+
+--------------------------------------------------
+10. MutationGuardScenarios
+--------------------------------------------------
+
+Add guard scenarios that would fail if critical cognition rules break.
+
+Examples:
+- remove contradiction penalty → inflated_senior test fails
+- invert uncertainty boost → ambiguous_generalist test fails
+- ignore unknown org fields → insufficient_context test fails
+- drop provenance → provenance tests fail
+- change propagation ordering nondeterministically → determinism test fails
+
+The goal:
+prove the tests catch real cognitive regressions.
+
+--------------------------------------------------
+CLI Requirements
+--------------------------------------------------
+
+Add commands:
+
+pnpm benchmark:cognition
+pnpm benchmark:cognition:update
+pnpm test:cognitive-smoke
+
+CLI output should show:
+- total scenarios
+- passed/failed
+- determinism status
+- provenance status
+- calibration status
+- failed expectations with paths and actual values
+
+--------------------------------------------------
+Console Integration
+--------------------------------------------------
+
+Add /benchmarks page.
+
+UI sections:
+- benchmark corpus list
+- scenario pass/fail matrix
+- determinism hash panel
+- provenance completeness panel
+- cognition integrity results
+- calibration smoke results
+- snapshot drift panel
+- markdown report preview
+
+The UI must feel like:
+- an intelligence validation lab,
+not:
+- generic test dashboard.
+
+--------------------------------------------------
+Critical Constraints
+--------------------------------------------------
+
+Maintain:
+- deterministic execution
+- no hidden time calls
+- no Math.random
+- stable ordering
+- provenance-first architecture
+- explicit uncertainty
+- no fake precision
+
+Do NOT:
+- overfit brittle exact scores
+- snapshot full natural-language output
+- hide failing benchmarks
+- silently update snapshots
+- weaken expectations just to pass tests
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+The framework should now have:
+
+- cognitive smoke tests
+- deterministic benchmark corpus
+- provenance integrity checks
+- calibration smoke tests
+- regression snapshots
+- mutation guard scenarios
+
+This should protect the system from silent cognition drift and make the repo credible as open-source recruiting intelligence infrastructure.
