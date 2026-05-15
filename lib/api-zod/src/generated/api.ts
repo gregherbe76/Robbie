@@ -3409,3 +3409,35 @@ export const GetSecuritySnapshotResponse = zod.object({
 })
 
 
+/**
+ * Returns the 5 deterministic hero cases used by the public replay UI.
+ * @summary List public demo cases
+ */
+export const ListDemoCasesResponseItem = zod.object({
+  "caseId": zod.enum(['founder-builder', 'inflated-senior', 'ambiguous-generalist', 'chaos-thriver', 'org-mismatch']),
+  "label": zod.string(),
+  "oneLiner": zod.string(),
+  "candidateName": zod.string(),
+  "targetRole": zod.string(),
+  "organizationName": zod.string(),
+  "expectedRecommendation": zod.string()
+})
+export const ListDemoCasesResponse = zod.array(ListDemoCasesResponseItem)
+
+
+/**
+ * Runs the real framework pipeline (ingestion → flagship agents → cognition →
+organization-intelligence) for the requested case and returns a deterministic
+replay trace. The trace shape is documented by the TypeScript
+`ReplayTrace` type in `@workspace/framework/replay`; this endpoint returns
+an opaque object that round-trips that type.
+
+ * @summary Run a demo case live and return its full trace
+ */
+export const GetDemoReplayParams = zod.object({
+  "caseId": zod.enum(['founder-builder', 'inflated-senior', 'ambiguous-generalist', 'chaos-thriver', 'org-mismatch']).describe('One of the 5 demo case ids.')
+})
+
+export const GetDemoReplayResponse = zod.record(zod.string(), zod.unknown()).describe('Deterministic end-to-end trace for a demo case. The full shape is the\nTypeScript `ReplayTrace` type in `@workspace\/framework\/replay`. The\nschema here is intentionally permissive — the contract is the TS type.\n')
+
+

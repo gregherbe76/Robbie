@@ -29,6 +29,8 @@ tags:
     description: Cross-agent cognitive synthesis (influence, disagreement, uncertainty)
   - name: benchmarks
     description: Cognitive benchmark + smoke-test report (deterministic regression protection)
+  - name: demo
+    description: Public demo replay — deterministic end-to-end traces for the 5 hero cases
 paths:
   /healthz:
     get:
@@ -787,6 +789,54 @@ paths:
                 $ref: "#/components/schemas/SecuritySnapshot"
         "404":
           description: Organization not found
+  /demo/cases:
+    get:
+      operationId: listDemoCases
+      tags: [demo]
+      summary: List public demo cases
+      description: Returns the 5 deterministic hero cases used by the public replay UI.
+      responses:
+        "200":
+          description: Cases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DemoCaseSummary"
+  /demo/replay/{caseId}:
+    get:
+      operationId: getDemoReplay
+      tags: [demo]
+      summary: Run a demo case live and return its full trace
+      description: |
+        Runs the real framework pipeline (ingestion → flagship agents → cognition →
+        organization-intelligence) for the requested case and returns a deterministic
+        replay trace. The trace shape is documented by the TypeScript
+        `ReplayTrace` type in `@workspace/framework/replay`; this endpoint returns
+        an opaque object that round-trips that type.
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          description: One of the 5 demo case ids.
+          schema:
+            type: string
+            enum:
+              - founder-builder
+              - inflated-senior
+              - ambiguous-generalist
+              - chaos-thriver
+              - org-mismatch
+      responses:
+        "200":
+          description: Replay trace
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoReplayTrace"
+        "404":
+          description: Unknown case id
 components:
   schemas:
     SecurityOrganizationTier:
@@ -4320,3 +4370,23 @@ components:
         entries:
           type: array
           items: { $ref: "#/components/schemas/CollaborationAuditEntry" }
+    DemoCaseSummary:
+      type: object
+      required: [caseId, label, oneLiner, candidateName, targetRole, organizationName, expectedRecommendation]
+      properties:
+        caseId:
+          type: string
+          enum: [founder-builder, inflated-senior, ambiguous-generalist, chaos-thriver, org-mismatch]
+        label: { type: string }
+        oneLiner: { type: string }
+        candidateName: { type: string }
+        targetRole: { type: string }
+        organizationName: { type: string }
+        expectedRecommendation: { type: string }
+    DemoReplayTrace:
+      type: object
+      description: |
+        Deterministic end-to-end trace for a demo case. The full shape is the
+        TypeScript `ReplayTrace` type in `@workspace/framework/replay`. The
+        schema here is intentionally permissive — the contract is the TS type.
+      additionalProperties: true

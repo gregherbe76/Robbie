@@ -1,9 +1,10 @@
 import { Link, useLocation } from "wouter";
-import { Activity, Brain, Server, Shield, Workflow, Cpu, Network, FileText, Database, Sparkles, GitBranch, Building2, Gauge, Crosshair, Beaker, Inbox, Users } from "lucide-react";
+import { Activity, Brain, Server, Shield, Workflow, Cpu, Network, FileText, Database, Sparkles, GitBranch, Building2, Gauge, Crosshair, Beaker, Inbox, Users, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { name: "Overview", path: "/", icon: Activity },
+  { name: "Demo", path: "/demo", icon: Play },
   { name: "Ingestion", path: "/ingestion", icon: Inbox },
   { name: "Collaboration", path: "/collaboration", icon: Users },
   { name: "Security", path: "/security", icon: Shield },

@@ -25,6 +25,8 @@ import { Collaboration } from "@/pages/collaboration";
 import { Security } from "@/pages/security";
 import { CandidateGraph } from "@/pages/graph/candidate";
 import { OrganizationGraph } from "@/pages/graph/organization";
+import { DemoIndex } from "@/pages/demo";
+import { Replay } from "@/pages/demo/replay";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Overview} />
+      <Route path="/demo" component={DemoIndex} />
+      <Route path="/replay/:caseId" component={Replay} />
       <Route path="/intelligence" component={Intelligence} />
       <Route path="/cognition" component={Cognition} />
       <Route path="/organization-intelligence" component={OrganizationIntelligence} />

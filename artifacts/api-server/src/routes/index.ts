@@ -13,6 +13,7 @@ import benchmarksRouter from "./benchmarks";
 import ingestionRouter from "./ingestion";
 import collaborationRouter from "./collaboration";
 import securityRouter from "./security";
+import demoRouter from "./demo";
 
 const router: IRouter = Router();
 
@@ -30,5 +31,6 @@ router.use(benchmarksRouter);
 router.use(ingestionRouter);
 router.use(collaborationRouter);
 router.use(securityRouter);
+router.use(demoRouter);
 
 export default router;

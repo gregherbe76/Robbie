@@ -41,6 +41,8 @@ import type {
   CollaborationReviewerCalibrationReport,
   CollaborationStateResponse,
   CollaborativeCase,
+  DemoCaseSummary,
+  DemoReplayTrace,
   EvaluationReport,
   GraphSnapshot,
   HealthStatus,
@@ -3569,6 +3571,167 @@ export function useGetSecuritySnapshot<TData = Awaited<ReturnType<typeof getSecu
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetSecuritySnapshotQueryOptions(organizationId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListDemoCasesUrl = () => {
+
+
+
+
+  return `/api/demo/cases`
+}
+
+/**
+ * Returns the 5 deterministic hero cases used by the public replay UI.
+ * @summary List public demo cases
+ */
+export const listDemoCases = async ( options?: RequestInit): Promise<DemoCaseSummary[]> => {
+
+  return customFetch<DemoCaseSummary[]>(getListDemoCasesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListDemoCasesQueryKey = () => {
+    return [
+    `/api/demo/cases`
+    ] as const;
+    }
+
+
+export const getListDemoCasesQueryOptions = <TData = Awaited<ReturnType<typeof listDemoCases>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listDemoCases>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListDemoCasesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDemoCases>>> = ({ signal }) => listDemoCases({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listDemoCases>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListDemoCasesQueryResult = NonNullable<Awaited<ReturnType<typeof listDemoCases>>>
+export type ListDemoCasesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List public demo cases
+ */
+
+export function useListDemoCases<TData = Awaited<ReturnType<typeof listDemoCases>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listDemoCases>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListDemoCasesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetDemoReplayUrl = (caseId: 'founder-builder' | 'inflated-senior' | 'ambiguous-generalist' | 'chaos-thriver' | 'org-mismatch',) => {
+
+
+
+
+  return `/api/demo/replay/${caseId}`
+}
+
+/**
+ * Runs the real framework pipeline (ingestion → flagship agents → cognition →
+organization-intelligence) for the requested case and returns a deterministic
+replay trace. The trace shape is documented by the TypeScript
+`ReplayTrace` type in `@workspace/framework/replay`; this endpoint returns
+an opaque object that round-trips that type.
+
+ * @summary Run a demo case live and return its full trace
+ */
+export const getDemoReplay = async (caseId: 'founder-builder' | 'inflated-senior' | 'ambiguous-generalist' | 'chaos-thriver' | 'org-mismatch', options?: RequestInit): Promise<DemoReplayTrace> => {
+
+  return customFetch<DemoReplayTrace>(getGetDemoReplayUrl(caseId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDemoReplayQueryKey = (caseId: 'founder-builder' | 'inflated-senior' | 'ambiguous-generalist' | 'chaos-thriver' | 'org-mismatch',) => {
+    return [
+    `/api/demo/replay/${caseId}`
+    ] as const;
+    }
+
+
+export const getGetDemoReplayQueryOptions = <TData = Awaited<ReturnType<typeof getDemoReplay>>, TError = ErrorType<void>>(caseId: 'founder-builder' | 'inflated-senior' | 'ambiguous-generalist' | 'chaos-thriver' | 'org-mismatch', options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDemoReplay>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDemoReplayQueryKey(caseId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDemoReplay>>> = ({ signal }) => getDemoReplay(caseId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(caseId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDemoReplay>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDemoReplayQueryResult = NonNullable<Awaited<ReturnType<typeof getDemoReplay>>>
+export type GetDemoReplayQueryError = ErrorType<void>
+
+
+/**
+ * @summary Run a demo case live and return its full trace
+ */
+
+export function useGetDemoReplay<TData = Awaited<ReturnType<typeof getDemoReplay>>, TError = ErrorType<void>>(
+ caseId: 'founder-builder' | 'inflated-senior' | 'ambiguous-generalist' | 'chaos-thriver' | 'org-mismatch', options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDemoReplay>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDemoReplayQueryOptions(caseId,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

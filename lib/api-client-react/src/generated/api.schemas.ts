@@ -2737,3 +2737,32 @@ export interface CollaborationAuditBundle {
   entries: CollaborationAuditEntry[];
 }
 
+export type DemoCaseSummaryCaseId = typeof DemoCaseSummaryCaseId[keyof typeof DemoCaseSummaryCaseId];
+
+
+export const DemoCaseSummaryCaseId = {
+  'founder-builder': 'founder-builder',
+  'inflated-senior': 'inflated-senior',
+  'ambiguous-generalist': 'ambiguous-generalist',
+  'chaos-thriver': 'chaos-thriver',
+  'org-mismatch': 'org-mismatch',
+} as const;
+
+export interface DemoCaseSummary {
+  caseId: DemoCaseSummaryCaseId;
+  label: string;
+  oneLiner: string;
+  candidateName: string;
+  targetRole: string;
+  organizationName: string;
+  expectedRecommendation: string;
+}
+
+/**
+ * Deterministic end-to-end trace for a demo case. The full shape is the
+TypeScript `ReplayTrace` type in `@workspace/framework/replay`. The
+schema here is intentionally permissive — the contract is the TS type.
+
+ */
+export interface DemoReplayTrace { [key: string]: unknown }
+

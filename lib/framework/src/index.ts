@@ -18,5 +18,6 @@ export * as benchmarks from "./benchmarks/index.js";
 export * as ingestion from "./ingestion/index.js";
 export * as collaboration from "./collaboration/index.js";
 export * as security from "./security/index.js";
+export * as replay from "./replay/index.js";
 
 export const FRAMEWORK_VERSION = "0.1.0";
