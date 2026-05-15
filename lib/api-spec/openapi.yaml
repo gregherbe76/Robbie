@@ -3,13 +3,26 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: |
+    Recruiting Intelligence Framework — control plane API.
+    Exposes registries (agents, skills, providers, workflows), memory introspection,
+    graph snapshots, reports and the system overview used by the console.
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: system
+    description: Framework-wide overview and telemetry
+  - name: registry
+    description: Registered components (agents, skills, providers, workflows)
+  - name: memory
+    description: Persistent memory introspection
+  - name: graph
+    description: Candidate and organization graph snapshots
+  - name: reports
+    description: Generated reports and explanations
 paths:
   /healthz:
     get:
@@ -24,13 +37,332 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /system/overview:
+    get:
+      operationId: getSystemOverview
+      tags: [system]
+      summary: Framework overview
+      description: High-level counts and status across all framework modules
+      responses:
+        "200":
+          description: Overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemOverview"
+  /registry/agents:
+    get:
+      operationId: listAgents
+      tags: [registry]
+      summary: List registered agents
+      responses:
+        "200":
+          description: Agents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Agent"
+  /registry/skills:
+    get:
+      operationId: listSkills
+      tags: [registry]
+      summary: List registered skills
+      responses:
+        "200":
+          description: Skills
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Skill"
+  /registry/providers:
+    get:
+      operationId: listProviders
+      tags: [registry]
+      summary: List registered AI providers
+      responses:
+        "200":
+          description: Providers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Provider"
+  /registry/workflows:
+    get:
+      operationId: listWorkflows
+      tags: [registry]
+      summary: List registered workflows
+      responses:
+        "200":
+          description: Workflows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Workflow"
+  /memory/entries:
+    get:
+      operationId: listMemoryEntries
+      tags: [memory]
+      summary: Recent persistent memory entries
+      responses:
+        "200":
+          description: Memory entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MemoryEntry"
+  /graph/candidate:
+    get:
+      operationId: getCandidateGraph
+      tags: [graph]
+      summary: Candidate graph snapshot
+      responses:
+        "200":
+          description: Graph
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GraphSnapshot"
+  /graph/organization:
+    get:
+      operationId: getOrganizationGraph
+      tags: [graph]
+      summary: Organization graph snapshot
+      responses:
+        "200":
+          description: Graph
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GraphSnapshot"
+  /reports:
+    get:
+      operationId: listReports
+      tags: [reports]
+      summary: List generated reports
+      responses:
+        "200":
+          description: Reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Report"
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
+    SystemOverview:
+      type: object
       required:
-        - status
-
+        [
+          version,
+          agents,
+          skills,
+          providers,
+          workflows,
+          memoryEntries,
+          candidateNodes,
+          organizationNodes,
+          reports,
+          uptimeSeconds,
+        ]
+      properties:
+        version:
+          type: string
+        agents:
+          type: integer
+        skills:
+          type: integer
+        providers:
+          type: integer
+        workflows:
+          type: integer
+        memoryEntries:
+          type: integer
+        candidateNodes:
+          type: integer
+        organizationNodes:
+          type: integer
+        reports:
+          type: integer
+        uptimeSeconds:
+          type: number
+    Agent:
+      type: object
+      required: [id, name, role, status, capabilities, description]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        role: { type: string }
+        status:
+          type: string
+          enum: [active, idle, disabled]
+        capabilities:
+          type: array
+          items: { type: string }
+        description: { type: string }
+        defaultProvider:
+          type: ["string", "null"]
+    Skill:
+      type: object
+      required: [id, name, category, inputs, outputs, description]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        category: { type: string }
+        inputs:
+          type: array
+          items: { type: string }
+        outputs:
+          type: array
+          items: { type: string }
+        description: { type: string }
+    Provider:
+      type: object
+      required: [id, name, kind, models, status]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        kind:
+          type: string
+          enum: [openai, anthropic, custom]
+        models:
+          type: array
+          items: { type: string }
+        status:
+          type: string
+          enum: [configured, unconfigured]
+    Workflow:
+      type: object
+      required: [id, name, trigger, steps, description]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        trigger: { type: string }
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkflowStep"
+        description: { type: string }
+    WorkflowStep:
+      type: object
+      required: [id, agentId, skillId]
+      properties:
+        id: { type: string }
+        agentId: { type: string }
+        skillId: { type: string }
+        description:
+          type: ["string", "null"]
+    MemoryEntry:
+      type: object
+      required:
+        [id, scope, subjectId, key, summary, createdAt, confidence, provenance]
+      properties:
+        id: { type: string }
+        scope:
+          type: string
+          enum: [candidate, organization, role, global]
+        subjectId: { type: string }
+        key: { type: string }
+        summary: { type: string }
+        createdAt: { type: string, format: date-time }
+        confidence: { type: number }
+        sourceAgentId:
+          type: ["string", "null"]
+        tags:
+          type: array
+          items: { type: string }
+        provenance:
+          $ref: "#/components/schemas/Provenance"
+    Provenance:
+      type: object
+      required: [producedBy, producedAt]
+      properties:
+        producedBy: { type: string }
+        producedAt: { type: string, format: date-time }
+        rationale:
+          type: ["string", "null"]
+        derivedFrom:
+          type: array
+          items: { type: string }
+    GraphSnapshot:
+      type: object
+      required: [nodes, edges]
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/GraphNode"
+        edges:
+          type: array
+          items:
+            $ref: "#/components/schemas/GraphEdge"
+    GraphNode:
+      type: object
+      required: [id, type, label]
+      properties:
+        id: { type: string }
+        type: { type: string }
+        label: { type: string }
+        weight:
+          type: ["number", "null"]
+    GraphEdge:
+      type: object
+      required: [from, to, relation]
+      properties:
+        from: { type: string }
+        to: { type: string }
+        relation: { type: string }
+        weight:
+          type: ["number", "null"]
+    Report:
+      type: object
+      required: [id, title, kind, createdAt, summary, sections, evidence]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        kind:
+          type: string
+          enum: [candidate, role, organization, system]
+        createdAt: { type: string, format: date-time }
+        summary: { type: string }
+        confidence:
+          type: ["number", "null"]
+        sections:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportSection"
+        evidence:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReportEvidence"
+    ReportSection:
+      type: object
+      required: [heading, body]
+      properties:
+        heading: { type: string }
+        body: { type: string }
+    ReportEvidence:
+      type: object
+      required: [id, kind, summary, confidence, producedBy]
+      properties:
+        id: { type: string }
+        kind: { type: string }
+        summary: { type: string }
+        confidence: { type: number }
+        producedBy: { type: string }
