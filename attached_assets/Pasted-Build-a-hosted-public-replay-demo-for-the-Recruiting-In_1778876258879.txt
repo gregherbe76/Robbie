@@ -1,0 +1,287 @@
+Build a hosted public replay demo for the Recruiting Intelligence Framework.
+
+Goal:
+Create a 30-second instantly understandable demo.
+
+The demo must showcase:
+- deterministic cognition
+- disagreement preservation
+- provenance
+- calibration
+- auditability
+- organizational fit reasoning
+
+NOT:
+- resume upload SaaS
+- ATS workflow
+- generic AI recruiter
+
+The core interaction is:
+"Replay a hiring decision."
+
+--------------------------------------------------
+Core UX
+--------------------------------------------------
+
+Public route:
+/
+/demo
+/replay/:caseId
+
+The user selects:
+- founder-builder
+- inflated-senior
+- ambiguous-generalist
+- chaos-thriver
+- org-mismatch
+
+The system replays:
+- ingestion
+- cognition
+- propagation
+- disagreement
+- organization fit
+- escalation
+- calibration
+- final recommendation
+
+in deterministic order.
+
+--------------------------------------------------
+Required Demo Screens
+--------------------------------------------------
+
+1. Decision Replay Timeline
+2. Disagreement Heatmap
+3. Confidence Propagation
+4. Provenance Explorer
+5. Organization Fit Analysis
+6. Escalation / Investigation Trace
+7. Calibration Snapshot
+8. Final Decision Summary
+
+--------------------------------------------------
+1. Decision Replay Timeline
+--------------------------------------------------
+
+Show:
+- ingestion
+- evidence normalization
+- contradiction detection
+- trajectory analysis
+- org-fit reasoning
+- propagation events
+- escalation events
+- reviewer actions
+
+Each step:
+- timestamped
+- provenance-linked
+- replayable
+
+Support:
+- play
+- pause
+- next step
+- rewind
+
+IMPORTANT:
+Replay must remain deterministic.
+
+--------------------------------------------------
+2. Disagreement Heatmap
+--------------------------------------------------
+
+Visualize:
+- reviewer disagreement
+- agent disagreement
+- unresolved tensions
+- confidence divergence
+
+Examples:
+TrajectoryAgent:
+"Strong upside"
+
+ContradictionAgent:
+"Narrative inflation"
+
+Founder reviewer:
+"Exceptional autonomy"
+
+Show:
+- disagreements preserved
+- not averaged away
+
+--------------------------------------------------
+3. Confidence Propagation
+--------------------------------------------------
+
+Visualize:
+- confidence before
+- influence propagation
+- confidence after
+
+Examples:
+- contradiction penalty reducing Bayesian confidence
+- uncertainty boost due to missing evidence
+- trajectory amplification
+
+Every propagation step must expose:
+- source
+- target
+- reason
+- evidence ids
+- before/after
+
+--------------------------------------------------
+4. Provenance Explorer
+--------------------------------------------------
+
+Build an explorable provenance graph.
+
+Every evidence item shows:
+- producedBy
+- producedAt
+- rationale
+- derivedFrom
+- rawReference
+
+Users can click:
+- evidence
+- reasoning
+- propagation
+- overrides
+- escalations
+
+and inspect lineage.
+
+This should become:
+- the visual centerpiece of the demo.
+
+--------------------------------------------------
+5. Organization Fit Analysis
+--------------------------------------------------
+
+Show:
+- candidate graph
+- organization graph
+- fit tensions
+- chaos tolerance
+- founder compatibility
+- role environment mismatch
+
+Visualize:
+candidate_subgraph × org_subgraph.
+
+--------------------------------------------------
+6. Escalation / Investigation Trace
+--------------------------------------------------
+
+Replay:
+- uncertainty escalation
+- evidence requests
+- adversarial review
+- reviewer disagreements
+- override rationale
+
+Show:
+- the system preserving uncertainty,
+NOT pretending certainty.
+
+--------------------------------------------------
+7. Calibration Snapshot
+--------------------------------------------------
+
+Include:
+- reliability diagram
+- ECE
+- overconfidence buckets
+- disagreement predictive value
+
+Very important:
+Show at least one benchmark failure intentionally.
+
+Example:
+0.60–0.75 bucket claims 68%
+actual outcome 22%
+=> overconfidence warning
+
+This demonstrates:
+the system critiques itself.
+
+--------------------------------------------------
+8. Final Decision Summary
+--------------------------------------------------
+
+Final screen:
+- recommendation
+- uncertainty category
+- unresolved questions
+- strongest evidence
+- strongest risks
+- escalation summary
+- reviewer disagreement summary
+
+IMPORTANT:
+Do NOT show:
+"AI made the decision."
+
+The UI must clearly communicate:
+- decision support
+- uncertainty preserved
+- human oversight
+
+--------------------------------------------------
+Technical Requirements
+--------------------------------------------------
+
+- deterministic replay only
+- fixed clocks
+- no randomness
+- replayable from stored traces
+- provenance-complete
+- public demo datasets only
+- no private candidate data
+
+--------------------------------------------------
+UI Requirements
+--------------------------------------------------
+
+Design:
+- dark analytical console
+- intelligence operations feel
+- cinematic replay
+- graph-heavy
+- provenance visible everywhere
+
+Avoid:
+- ATS dashboards
+- HR SaaS aesthetics
+- chatbot layouts
+
+--------------------------------------------------
+Deployment Requirements
+--------------------------------------------------
+
+Deploy publicly:
+- Fly.io
+- Render
+- Railway
+or equivalent.
+
+Add:
+- demo seed loader
+- replay URL sharing
+- OpenGraph previews
+- screenshots for README
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+A visitor should understand within 30 seconds:
+
+"This is not an ATS.
+
+This is a deterministic, provenance-aware recruiting intelligence system
+that preserves uncertainty and disagreement."
