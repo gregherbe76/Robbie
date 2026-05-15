@@ -53,6 +53,9 @@ import type {
   IngestionEventDetail,
   IngestionStateResponse,
   IntelligenceCase,
+  LabRunRequest,
+  LabRunSignature,
+  LabRunSummary,
   MemoryEntry,
   OpenCollaborationCaseRequest,
   OperationsReport,
@@ -3732,6 +3735,319 @@ export function useGetDemoReplay<TData = Awaited<ReturnType<typeof getDemoReplay
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetDemoReplayQueryOptions(caseId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateLabRunUrl = () => {
+
+
+
+
+  return `/api/lab/run`
+}
+
+/**
+ * Synthesise a deterministic replay trace from user-provided input.
+Two modes:
+  - `scenario` — start from one of the 5 canonical hero cases, with
+    optional organization override + appended synthetic resume/transcript.
+  - `synthetic` — provide a full candidate dossier + organization
+    context as JSON; the framework runs the same deterministic
+    pipeline as the hero cases.
+Inputs are size-limited and pass through a basic abuse filter. The
+run is stored in-memory for ~1 hour; identical inputs always
+produce the same runId.
+
+ * @summary Run a Cognition Lab replay
+ */
+export const createLabRun = async (labRunRequest: LabRunRequest, options?: RequestInit): Promise<LabRunSummary> => {
+
+  return customFetch<LabRunSummary>(getCreateLabRunUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      labRunRequest,)
+  }
+);}
+
+
+
+
+export const getCreateLabRunMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createLabRun>>, TError,{data: BodyType<LabRunRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createLabRun>>, TError,{data: BodyType<LabRunRequest>}, TContext> => {
+
+const mutationKey = ['createLabRun'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createLabRun>>, {data: BodyType<LabRunRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createLabRun(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateLabRunMutationResult = NonNullable<Awaited<ReturnType<typeof createLabRun>>>
+    export type CreateLabRunMutationBody = BodyType<LabRunRequest>
+    export type CreateLabRunMutationError = ErrorType<void>
+
+    /**
+ * @summary Run a Cognition Lab replay
+ */
+export const useCreateLabRun = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createLabRun>>, TError,{data: BodyType<LabRunRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createLabRun>>,
+        TError,
+        {data: BodyType<LabRunRequest>},
+        TContext
+      > => {
+      return useMutation(getCreateLabRunMutationOptions(options));
+    }
+
+export const getGetLabRunSummaryUrl = (runId: string,) => {
+
+
+
+
+  return `/api/lab/run/${runId}`
+}
+
+/**
+ * @summary Fetch the compact summary of a lab run
+ */
+export const getLabRunSummary = async (runId: string, options?: RequestInit): Promise<LabRunSummary> => {
+
+  return customFetch<LabRunSummary>(getGetLabRunSummaryUrl(runId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetLabRunSummaryQueryKey = (runId: string,) => {
+    return [
+    `/api/lab/run/${runId}`
+    ] as const;
+    }
+
+
+export const getGetLabRunSummaryQueryOptions = <TData = Awaited<ReturnType<typeof getLabRunSummary>>, TError = ErrorType<void>>(runId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLabRunSummary>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetLabRunSummaryQueryKey(runId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLabRunSummary>>> = ({ signal }) => getLabRunSummary(runId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(runId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLabRunSummary>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetLabRunSummaryQueryResult = NonNullable<Awaited<ReturnType<typeof getLabRunSummary>>>
+export type GetLabRunSummaryQueryError = ErrorType<void>
+
+
+/**
+ * @summary Fetch the compact summary of a lab run
+ */
+
+export function useGetLabRunSummary<TData = Awaited<ReturnType<typeof getLabRunSummary>>, TError = ErrorType<void>>(
+ runId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLabRunSummary>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetLabRunSummaryQueryOptions(runId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetLabRunTraceUrl = (runId: string,) => {
+
+
+
+
+  return `/api/lab/run/${runId}/trace`
+}
+
+/**
+ * @summary Fetch the full replay trace for a lab run
+ */
+export const getLabRunTrace = async (runId: string, options?: RequestInit): Promise<DemoReplayTrace> => {
+
+  return customFetch<DemoReplayTrace>(getGetLabRunTraceUrl(runId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetLabRunTraceQueryKey = (runId: string,) => {
+    return [
+    `/api/lab/run/${runId}/trace`
+    ] as const;
+    }
+
+
+export const getGetLabRunTraceQueryOptions = <TData = Awaited<ReturnType<typeof getLabRunTrace>>, TError = ErrorType<void>>(runId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLabRunTrace>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetLabRunTraceQueryKey(runId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLabRunTrace>>> = ({ signal }) => getLabRunTrace(runId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(runId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLabRunTrace>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetLabRunTraceQueryResult = NonNullable<Awaited<ReturnType<typeof getLabRunTrace>>>
+export type GetLabRunTraceQueryError = ErrorType<void>
+
+
+/**
+ * @summary Fetch the full replay trace for a lab run
+ */
+
+export function useGetLabRunTrace<TData = Awaited<ReturnType<typeof getLabRunTrace>>, TError = ErrorType<void>>(
+ runId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLabRunTrace>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetLabRunTraceQueryOptions(runId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetLabRunSignatureUrl = (runId: string,) => {
+
+
+
+
+  return `/api/lab/run/${runId}/signature`
+}
+
+/**
+ * @summary Fetch only the sha256 signature of a lab run
+ */
+export const getLabRunSignature = async (runId: string, options?: RequestInit): Promise<LabRunSignature> => {
+
+  return customFetch<LabRunSignature>(getGetLabRunSignatureUrl(runId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetLabRunSignatureQueryKey = (runId: string,) => {
+    return [
+    `/api/lab/run/${runId}/signature`
+    ] as const;
+    }
+
+
+export const getGetLabRunSignatureQueryOptions = <TData = Awaited<ReturnType<typeof getLabRunSignature>>, TError = ErrorType<void>>(runId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLabRunSignature>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetLabRunSignatureQueryKey(runId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getLabRunSignature>>> = ({ signal }) => getLabRunSignature(runId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(runId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getLabRunSignature>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetLabRunSignatureQueryResult = NonNullable<Awaited<ReturnType<typeof getLabRunSignature>>>
+export type GetLabRunSignatureQueryError = ErrorType<void>
+
+
+/**
+ * @summary Fetch only the sha256 signature of a lab run
+ */
+
+export function useGetLabRunSignature<TData = Awaited<ReturnType<typeof getLabRunSignature>>, TError = ErrorType<void>>(
+ runId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getLabRunSignature>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetLabRunSignatureQueryOptions(runId,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

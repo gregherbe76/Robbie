@@ -2766,3 +2766,101 @@ schema here is intentionally permissive — the contract is the TS type.
  */
 export interface DemoReplayTrace { [key: string]: unknown }
 
+export type LabScenarioId = typeof LabScenarioId[keyof typeof LabScenarioId];
+
+
+export const LabScenarioId = {
+  'founder-builder': 'founder-builder',
+  'inflated-senior': 'inflated-senior',
+  'ambiguous-generalist': 'ambiguous-generalist',
+  'chaos-thriver': 'chaos-thriver',
+  'org-mismatch': 'org-mismatch',
+} as const;
+
+export type LabRunRequestMode = typeof LabRunRequestMode[keyof typeof LabRunRequestMode];
+
+
+export const LabRunRequestMode = {
+  scenario: 'scenario',
+  synthetic: 'synthetic',
+} as const;
+
+export type LabRunRequestOrganizationOverride = { [key: string]: unknown } | null;
+
+export type LabRunRequestDossier = { [key: string]: unknown } | null;
+
+export type LabRunRequestOrganization = { [key: string]: unknown } | null;
+
+/**
+ * Discriminated by `mode`. The full TS contract lives in
+`@workspace/framework/lab` (`LabRunInput`). For `synthetic` mode,
+`dossier` and `organization` are opaque JSON whose shape is the
+framework's `CandidateDossier` and `OrganizationContext` types.
+
+ */
+export interface LabRunRequest {
+  mode: LabRunRequestMode;
+  scenarioId?: LabScenarioId;
+  organizationOverride?: LabRunRequestOrganizationOverride;
+  dossier?: LabRunRequestDossier;
+  organization?: LabRunRequestOrganization;
+  /** @maxLength 8192 */
+  resumeText?: string | null;
+  /** @maxLength 8192 */
+  transcriptText?: string | null;
+  /** @maxLength 120 */
+  label?: string | null;
+}
+
+export type LabRunSummaryMode = typeof LabRunSummaryMode[keyof typeof LabRunSummaryMode];
+
+
+export const LabRunSummaryMode = {
+  scenario: 'scenario',
+  synthetic: 'synthetic',
+} as const;
+
+export type LabRunSummaryDisagreementSummary = {
+  count: number;
+  score: number;
+};
+
+export type LabRunSummaryEscalationSummary = {
+  count: number;
+  triggers: string[];
+};
+
+export type LabRunSummaryProvenanceSummary = {
+  nodeCount: number;
+  edgeCount: number;
+};
+
+export type LabRunSummaryCalibrationSummary = {
+  expectedCalibrationError: number;
+  overconfidentBuckets: number;
+};
+
+export interface LabRunSummary {
+  runId: string;
+  signature: string;
+  mode: LabRunSummaryMode;
+  baseScenarioId?: string | null;
+  caseLabel: string;
+  candidateName: string;
+  organizationName: string;
+  generatedAt: string;
+  expiresAt: string;
+  recommendation: string;
+  uncertaintyCategory: string;
+  globalConfidence: number;
+  disagreementSummary: LabRunSummaryDisagreementSummary;
+  escalationSummary: LabRunSummaryEscalationSummary;
+  provenanceSummary: LabRunSummaryProvenanceSummary;
+  calibrationSummary: LabRunSummaryCalibrationSummary;
+}
+
+export interface LabRunSignature {
+  runId: string;
+  signature: string;
+}
+

@@ -42,10 +42,16 @@ export function Landing() {
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link
-              href="/demo"
+              href="/lab"
               className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
-              Replay a live case <ArrowRight className="size-4" />
+              Open the Cognition Lab <ArrowRight className="size-4" />
+            </Link>
+            <Link
+              href="/demo"
+              className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-5 py-2.5 text-sm font-semibold hover:border-primary/50 transition-colors"
+            >
+              Replay a hero case
             </Link>
             <Link
               href="/architecture"

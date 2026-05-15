@@ -37,7 +37,11 @@ export type ReplayLayer =
   | "recommendation";
 
 export interface ReplayCaseSummary {
-  caseId: ReplayCaseId;
+  /**
+   * Canonical ReplayCaseId for hero cases, or an arbitrary string for
+   * lab runs synthesised from user-provided input.
+   */
+  caseId: ReplayCaseId | string;
   label: string;
   oneLiner: string;
   candidateName: string;
@@ -180,7 +184,11 @@ export interface RecommendationView {
 }
 
 export interface ReplayTrace {
-  caseId: ReplayCaseId;
+  /**
+   * Canonical ReplayCaseId for hero cases, or an arbitrary string for
+   * lab runs (where the case is synthesised from user input).
+   */
+  caseId: ReplayCaseId | string;
   summary: ReplayCaseSummary;
   /** Fixed clock used for the whole trace. */
   generatedAt: string;

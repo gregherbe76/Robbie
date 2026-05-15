@@ -58,7 +58,7 @@ interface CaseConfig {
  * `PredictionRecord`s and `OutcomeEvent`s that the evaluation engine
  * digests; that engine is what produces the displayed calibration view.
  */
-interface CalibrationSeedShape {
+export interface CalibrationSeedShape {
   /** Predictions evenly spaced across these confidence bands. */
   buckets: Array<{
     /** Mean self-reported confidence in [0,1]. */

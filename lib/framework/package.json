@@ -94,6 +94,10 @@
       "types": "./dist/replay/index.d.ts",
       "import": "./dist/replay/index.js"
     },
+    "./lab": {
+      "types": "./dist/lab/index.d.ts",
+      "import": "./dist/lab/index.js"
+    },
     "./replay/narrative": {
       "types": "./dist/replay/narrative.d.ts",
       "import": "./dist/replay/narrative.js"

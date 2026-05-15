@@ -14,6 +14,7 @@ import ingestionRouter from "./ingestion";
 import collaborationRouter from "./collaboration";
 import securityRouter from "./security";
 import demoRouter from "./demo";
+import labRouter from "./lab";
 import analyticsRouter from "./analytics";
 
 const router: IRouter = Router();
@@ -33,6 +34,7 @@ router.use(ingestionRouter);
 router.use(collaborationRouter);
 router.use(securityRouter);
 router.use(demoRouter);
+router.use(labRouter);
 router.use(analyticsRouter);
 
 export default router;

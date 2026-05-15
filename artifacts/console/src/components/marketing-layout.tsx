@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { name: "Why", path: "/why" },
   { name: "Architecture", path: "/architecture" },
+  { name: "Lab", path: "/lab" },
   { name: "Demo", path: "/demo" },
   { name: "Benchmarks", path: "/benchmarks-public" },
   { name: "API", path: "/api-explorer" },

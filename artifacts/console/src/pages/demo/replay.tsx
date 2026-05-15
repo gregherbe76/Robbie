@@ -940,11 +940,29 @@ function FinalDecision({ trace }: { trace: ReplayTrace }) {
 // Page
 // ---------------------------------------------------------------------------
 
-export function Replay() {
+interface ReplayProps {
+  /**
+   * Optional override trace. When provided, the component skips the
+   * `useGetDemoReplay` fetch and renders the given trace directly.
+   * This is what the Cognition Lab uses to render its lab runs.
+   */
+  traceOverride?: ReplayTrace;
+  /** Back link, defaults to /demo. */
+  backHref?: string;
+  backLabel?: string;
+  /** Optional banner shown above the header (e.g. demo/synthetic warning). */
+  headerBanner?: React.ReactNode;
+}
+
+export function Replay(props: ReplayProps = {}) {
+  const { traceOverride, backHref = "/demo", backLabel = "all cases", headerBanner } = props;
   const [, params] = useRoute("/replay/:caseId");
   const caseId = (params?.caseId ?? "founder-builder") as CaseId;
-  const { data, isLoading, error } = useGetDemoReplay(caseId);
-  const trace = data as unknown as ReplayTrace | undefined;
+  const fetchEnabled = !traceOverride;
+  const { data, isLoading, error } = useGetDemoReplay(caseId, {
+    query: { enabled: fetchEnabled } as never,
+  });
+  const trace = (traceOverride ?? (data as unknown as ReplayTrace | undefined));
   const [currentOrd, setCurrentOrd] = useState(0);
 
   // reset cursor when case changes
@@ -956,7 +974,7 @@ export function Replay() {
     }
   }, [caseId]);
 
-  if (isLoading) {
+  if (fetchEnabled && isLoading) {
     return (
       <div className="flex items-center gap-3 text-muted-foreground py-12">
         <Loader2 className="size-4 animate-spin" /> Running framework for{" "}
@@ -964,12 +982,12 @@ export function Replay() {
       </div>
     );
   }
-  if (error || !trace) {
+  if ((fetchEnabled && error) || !trace) {
     return (
       <div className="rounded-md border border-destructive/40 bg-destructive/5 p-6 space-y-3">
         <div className="text-destructive font-mono">Failed to load replay.</div>
-        <Link href="/demo" className="text-sm text-primary underline">
-          ← back to cases
+        <Link href={backHref} className="text-sm text-primary underline">
+          ← back
         </Link>
       </div>
     );
@@ -977,13 +995,14 @@ export function Replay() {
 
   return (
     <div className="space-y-6">
+      {headerBanner}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="space-y-1">
           <Link
-            href="/demo"
+            href={backHref}
             className="inline-flex items-center gap-1 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-primary"
           >
-            <ArrowLeft className="size-3" /> all cases
+            <ArrowLeft className="size-3" /> {backLabel}
           </Link>
           <h1 className="text-2xl font-mono font-semibold tracking-tight">
             {trace.summary.label}

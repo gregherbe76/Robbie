@@ -39,6 +39,8 @@ import { ApiExplorer } from "@/pages/public/api-explorer";
 // Demo + replay (public, but use their own padded container)
 import { DemoIndex } from "@/pages/demo";
 import { Replay } from "@/pages/demo/replay";
+import { LabIndex } from "@/pages/lab";
+import { LabRun } from "@/pages/lab/run";
 
 const queryClient = new QueryClient();
 
@@ -110,6 +112,18 @@ function PublicArea() {
           {(params) => (
             <PaddedContainer>
               <Replay key={params.caseId} />
+            </PaddedContainer>
+          )}
+        </Route>
+        <Route path="/lab">
+          <PaddedContainer>
+            <LabIndex />
+          </PaddedContainer>
+        </Route>
+        <Route path="/lab/run/:runId">
+          {(params) => (
+            <PaddedContainer>
+              <LabRun key={params.runId} />
             </PaddedContainer>
           )}
         </Route>

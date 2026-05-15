@@ -837,6 +837,96 @@ paths:
                 $ref: "#/components/schemas/DemoReplayTrace"
         "404":
           description: Unknown case id
+  /lab/run:
+    post:
+      operationId: createLabRun
+      tags: [lab]
+      summary: Run a Cognition Lab replay
+      description: |
+        Synthesise a deterministic replay trace from user-provided input.
+        Two modes:
+          - `scenario` — start from one of the 5 canonical hero cases, with
+            optional organization override + appended synthetic resume/transcript.
+          - `synthetic` — provide a full candidate dossier + organization
+            context as JSON; the framework runs the same deterministic
+            pipeline as the hero cases.
+        Inputs are size-limited and pass through a basic abuse filter. The
+        run is stored in-memory for ~1 hour; identical inputs always
+        produce the same runId.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LabRunRequest"
+      responses:
+        "201":
+          description: Run created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabRunSummary"
+        "400":
+          description: Invalid input shape
+        "422":
+          description: Input failed safety check (size / disallowed content)
+  /lab/run/{runId}:
+    get:
+      operationId: getLabRunSummary
+      tags: [lab]
+      summary: Fetch the compact summary of a lab run
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabRunSummary"
+        "404":
+          description: Unknown or expired run id
+  /lab/run/{runId}/trace:
+    get:
+      operationId: getLabRunTrace
+      tags: [lab]
+      summary: Fetch the full replay trace for a lab run
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Replay trace
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DemoReplayTrace"
+        "404":
+          description: Unknown or expired run id
+  /lab/run/{runId}/signature:
+    get:
+      operationId: getLabRunSignature
+      tags: [lab]
+      summary: Fetch only the sha256 signature of a lab run
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Signature
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabRunSignature"
+        "404":
+          description: Unknown or expired run id
 components:
   schemas:
     SecurityOrganizationTier:
@@ -4390,3 +4480,118 @@ components:
         TypeScript `ReplayTrace` type in `@workspace/framework/replay`. The
         schema here is intentionally permissive — the contract is the TS type.
       additionalProperties: true
+    LabScenarioId:
+      type: string
+      enum:
+        - founder-builder
+        - inflated-senior
+        - ambiguous-generalist
+        - chaos-thriver
+        - org-mismatch
+    LabRunRequest:
+      type: object
+      description: |
+        Discriminated by `mode`. The full TS contract lives in
+        `@workspace/framework/lab` (`LabRunInput`). For `synthetic` mode,
+        `dossier` and `organization` are opaque JSON whose shape is the
+        framework's `CandidateDossier` and `OrganizationContext` types.
+      required: [mode]
+      properties:
+        mode:
+          type: string
+          enum: [scenario, synthetic]
+        scenarioId:
+          $ref: "#/components/schemas/LabScenarioId"
+        organizationOverride:
+          type: object
+          additionalProperties: true
+          nullable: true
+        dossier:
+          type: object
+          additionalProperties: true
+          nullable: true
+        organization:
+          type: object
+          additionalProperties: true
+          nullable: true
+        resumeText:
+          type: string
+          maxLength: 8192
+          nullable: true
+        transcriptText:
+          type: string
+          maxLength: 8192
+          nullable: true
+        label:
+          type: string
+          maxLength: 120
+          nullable: true
+    LabRunSummary:
+      type: object
+      required:
+        - runId
+        - signature
+        - mode
+        - caseLabel
+        - candidateName
+        - organizationName
+        - generatedAt
+        - expiresAt
+        - recommendation
+        - uncertaintyCategory
+        - globalConfidence
+        - disagreementSummary
+        - escalationSummary
+        - provenanceSummary
+        - calibrationSummary
+      properties:
+        runId: { type: string }
+        signature: { type: string }
+        mode:
+          type: string
+          enum: [scenario, synthetic]
+        baseScenarioId:
+          type: string
+          nullable: true
+        caseLabel: { type: string }
+        candidateName: { type: string }
+        organizationName: { type: string }
+        generatedAt: { type: string, format: date-time }
+        expiresAt: { type: string, format: date-time }
+        recommendation: { type: string }
+        uncertaintyCategory: { type: string }
+        globalConfidence:
+          type: number
+          format: float
+        disagreementSummary:
+          type: object
+          required: [count, score]
+          properties:
+            count: { type: integer }
+            score: { type: number, format: float }
+        escalationSummary:
+          type: object
+          required: [count, triggers]
+          properties:
+            count: { type: integer }
+            triggers:
+              type: array
+              items: { type: string }
+        provenanceSummary:
+          type: object
+          required: [nodeCount, edgeCount]
+          properties:
+            nodeCount: { type: integer }
+            edgeCount: { type: integer }
+        calibrationSummary:
+          type: object
+          required: [expectedCalibrationError, overconfidentBuckets]
+          properties:
+            expectedCalibrationError: { type: number, format: float }
+            overconfidentBuckets: { type: integer }
+    LabRunSignature:
+      type: object
+      required: [runId, signature]
+      properties:
+        runId: { type: string }
+        signature: { type: string }

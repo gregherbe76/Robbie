@@ -3441,3 +3441,99 @@ export const GetDemoReplayParams = zod.object({
 export const GetDemoReplayResponse = zod.record(zod.string(), zod.unknown()).describe('Deterministic end-to-end trace for a demo case. The full shape is the\nTypeScript `ReplayTrace` type in `@workspace\/framework\/replay`. The\nschema here is intentionally permissive — the contract is the TS type.\n')
 
 
+/**
+ * Synthesise a deterministic replay trace from user-provided input.
+Two modes:
+  - `scenario` — start from one of the 5 canonical hero cases, with
+    optional organization override + appended synthetic resume/transcript.
+  - `synthetic` — provide a full candidate dossier + organization
+    context as JSON; the framework runs the same deterministic
+    pipeline as the hero cases.
+Inputs are size-limited and pass through a basic abuse filter. The
+run is stored in-memory for ~1 hour; identical inputs always
+produce the same runId.
+
+ * @summary Run a Cognition Lab replay
+ */
+export const createLabRunBodyResumeTextMax = 8192;
+
+export const createLabRunBodyTranscriptTextMax = 8192;
+
+export const createLabRunBodyLabelMax = 120;
+
+
+
+export const CreateLabRunBody = zod.object({
+  "mode": zod.enum(['scenario', 'synthetic']),
+  "scenarioId": zod.enum(['founder-builder', 'inflated-senior', 'ambiguous-generalist', 'chaos-thriver', 'org-mismatch']).optional(),
+  "organizationOverride": zod.record(zod.string(), zod.unknown()).nullish(),
+  "dossier": zod.record(zod.string(), zod.unknown()).nullish(),
+  "organization": zod.record(zod.string(), zod.unknown()).nullish(),
+  "resumeText": zod.string().max(createLabRunBodyResumeTextMax).nullish(),
+  "transcriptText": zod.string().max(createLabRunBodyTranscriptTextMax).nullish(),
+  "label": zod.string().max(createLabRunBodyLabelMax).nullish()
+}).describe('Discriminated by `mode`. The full TS contract lives in\n`@workspace\/framework\/lab` (`LabRunInput`). For `synthetic` mode,\n`dossier` and `organization` are opaque JSON whose shape is the\nframework\'s `CandidateDossier` and `OrganizationContext` types.\n')
+
+
+/**
+ * @summary Fetch the compact summary of a lab run
+ */
+export const GetLabRunSummaryParams = zod.object({
+  "runId": zod.coerce.string()
+})
+
+export const GetLabRunSummaryResponse = zod.object({
+  "runId": zod.string(),
+  "signature": zod.string(),
+  "mode": zod.enum(['scenario', 'synthetic']),
+  "baseScenarioId": zod.string().nullish(),
+  "caseLabel": zod.string(),
+  "candidateName": zod.string(),
+  "organizationName": zod.string(),
+  "generatedAt": zod.coerce.date(),
+  "expiresAt": zod.coerce.date(),
+  "recommendation": zod.string(),
+  "uncertaintyCategory": zod.string(),
+  "globalConfidence": zod.number(),
+  "disagreementSummary": zod.object({
+  "count": zod.number(),
+  "score": zod.number()
+}),
+  "escalationSummary": zod.object({
+  "count": zod.number(),
+  "triggers": zod.array(zod.string())
+}),
+  "provenanceSummary": zod.object({
+  "nodeCount": zod.number(),
+  "edgeCount": zod.number()
+}),
+  "calibrationSummary": zod.object({
+  "expectedCalibrationError": zod.number(),
+  "overconfidentBuckets": zod.number()
+})
+})
+
+
+/**
+ * @summary Fetch the full replay trace for a lab run
+ */
+export const GetLabRunTraceParams = zod.object({
+  "runId": zod.coerce.string()
+})
+
+export const GetLabRunTraceResponse = zod.record(zod.string(), zod.unknown()).describe('Deterministic end-to-end trace for a demo case. The full shape is the\nTypeScript `ReplayTrace` type in `@workspace\/framework\/replay`. The\nschema here is intentionally permissive — the contract is the TS type.\n')
+
+
+/**
+ * @summary Fetch only the sha256 signature of a lab run
+ */
+export const GetLabRunSignatureParams = zod.object({
+  "runId": zod.coerce.string()
+})
+
+export const GetLabRunSignatureResponse = zod.object({
+  "runId": zod.string(),
+  "signature": zod.string()
+})
+
+

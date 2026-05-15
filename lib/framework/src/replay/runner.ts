@@ -26,7 +26,12 @@ import {
   computeCalibration,
 } from "../evaluation/index.js";
 import type { CalibrationCurve } from "../evaluation/index.js";
-import { expandCalibrationSeeds, findCase, lookupScenario } from "./cases.js";
+import {
+  expandCalibrationSeeds,
+  findCase,
+  lookupScenario,
+  type CalibrationSeedShape,
+} from "./cases.js";
 import type {
   CalibrationBucket as ReplayCalibrationBucket,
   CalibrationView,
@@ -702,15 +707,52 @@ function buildRecommendationView(
 // Public entry point
 // ---------------------------------------------------------------------------
 
+/**
+ * Inline config for `runReplayTraceFromConfig`. The shape mirrors a
+ * `CaseConfig` from `cases.ts`, except the dossier and organization are
+ * passed in directly (rather than looked up from a benchmark scenario).
+ * This is what the public Cognition Lab uses to feed user-provided
+ * synthetic input through the same deterministic pipeline as the hero
+ * cases.
+ */
+export interface ReplayConfigInput {
+  caseId: string;
+  label: string;
+  oneLiner: string;
+  expectedRecommendation: string;
+  selfCritique: string;
+  dossier: CandidateDossier;
+  organization: OrganizationContext;
+  calibrationSeeds: CalibrationSeedShape;
+}
+
+/**
+ * Canonical hero case entry point. Looks up the case + scenario and
+ * delegates to `runReplayTraceFromConfig`.
+ */
 export function runReplayTrace(caseId: ReplayCaseId): ReplayTrace {
-  const config = findCase(caseId);
-  if (!config) {
+  const c = findCase(caseId);
+  if (!c) {
     throw new Error(`replay: unknown case ${caseId}`);
   }
-  const scenario = lookupScenario(config.scenarioId);
-  const dossier: CandidateDossier = scenario.dossier;
-  const organization: OrganizationContext =
-    config.organizationOverride ?? scenario.organization;
+  const scenario = lookupScenario(c.scenarioId);
+  return runReplayTraceFromConfig({
+    caseId: c.caseId,
+    label: c.label,
+    oneLiner: c.oneLiner,
+    expectedRecommendation: c.expectedRecommendation,
+    selfCritique: c.selfCritique,
+    dossier: scenario.dossier,
+    organization: c.organizationOverride ?? scenario.organization,
+    calibrationSeeds: c.calibrationSeeds,
+  });
+}
+
+export function runReplayTraceFromConfig(
+  config: ReplayConfigInput,
+): ReplayTrace {
+  const dossier: CandidateDossier = config.dossier;
+  const organization: OrganizationContext = config.organization;
 
   const generatedAt = new Date(BASE_CLOCK_MS).toISOString();
   const fixedNow = () => new Date(BASE_CLOCK_MS);
