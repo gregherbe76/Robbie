@@ -28,6 +28,8 @@ import {
 } from "../organization_graph/index.js";
 import { InMemoryReportStore, type ReportStore } from "../reports/index.js";
 
+export * from "./manifests.js";
+
 export interface FrameworkRegistry {
   agents: AgentRegistry;
   skills: SkillRegistry;

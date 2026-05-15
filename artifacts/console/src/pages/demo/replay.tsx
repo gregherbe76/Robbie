@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useRoute } from "wouter";
 import { useGetDemoReplay } from "@workspace/api-client-react";
 import type { ReplayTrace, ReplayStep } from "@workspace/framework/replay";
+import { findNarrative } from "@workspace/framework/replay/narrative";
+import { NarrativePanel } from "@/components/narrative-panel";
 import {
   Play,
   Pause,
@@ -1009,6 +1011,13 @@ export function Replay() {
           </div>
         </div>
       </div>
+
+      {(() => {
+        const narrative = findNarrative(caseId);
+        return narrative ? (
+          <NarrativePanel narrative={narrative} caseId={caseId} />
+        ) : null;
+      })()}
 
       <Timeline
         trace={trace}

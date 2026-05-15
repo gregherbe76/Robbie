@@ -1,0 +1,321 @@
+Build the Public Cognition Lab for the Recruiting Intelligence Framework.
+
+IMPORTANT:
+The framework already has:
+- public landing
+- deterministic replay demo
+- benchmarks
+- provenance
+- calibration
+- cognition engine
+- organization intelligence
+- collaborative operations
+- security boundaries
+
+Now build:
+- a controlled public experimentation surface.
+
+This is NOT:
+- an ATS
+- a resume uploader
+- an AI recruiter chatbot
+- an autonomous hiring tool
+
+This IS:
+- a sandbox for deterministic hiring cognition replay.
+
+--------------------------------------------------
+Core Thesis
+--------------------------------------------------
+
+Users should feel like they are:
+- investigating a hiring case,
+NOT:
+- uploading resumes into AI.
+
+The Cognition Lab is:
+- evidence-centric
+- replay-centric
+- provenance-centric
+- uncertainty-visible
+
+--------------------------------------------------
+Routes
+--------------------------------------------------
+
+Add:
+
+/lab
+/lab/run/:runId
+
+The homepage CTA should point to:
+"Open the Cognition Lab"
+
+--------------------------------------------------
+Core UX
+--------------------------------------------------
+
+The lab allows users to:
+- provide synthetic candidate evidence
+- provide organization context
+- run deterministic cognition
+- replay the reasoning trace
+- inspect disagreements
+- inspect provenance
+- inspect calibration
+- inspect escalation
+
+The lab must preserve:
+- uncertainty
+- disagreement
+- provenance
+- replayability
+
+--------------------------------------------------
+Supported Inputs
+--------------------------------------------------
+
+Initial supported inputs:
+
+1. Candidate dossier JSON
+2. Organization context JSON
+3. Plain-text synthetic resume
+4. Plain-text synthetic transcript
+5. Prebuilt sample scenarios
+
+DO NOT support:
+- live ATS integrations
+- production candidate ingestion
+- real personal data workflows
+- sourcing flows
+- bulk uploads
+
+--------------------------------------------------
+Lab Modes
+--------------------------------------------------
+
+Mode 1:
+"Explore a canonical scenario"
+
+Examples:
+- founder-builder
+- inflated-senior
+- ambiguous-generalist
+- org-mismatch
+- chaos-thriver
+
+Mode 2:
+"Run your own synthetic cognition replay"
+
+--------------------------------------------------
+Lab Workflow
+--------------------------------------------------
+
+Step 1:
+Input evidence
+
+Step 2:
+Preview normalized evidence
+
+Step 3:
+Run deterministic cognition
+
+Step 4:
+Replay cognition trace
+
+Step 5:
+Inspect:
+- disagreements
+- propagation
+- provenance
+- escalation
+- calibration
+- unresolved tensions
+
+--------------------------------------------------
+Input Experience
+--------------------------------------------------
+
+Build:
+- structured JSON editor
+- guided synthetic resume form
+- transcript paste input
+- organization context form
+
+Important:
+Clearly label:
+"Synthetic / demo use only."
+
+DO NOT imply:
+production hiring workflows.
+
+--------------------------------------------------
+Execution Model
+--------------------------------------------------
+
+The lab must run through:
+- the REAL ingestion pipeline
+- the REAL cognition engine
+- the REAL org-fit engine
+- the REAL escalation engine
+- the REAL calibration engine
+
+Requirements:
+- fixed deterministic clock
+- deterministic ordering
+- deterministic signatures
+- replayable runs
+
+Every run must produce:
+- sha256 replay signature
+- provenance-complete trace
+- calibration snapshot
+- disagreement graph
+
+--------------------------------------------------
+Replay Experience
+--------------------------------------------------
+
+Reuse and extend the replay engine.
+
+Required sections:
+1. Timeline
+2. Disagreement
+3. Propagation
+4. Provenance
+5. Org Fit
+6. Escalation
+7. Calibration
+8. Final Recommendation
+
+Add:
+- side-by-side input vs normalized evidence
+- evidence lineage explorer
+- unresolved tensions panel
+- confidence evolution chart
+
+--------------------------------------------------
+Run Output
+--------------------------------------------------
+
+Each run should produce:
+
+{
+  replaySignature,
+  recommendation,
+  uncertaintyCategory,
+  disagreementSummary,
+  escalationSummary,
+  provenanceSummary,
+  calibrationSummary
+}
+
+Users must be able to:
+- share replay links
+- export replay JSON
+- inspect raw cognition trace
+
+--------------------------------------------------
+Safety + Privacy
+--------------------------------------------------
+
+Add clear warnings:
+
+- Demo environment only
+- Do not upload real candidate data
+- Runs may be publicly accessible
+- Synthetic testing only
+
+Implement:
+- input size limits
+- profanity/basic abuse filtering
+- temporary retention only
+- public replay isolation
+
+--------------------------------------------------
+Console Integration
+--------------------------------------------------
+
+The lab should feel:
+- lighter than /console
+- more guided
+- more approachable
+- still rigorous
+
+The operator console remains:
+- deeper
+- operational
+- investigation-heavy
+
+--------------------------------------------------
+UI Philosophy
+--------------------------------------------------
+
+The lab should communicate:
+
+"This framework reasons explicitly under uncertainty."
+
+NOT:
+"This AI makes hiring decisions."
+
+Visual style:
+- analytical
+- calm
+- provenance-visible
+- replay-oriented
+- intelligence-centric
+
+Avoid:
+- ATS UX
+- chatbot UX
+- AI assistant UX
+- recruiting CRM patterns
+
+--------------------------------------------------
+Technical Requirements
+--------------------------------------------------
+
+- deterministic execution
+- no randomness
+- provenance-first
+- replayable runs
+- benchmark-compatible
+- OpenAPI-driven
+- Zod-validated
+
+Every run must remain:
+- reproducible
+- inspectable
+- auditable
+
+--------------------------------------------------
+API Requirements
+--------------------------------------------------
+
+Add:
+
+POST /lab/run
+GET /lab/run/{runId}
+GET /lab/run/{runId}/trace
+GET /lab/run/{runId}/signature
+
+Generate:
+- OpenAPI schemas
+- React Query hooks
+- Zod validators
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+A technical founder, governance lead, or infra engineer should be able to:
+
+- open /lab
+- run a cognition replay
+- inspect provenance
+- inspect disagreement
+- inspect escalation
+- understand deterministic replay
+
+within 5 minutes,
+without reading the full architecture docs.
