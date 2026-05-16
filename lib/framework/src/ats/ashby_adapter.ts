@@ -29,6 +29,7 @@ import type {
   ATSObjectKind,
 } from "./types.js";
 import { shortSignature } from "./signature.js";
+import { extractSourceChronologyTimestamp } from "./temporal_chronology.js";
 
 const ASHBY_BASE = "https://api.ashbyhq.com";
 
@@ -118,41 +119,77 @@ export class AshbyAdapter implements ATSAdapter {
 
   async fetchHiringProcess(candidateAtsId: string): Promise<ATSRawRecord[]> {
     if (!this.apiKey) throw new AshbyAPIUnconfiguredError();
-    const fetchedAt = new Date().toISOString();
-    const out: ATSRawRecord[] = [];
+
+    // Phase 1: gather every source payload up-front so we can derive
+    // `fetchedAt` deterministically from the evidence chronology itself,
+    // not from the wallclock. See temporal_chronology.ts for the
+    // contract.
+    interface Pending {
+      kind: ATSObjectKind;
+      atsId: string;
+      payload: unknown;
+      parentIds?: string[];
+    }
+    const pending: Pending[] = [];
 
     const candidate = await this.post<unknown>("candidate.info", {
       id: candidateAtsId,
     });
-    out.push(this.wrap("candidate", candidateAtsId, candidate, fetchedAt));
+    pending.push({ kind: "candidate", atsId: candidateAtsId, payload: candidate });
 
     const applications = await this.post<{
       results?: Array<{ id: string } & Record<string, unknown>>;
     }>("application.list", { candidateId: candidateAtsId });
     for (const app of applications.results ?? []) {
-      out.push(
-        this.wrap("application", app.id, app, fetchedAt, [candidateAtsId]),
-      );
+      pending.push({
+        kind: "application",
+        atsId: app.id,
+        payload: app,
+        parentIds: [candidateAtsId],
+      });
       const interviews = await this.post<{
         results?: Array<{ id: string } & Record<string, unknown>>;
       }>("interview.list", { applicationId: app.id });
       for (const iv of interviews.results ?? []) {
-        out.push(this.wrap("interview", iv.id, iv, fetchedAt, [app.id]));
+        pending.push({
+          kind: "interview",
+          atsId: iv.id,
+          payload: iv,
+          parentIds: [app.id],
+        });
       }
       const feedbacks = await this.post<{
         results?: Array<{ id: string } & Record<string, unknown>>;
       }>("feedback.list", { applicationId: app.id });
       for (const fb of feedbacks.results ?? []) {
-        out.push(this.wrap("scorecard", fb.id, fb, fetchedAt, [app.id]));
+        pending.push({
+          kind: "scorecard",
+          atsId: fb.id,
+          payload: fb,
+          parentIds: [app.id],
+        });
       }
       const activity = await this.post<{
         results?: Array<{ id: string } & Record<string, unknown>>;
       }>("activityFeed.list", { applicationId: app.id });
       for (const act of activity.results ?? []) {
-        out.push(this.wrap("activity", act.id, act, fetchedAt, [app.id]));
+        pending.push({
+          kind: "activity",
+          atsId: act.id,
+          payload: act,
+          parentIds: [app.id],
+        });
       }
     }
-    return out;
+
+    // Phase 2: deterministic anchor.
+    const fetchedAt = extractSourceChronologyTimestamp(
+      pending.map((p) => p.payload),
+    );
+
+    return pending.map((p) =>
+      this.wrap(p.kind, p.atsId, p.payload, fetchedAt, p.parentIds),
+    );
   }
 
   private wrap(

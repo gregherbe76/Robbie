@@ -26,6 +26,7 @@ import type {
   ATSObjectKind,
 } from "./types.js";
 import { shortSignature } from "./signature.js";
+import { extractSourceChronologyTimestamp } from "./temporal_chronology.js";
 
 const HARVEST_BASE = "https://harvest.greenhouse.io/v1";
 
@@ -111,33 +112,53 @@ export class GreenhouseAdapter implements ATSAdapter {
 
   async fetchHiringProcess(candidateAtsId: string): Promise<ATSRawRecord[]> {
     if (!this.apiKey) throw new GreenhouseAPIUnconfiguredError();
-    const fetchedAt = new Date().toISOString();
-    const out: ATSRawRecord[] = [];
+
+    // Phase 1: collect all source payloads. `fetchedAt` is derived
+    // deterministically from the evidence chronology after the fetch
+    // completes — see temporal_chronology.ts.
+    interface Pending {
+      kind: ATSObjectKind;
+      atsId: string;
+      payload: unknown;
+      parentIds?: string[];
+    }
+    const pending: Pending[] = [];
 
     const candidate = await this.get<unknown>(`candidates/${candidateAtsId}`);
-    out.push(this.wrap("candidate", candidateAtsId, candidate, fetchedAt));
+    pending.push({ kind: "candidate", atsId: candidateAtsId, payload: candidate });
 
     const applications = await this.get<Array<{ id: number }>>(
       `applications?candidate_id=${candidateAtsId}&per_page=100`,
     );
     for (const app of applications) {
       const appId = String(app.id);
-      out.push(this.wrap("application", appId, app, fetchedAt, [candidateAtsId]));
+      pending.push({
+        kind: "application",
+        atsId: appId,
+        payload: app,
+        parentIds: [candidateAtsId],
+      });
       const scorecards = await this.get<Array<{ id: number }>>(
         `applications/${appId}/scorecards?per_page=100`,
       );
       for (const sc of scorecards) {
-        out.push(
-          this.wrap("scorecard", String(sc.id), sc, fetchedAt, [appId]),
-        );
+        pending.push({
+          kind: "scorecard",
+          atsId: String(sc.id),
+          payload: sc,
+          parentIds: [appId],
+        });
       }
       const interviews = await this.get<Array<{ id: number }>>(
         `applications/${appId}/interviews?per_page=100`,
       );
       for (const iv of interviews) {
-        out.push(
-          this.wrap("interview", String(iv.id), iv, fetchedAt, [appId]),
-        );
+        pending.push({
+          kind: "interview",
+          atsId: String(iv.id),
+          payload: iv,
+          parentIds: [appId],
+        });
       }
     }
 
@@ -146,9 +167,22 @@ export class GreenhouseAdapter implements ATSAdapter {
     );
     for (const a of activity) {
       const id = String(a.id ?? `act_${shortSignature(a)}`);
-      out.push(this.wrap("activity", id, a, fetchedAt, [candidateAtsId]));
+      pending.push({
+        kind: "activity",
+        atsId: id,
+        payload: a,
+        parentIds: [candidateAtsId],
+      });
     }
-    return out;
+
+    // Phase 2: deterministic anchor from source chronology.
+    const fetchedAt = extractSourceChronologyTimestamp(
+      pending.map((p) => p.payload),
+    );
+
+    return pending.map((p) =>
+      this.wrap(p.kind, p.atsId, p.payload, fetchedAt, p.parentIds),
+    );
   }
 
   private wrap(

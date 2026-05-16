@@ -26,6 +26,7 @@ import {
   CANONICAL_BODY_VERSION,
   REPLAY_BUILDER_VERSION,
   NORMALIZATION_VERSION,
+  extractSourceChronologyTimestamp,
 } from "@workspace/framework/ats";
 
 interface Golden {
@@ -105,6 +106,148 @@ interface Failure {
 async function main(): Promise<void> {
   const adapter = new SyntheticATSAdapter();
   const failures: Failure[] = [];
+
+  // -------------------------------------------------------------------------
+  // Source-chronology extractor invariance.
+  //
+  // `extractSourceChronologyTimestamp` is the deterministic anchor that
+  // replaces wallclock `fetchedAt` in the Ashby/Greenhouse adapters. Its
+  // determinism is load-bearing for the "same evidence → same signature"
+  // claim across server restarts and across re-syncs of unchanged source
+  // data. We assert here that it (a) picks the max ISO timestamp under
+  // known chronology keys, (b) walks nested structures, (c) is
+  // permutation-invariant, and (d) fails loud when no chronology is
+  // present (refusing to fall back to wallclock).
+  {
+    const samplePayloads: unknown[] = [
+      { id: "c1", created_at: "2026-04-01T10:00:00Z" },
+      {
+        id: "app1",
+        createdAt: "2026-04-02T09:30:00Z",
+        current_stage: { updated_at: "2026-04-05T12:00:00Z" },
+      },
+      { id: "iv1", submittedAt: "2026-04-04T17:45:00Z" },
+      { id: "sc1", sent_at: "2026-04-03T08:00:00Z" },
+    ];
+    // Canonical UTC ISO with .sssZ — extractor re-emits in this shape.
+    const expectedMax = "2026-04-05T12:00:00.000Z";
+    const got = extractSourceChronologyTimestamp(samplePayloads);
+    if (got !== expectedMax) {
+      failures.push({
+        candidateAtsId: "(extractor)",
+        field: "max-pick",
+        expected: expectedMax,
+        actual: got,
+      });
+    }
+
+    // Permutation invariance over the payload batch.
+    for (let p = 1; p <= 8; p++) {
+      const shuffled = deterministicShuffle(samplePayloads, 0xdecafe + p);
+      const out = extractSourceChronologyTimestamp(shuffled);
+      if (out !== expectedMax) {
+        failures.push({
+          candidateAtsId: "(extractor)",
+          field: `permutation-${p}`,
+          expected: expectedMax,
+          actual: out,
+        });
+      }
+    }
+
+    // Mixed-offset chronological correctness.
+    //
+    // Lexically, "2026-04-05T11:00:00+02:00" > "2026-04-05T10:00:00Z",
+    // but chronologically the +02:00 stamp is 09:00 UTC — EARLIER.
+    // A lexical-max extractor would silently pick the wrong frontier
+    // and produce a wrong-but-deterministic `fetchedAt`. The current
+    // parse-then-max implementation must return the Z stamp.
+    {
+      const mixed: unknown[] = [
+        { id: "a", created_at: "2026-04-05T11:00:00+02:00" }, // 09:00Z
+        { id: "b", updated_at: "2026-04-05T10:00:00Z" },      // 10:00Z ← true max
+      ];
+      const out = extractSourceChronologyTimestamp(mixed);
+      const expected = "2026-04-05T10:00:00.000Z";
+      if (out !== expected) {
+        failures.push({
+          candidateAtsId: "(extractor)",
+          field: "mixed-offset-true-chronology",
+          expected,
+          actual: out,
+        });
+      }
+    }
+
+    // Variable fractional-second precision.
+    //
+    // ".5Z" (= 500ms) and ".500Z" must compare equal and produce a
+    // canonical ".500Z" output. ".5Z" actually parses fine via
+    // Date.parse; the regex permits any positive number of digits.
+    {
+      const fractional: unknown[] = [
+        { id: "a", submittedAt: "2026-04-05T10:00:00.500Z" },
+        { id: "b", sentAt: "2026-04-05T10:00:00.500000Z" },
+        { id: "c", updatedAt: "2026-04-05T10:00:00.5Z" },
+      ];
+      const out = extractSourceChronologyTimestamp(fractional);
+      const expected = "2026-04-05T10:00:00.500Z";
+      if (out !== expected) {
+        failures.push({
+          candidateAtsId: "(extractor)",
+          field: "fractional-precision-canonicalized",
+          expected,
+          actual: out,
+        });
+      }
+    }
+
+    // Additional provider-specific keys: should be honored alongside
+    // the shared defaults, not replace them.
+    {
+      const out = extractSourceChronologyTimestamp(
+        [
+          { id: "a", created_at: "2026-04-01T00:00:00Z" },
+          { id: "b", ashby_moved_at: "2026-04-09T00:00:00Z" },
+        ],
+        { additionalKeys: ["ashby_moved_at"] },
+      );
+      const expected = "2026-04-09T00:00:00.000Z";
+      if (out !== expected) {
+        failures.push({
+          candidateAtsId: "(extractor)",
+          field: "additional-keys-honored",
+          expected,
+          actual: out,
+        });
+      }
+    }
+
+    // Failure mode: no chronology keys → must throw, never silently
+    // fall back to a wallclock value.
+    let threw = false;
+    try {
+      extractSourceChronologyTimestamp([
+        { id: "x", note: "no timestamps here" },
+        { id: "y", nested: { also: "nope" } },
+      ]);
+    } catch {
+      threw = true;
+    }
+    if (!threw) {
+      failures.push({
+        candidateAtsId: "(extractor)",
+        field: "no-timestamps-fails-loud",
+        expected: "throws",
+        actual: "returned silently",
+      });
+    }
+
+    // eslint-disable-next-line no-console
+    console.log(
+      "  ok  extractor: max-pick + permutation×8 + mixed-offset + fractional + additional-keys + fail-loud",
+    );
+  }
 
   for (const golden of GOLDENS) {
     const records = await adapter.fetchHiringProcess(golden.candidateAtsId);

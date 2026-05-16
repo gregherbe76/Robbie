@@ -38,6 +38,10 @@ export { verifyReplaySignature } from "./audit.js";
 export { ATSIngestionGateway } from "./ingestion_gateway.js";
 export { shortSignature, canonicalStringify } from "./signature.js";
 export {
+  extractSourceChronologyTimestamp,
+  CHRONOLOGY_KEYS,
+} from "./temporal_chronology.js";
+export {
   buildReplayDiff,
   type ReplayDiff,
   type CountDelta,
