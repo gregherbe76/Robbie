@@ -50,6 +50,7 @@ import type {
 } from "@workspace/framework/evaluation";
 import { buildEvaluationContext } from "./evaluation";
 import { buildOperationsContext } from "./operations";
+import { getPersistenceLayer } from "../operations_maturity/bootstrap";
 import type { OperationsReport } from "@workspace/framework/intelligence-operations";
 import {
   runBenchmarkSuite,
@@ -701,6 +702,9 @@ export function initFramework(): Promise<FrameworkRegistry> {
     const suite = runBenchmarkSuite({ baselineSnapshot });
     benchmarkReportFramework = suite.report;
     benchmarkReport = toBenchmarkApiReport(suite.report);
+    // Initialise the operational-maturity persistence layer eagerly so
+    // the seed runs at startup, not on first request.
+    await getPersistenceLayer();
     cached = registry;
     return registry;
   })();

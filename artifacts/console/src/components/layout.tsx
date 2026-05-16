@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import {
   Activity,
   Brain,
+  HardDrive,
   Server,
   Shield,
   Workflow,
@@ -37,6 +38,11 @@ const navItems = [
   },
   { name: "Evaluation", path: "/console/evaluation", icon: Gauge },
   { name: "Operations", path: "/console/operations", icon: Crosshair },
+  {
+    name: "Persistence",
+    path: "/console/operations-maturity",
+    icon: HardDrive,
+  },
   { name: "Benchmarks", path: "/console/benchmarks", icon: Beaker },
   { name: "Agents", path: "/console/agents", icon: Brain },
   { name: "Skills", path: "/console/skills", icon: Cpu },

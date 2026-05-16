@@ -16,7 +16,10 @@
 
 import { Router, type IRouter } from "express";
 import { getPersistenceLayer } from "../operations_maturity/bootstrap";
-import type { PersistedEventKind } from "@workspace/framework/operations-maturity";
+import {
+  shortSignature,
+  type PersistedEventKind,
+} from "@workspace/framework/operations-maturity";
 
 const router: IRouter = Router();
 
@@ -43,6 +46,28 @@ router.get("/operations-maturity/orgs", async (_req, res) => {
 router.get("/operations-maturity/events/stats", async (req, res) => {
   const layer = await getPersistenceLayer();
   res.json(await layer.events.stats(org(req)));
+});
+
+router.get("/operations-maturity/events/:id/verify", async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1) {
+    res.status(400).json({ error: "invalid_id" });
+    return;
+  }
+  const layer = await getPersistenceLayer();
+  const event = await layer.events.get(id);
+  if (!event) {
+    res.status(404).json({ error: "unknown_event", id });
+    return;
+  }
+  const recomputed = shortSignature(event.payload);
+  res.json({
+    id: event.id,
+    storedSignature: event.signature,
+    recomputedSignature: recomputed,
+    match: recomputed === event.signature,
+    verifiedAt: new Date().toISOString(),
+  });
 });
 
 router.get("/operations-maturity/events/:id", async (req, res) => {

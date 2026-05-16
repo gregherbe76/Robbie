@@ -5,8 +5,10 @@ import {
   timestamp,
   jsonb,
   index,
+  uniqueIndex,
   doublePrecision,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 /**
  * Temporal memory snapshots — point-in-time projections of the
@@ -46,7 +48,12 @@ export const memorySnapshotsTable = pgTable(
       t.scope,
       t.key,
     ),
-    activeIdx: index("om_mem_active_idx").on(t.orgId, t.validTo),
+    // Partial unique index: at most one active snapshot per
+    // (orgId, scope, key). Enforces the temporal invariant at the
+    // database, so concurrent writers cannot produce two open rows.
+    activeUnique: uniqueIndex("om_mem_active_unique")
+      .on(t.orgId, t.scope, t.key)
+      .where(sql`valid_to is null`),
     validFromIdx: index("om_mem_validfrom_idx").on(t.validFrom),
   }),
 );

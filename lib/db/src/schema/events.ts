@@ -5,6 +5,7 @@ import {
   timestamp,
   jsonb,
   index,
+  uniqueIndex,
   bigint,
 } from "drizzle-orm/pg-core";
 
@@ -48,7 +49,14 @@ export const eventsTable = pgTable(
     correlationId: text("correlation_id"),
   },
   (t) => ({
-    orgSeqIdx: index("om_events_org_seq_idx").on(t.orgId, t.sequence),
+    // Hard constraint: a given org cannot have two events at the same
+    // sequence number. Together with per-org advisory locking in the
+    // append path this gives strict monotonic ordering even under
+    // concurrent writers.
+    orgSeqUnique: uniqueIndex("om_events_org_seq_unique").on(
+      t.orgId,
+      t.sequence,
+    ),
     orgKindIdx: index("om_events_org_kind_idx").on(t.orgId, t.kind),
     occurredIdx: index("om_events_occurred_idx").on(t.occurredAt),
     correlationIdx: index("om_events_correlation_idx").on(t.correlationId),

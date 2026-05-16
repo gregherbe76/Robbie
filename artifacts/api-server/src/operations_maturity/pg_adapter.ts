@@ -120,12 +120,21 @@ export class PgEventStore implements EventStore {
         byOrg.set(i.orgId, list);
       }
       for (const [orgId, items] of byOrg) {
-        // SELECT FOR UPDATE on the org row to serialise sequence allocation.
-        // If the org doesn't exist yet, insert it (idempotent).
+        // Idempotently ensure the org row exists, then take a
+        // transaction-scoped advisory lock keyed by orgId. The lock
+        // serialises sequence allocation per-org without blocking
+        // unrelated orgs; it is released automatically at COMMIT/
+        // ROLLBACK. Combined with the UNIQUE(org_id, sequence) index
+        // on om_events, duplicate sequences are impossible — the
+        // lock makes the happy path conflict-free, the unique index
+        // is the belt-and-braces backstop.
         await tx
           .insert(organizationsTable)
           .values({ id: orgId, name: orgId, tier: "demo" })
           .onConflictDoNothing();
+        await tx.execute(
+          sql`select pg_advisory_xact_lock(hashtextextended(${"om_events:" + orgId}, 0))`,
+        );
         const [{ value: maxSeq }] = await tx
           .select({
             value: sql<number>`coalesce(max(${eventsTable.sequence}), 0)::int`,
@@ -235,6 +244,14 @@ export class PgLongitudinalMemory implements LongitudinalMemoryStore {
       payload: input.payload,
     });
     return await db.transaction(async (tx) => {
+      // Serialise concurrent writes against the same (org, scope, key)
+      // so the "close prior active, then insert new active" sequence
+      // is atomic. The partial unique index on
+      // (org_id, scope, key) WHERE valid_to IS NULL is the DB-side
+      // safety net.
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtextextended(${"om_mem:" + input.orgId + ":" + input.scope + ":" + input.key}, 0))`,
+      );
       // Close the prior active snapshot, if any.
       await tx
         .update(memorySnapshotsTable)

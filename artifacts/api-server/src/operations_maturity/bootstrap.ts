@@ -9,7 +9,7 @@
  * /operations-maturity console pages render meaningful content.
  */
 
-import { logger } from "../logger";
+import { logger } from "../lib/logger";
 import {
   InMemoryPersistenceLayer,
   type PersistenceLayer,

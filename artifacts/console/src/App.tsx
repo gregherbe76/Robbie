@@ -21,6 +21,7 @@ import { Cognition } from "@/pages/cognition";
 import { OrganizationIntelligence } from "@/pages/organization-intelligence";
 import { Evaluation } from "@/pages/evaluation";
 import { Operations } from "@/pages/operations";
+import { OperationsMaturity } from "@/pages/operations-maturity";
 import { Benchmarks } from "@/pages/benchmarks";
 import { Ingestion } from "@/pages/ingestion";
 import { Collaboration } from "@/pages/collaboration";
@@ -66,6 +67,10 @@ function ConsoleArea() {
         />
         <Route path="/console/evaluation" component={Evaluation} />
         <Route path="/console/operations" component={Operations} />
+        <Route
+          path="/console/operations-maturity"
+          component={OperationsMaturity}
+        />
         <Route path="/console/benchmarks" component={Benchmarks} />
         <Route path="/console/ingestion" component={Ingestion} />
         <Route path="/console/collaboration" component={Collaboration} />

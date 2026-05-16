@@ -10,6 +10,7 @@ import {
   Shield,
   Network,
   Database,
+  HardDrive,
   ArrowRight,
   ArrowDown,
 } from "lucide-react";
@@ -89,6 +90,11 @@ const SUPPORTING: Array<{
     module: "providers · registry · skills · workflows",
     icon: Network,
     body: "Provider abstraction (OpenAI / Anthropic / custom). Registry-backed agents, skills, workflows. Everything is introspectable.",
+  },
+  {
+    module: "operations_maturity",
+    icon: HardDrive,
+    body: "Append-only, organization-scoped persistence: event store with deterministic per-org sequences, longitudinal memory with point-in-time queries, and calibration history. Postgres-backed with an in-memory fallback so the framework still runs without a database.",
   },
 ];
 
