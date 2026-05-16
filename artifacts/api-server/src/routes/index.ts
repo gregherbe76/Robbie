@@ -15,6 +15,7 @@ import collaborationRouter from "./collaboration";
 import securityRouter from "./security";
 import demoRouter from "./demo";
 import labRouter from "./lab";
+import operationsMaturityRouter from "./operations_maturity";
 import analyticsRouter from "./analytics";
 
 const router: IRouter = Router();
@@ -35,6 +36,7 @@ router.use(collaborationRouter);
 router.use(securityRouter);
 router.use(demoRouter);
 router.use(labRouter);
+router.use(operationsMaturityRouter);
 router.use(analyticsRouter);
 
 export default router;

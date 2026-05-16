@@ -101,6 +101,10 @@
     "./replay/narrative": {
       "types": "./dist/replay/narrative.d.ts",
       "import": "./dist/replay/narrative.js"
+    },
+    "./operations-maturity": {
+      "types": "./dist/operations_maturity/index.d.ts",
+      "import": "./dist/operations_maturity/index.js"
     }
   },
   "scripts": {
