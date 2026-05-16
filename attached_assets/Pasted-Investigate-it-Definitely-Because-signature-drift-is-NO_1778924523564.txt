@@ -1,0 +1,239 @@
+Investigate it.
+
+Definitely.
+
+Because:
+
+signature drift is NOT cosmetic in your architecture
+
+It directly touches:
+
+* determinism credibility,
+* replay integrity,
+* benchmark trust,
+* audit guarantees,
+* public launch consistency.
+
+This is one of the few things that should block “done.”
+
+⸻
+
+Why this matters so much
+
+Your repo is increasingly anchored around:
+
+same evidence
+→ same replay
+→ same signature
+
+That is:
+
+* philosophically central,
+* technically central,
+* operationally central,
+* narratively central.
+
+So:
+unexpected signature drift MUST be explained.
+
+⸻
+
+The important nuance
+
+The issue is NOT necessarily:
+
+the current signatures changed
+
+The issue is:
+
+you do not yet know WHY they changed
+
+Very important distinction.
+
+⸻
+
+Possible explanations
+
+Could be legitimate:
+
+* canonicalization changed,
+* ordering stabilized,
+* replay payload evolved,
+* replay serialization improved,
+* deterministic timestamp fix,
+* propagation ordering change.
+
+All acceptable.
+
+BUT:
+you need:
+
+traceable causality
+
+for the drift.
+
+⸻
+
+Otherwise you weaken your strongest claim
+
+Namely:
+
+deterministic replay integrity
+
+If public docs:
+
+* show old signatures,
+    while runtime:
+* returns different ones,
+    and:
+* nobody knows why,
+
+that creates:
+
+epistemic ambiguity
+
+Exactly what your framework is trying to avoid.
+
+⸻
+
+The good news
+
+Because your architecture is now:
+
+* append-only,
+* provenance-first,
+* deterministic,
+* replayable,
+* benchmarked,
+
+you SHOULD be able to investigate this cleanly.
+
+That is actually a strength demonstration.
+
+⸻
+
+What I would do
+
+⸻
+
+1. Treat this as a replay integrity investigation
+
+NOT:
+
+docs cleanup
+
+But:
+
+replay lineage validation
+
+⸻
+
+2. Build a tiny investigation report
+
+For each replay:
+
+* old signature,
+* current signature,
+* replay hash inputs,
+* changed fields,
+* changed serialization,
+* changed ordering,
+* changed propagation,
+* changed timestamps,
+* changed canonicalization.
+
+⸻
+
+3. Determine whether:
+
+A.
+
+the old docs were stale
+
+OR:
+
+B.
+
+a real replay determinism drift occurred
+
+Important difference.
+
+⸻
+
+4. If drift was legitimate
+
+Then:
+
+* update docs,
+* update screenshots,
+* regenerate replay references,
+* note replay version evolution.
+
+Perfectly fine.
+
+⸻
+
+5. If drift was NOT explainable
+
+Then:
+STOP and investigate deeper.
+
+Because:
+that would indicate:
+
+* hidden nondeterminism,
+* serialization instability,
+* ordering instability,
+* replay reconstruction inconsistency.
+
+And THAT would be serious.
+
+⸻
+
+The key thing
+
+Your repo’s strongest credibility signal now is:
+
+replay integrity
+
+Protect that aggressively.
+
+⸻
+
+Another important reason
+
+This is actually:
+
+a beautiful public demo opportunity
+
+Because you can literally show:
+
+Why did the replay signature change?
+
+INCLUDING:
+
+* replay diff,
+* canonicalization,
+* provenance lineage,
+* deterministic reconstruction.
+
+That is VERY aligned with your thesis.
+
+⸻
+
+Recommendation
+
+YES:
+
+investigate the signature drift fully
+before freezing launch references
+
+Then:
+
+* establish new canonical signatures,
+* update launch assets,
+* update replay screenshots,
+* update benchmark references,
+* document replay-version evolution if needed.
+
+That is the correct rigor level for this architecture.
