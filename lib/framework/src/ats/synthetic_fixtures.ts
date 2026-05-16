@@ -47,6 +47,27 @@ export const SYNTHETIC_CANDIDATE = {
 } as const;
 
 /**
+ * Second deterministic story: "Lena Park → Staff Frontend Engineer at
+ * Atlas Robotics." Same reviewer panel, consensus decline, low spread,
+ * no escalation, no override. Calibrated outcome (declined; reviewers
+ * were right). Exists so the framework can demonstrate the *opposite*
+ * of the Marcus case: when the org reasons well, the replay shows it.
+ */
+export const SYNTHETIC_CANDIDATE_B = {
+  atsId: "cand_lena_park",
+  name: "Lena Park",
+  targetRole: "Staff Frontend Engineer",
+  organization: "Atlas Robotics",
+  applicationOpenedAt: ISO("2026-04-02T14:00:00Z"),
+  declinedAt: ISO("2026-04-09T17:00:00Z"),
+} as const;
+
+export const SYNTHETIC_CANDIDATE_IDS = [
+  SYNTHETIC_CANDIDATE.atsId,
+  SYNTHETIC_CANDIDATE_B.atsId,
+];
+
+/**
  * Build the synthetic Ashby-shaped raw records. Mimics what the
  * Ashby adapter would return for one candidate's full process.
  */
@@ -352,9 +373,216 @@ export function buildSyntheticAshbyRecords(): ATSRawRecord[] {
 }
 
 /**
- * Synthetic outcome record — six months later the hire was let go.
- * Used by the calibration layer to score the confidence the org
- * expressed at decision time.
+ * Build the Ashby-shaped raw records for the Lena Park decline.
+ * Consensus across three reviewers, low spread, no escalation, no
+ * override. The decision is a clean "decline" and the calibration
+ * layer treats this as a correctly-anchored low-confidence prediction.
+ */
+export function buildSyntheticAshbyRecordsB(): ATSRawRecord[] {
+  const records: ATSRawRecord[] = [];
+  const push = (r: Omit<ATSRawRecord, "provider" | "fetchedAt">) => {
+    records.push({
+      provider: "synthetic",
+      fetchedAt: ISO("2026-04-12T00:00:00Z"),
+      ...r,
+    });
+  };
+
+  push({
+    atsId: SYNTHETIC_CANDIDATE_B.atsId,
+    kind: "candidate",
+    occurredAt: SYNTHETIC_CANDIDATE_B.applicationOpenedAt,
+    payloadHash: "h_candidate_b_root",
+    payload: {
+      id: SYNTHETIC_CANDIDATE_B.atsId,
+      name: SYNTHETIC_CANDIDATE_B.name,
+      currentTitle: "Senior Frontend Engineer",
+      currentCompany: "Helix",
+      yearsExperience: 7,
+      sourceChannel: "inbound",
+    },
+  });
+
+  push({
+    atsId: "app_lena_atlas",
+    kind: "application",
+    parentIds: [SYNTHETIC_CANDIDATE_B.atsId],
+    occurredAt: SYNTHETIC_CANDIDATE_B.applicationOpenedAt,
+    payloadHash: "h_application_b",
+    payload: {
+      id: "app_lena_atlas",
+      candidateId: SYNTHETIC_CANDIDATE_B.atsId,
+      role: SYNTHETIC_CANDIDATE_B.targetRole,
+      organization: SYNTHETIC_CANDIDATE_B.organization,
+      stage: "Technical",
+    },
+  });
+
+  for (const r of SYNTHETIC_REVIEWERS) {
+    push({
+      atsId: r.id,
+      kind: "reviewer",
+      occurredAt: SYNTHETIC_CANDIDATE_B.applicationOpenedAt,
+      payloadHash: `h_reviewer_${r.id}_b`,
+      payload: { id: r.id, name: r.name, role: r.role },
+    });
+  }
+
+  // Alice — decline
+  push({
+    atsId: "iv_b_alice_phone",
+    kind: "interview",
+    parentIds: ["app_lena_atlas"],
+    occurredAt: ISO("2026-04-03T17:00:00Z"),
+    payloadHash: "h_iv_b_alice",
+    payload: {
+      id: "iv_b_alice_phone",
+      interviewer: "rev_alice",
+      kind: "phone-screen",
+      durationMinutes: 45,
+    },
+  });
+  push({
+    atsId: "sc_b_alice_phone",
+    kind: "scorecard",
+    parentIds: ["iv_b_alice_phone"],
+    occurredAt: ISO("2026-04-03T17:45:00Z"),
+    payloadHash: "h_sc_b_alice",
+    payload: {
+      id: "sc_b_alice_phone",
+      interviewId: "iv_b_alice_phone",
+      submitter: "rev_alice",
+      overall: { value: "strong-decline", score: 1, scale: 5 },
+      attributes: [
+        {
+          topic: "depth-of-craft",
+          score: 2,
+          scale: 5,
+          comment:
+            "Could not explain virtual-DOM tradeoffs beyond surface analogies.",
+        },
+        {
+          topic: "communication",
+          score: 3,
+          scale: 5,
+          comment: "Clear but not precise on technical specifics.",
+        },
+      ],
+      confidence: 0.74,
+    },
+  });
+
+  // Bob — decline
+  push({
+    atsId: "iv_b_bob_tech",
+    kind: "interview",
+    parentIds: ["app_lena_atlas"],
+    occurredAt: ISO("2026-04-06T19:00:00Z"),
+    payloadHash: "h_iv_b_bob",
+    payload: {
+      id: "iv_b_bob_tech",
+      interviewer: "rev_bob",
+      kind: "technical-deep-dive",
+      durationMinutes: 60,
+    },
+  });
+  push({
+    atsId: "sc_b_bob_tech",
+    kind: "scorecard",
+    parentIds: ["iv_b_bob_tech"],
+    occurredAt: ISO("2026-04-06T20:15:00Z"),
+    payloadHash: "h_sc_b_bob",
+    payload: {
+      id: "sc_b_bob_tech",
+      interviewId: "iv_b_bob_tech",
+      submitter: "rev_bob",
+      overall: { value: "strong-decline", score: 1, scale: 5 },
+      attributes: [
+        {
+          topic: "depth-of-craft",
+          score: 1,
+          scale: 5,
+          comment:
+            "State-management answer collapsed under follow-up. Not yet at staff bar.",
+        },
+      ],
+      confidence: 0.81,
+    },
+  });
+
+  // Carol — strong decline
+  push({
+    atsId: "iv_b_carol_design",
+    kind: "interview",
+    parentIds: ["app_lena_atlas"],
+    occurredAt: ISO("2026-04-07T18:00:00Z"),
+    payloadHash: "h_iv_b_carol",
+    payload: {
+      id: "iv_b_carol_design",
+      interviewer: "rev_carol",
+      kind: "product-sense",
+      durationMinutes: 45,
+    },
+  });
+  push({
+    atsId: "sc_b_carol_design",
+    kind: "scorecard",
+    parentIds: ["iv_b_carol_design"],
+    occurredAt: ISO("2026-04-07T18:50:00Z"),
+    payloadHash: "h_sc_b_carol",
+    payload: {
+      id: "sc_b_carol_design",
+      interviewId: "iv_b_carol_design",
+      submitter: "rev_carol",
+      overall: { value: "strong-decline", score: 1, scale: 5 },
+      attributes: [
+        {
+          topic: "product-sense",
+          score: 2,
+          scale: 5,
+          comment:
+            "Strong execution at a feature level; not the systems-level taste we need at staff.",
+        },
+      ],
+      confidence: 0.83,
+    },
+  });
+
+  // Clean decision — decline, consensus
+  push({
+    atsId: "dec_decline_b",
+    kind: "decision",
+    parentIds: ["app_lena_atlas"],
+    occurredAt: SYNTHETIC_CANDIDATE_B.declinedAt,
+    payloadHash: "h_decision_b",
+    payload: {
+      id: "dec_decline_b",
+      outcome: "declined",
+      decidedBy: "rev_bob",
+      rationale:
+        "Consensus decline across three reviewers. Strong communicator, " +
+        "not at staff depth for this team. Encouraged to re-apply in 12 months.",
+    },
+  });
+
+  push({
+    atsId: "act_stage_decline",
+    kind: "activity",
+    parentIds: ["app_lena_atlas"],
+    occurredAt: SYNTHETIC_CANDIDATE_B.declinedAt,
+    payloadHash: "h_act_decline",
+    payload: { id: "act_stage_decline", event: "stage-moved", to: "Declined" },
+  });
+
+  return records;
+}
+
+/**
+ * Synthetic outcome records used by the calibration layer.
+ *
+ * - Marcus (hired) → regretted six months later (overconfident hire)
+ * - Lena (declined) → declined, the reviewer team's low-confidence
+ *   prediction was correctly anchored, no regret
  */
 export const SYNTHETIC_OUTCOMES = [
   {
@@ -362,5 +590,11 @@ export const SYNTHETIC_OUTCOMES = [
     outcome: "regretted" as const,
     observedAt: ISO("2026-09-15T00:00:00Z"),
     note: "Did not pass first performance review. Difficulties matched Bob's stated concerns.",
+  },
+  {
+    candidateAtsId: SYNTHETIC_CANDIDATE_B.atsId,
+    outcome: "declined" as const,
+    observedAt: SYNTHETIC_CANDIDATE_B.declinedAt,
+    note: "Consensus decline. Predictions and outcome aligned; calibration-clean.",
   },
 ];

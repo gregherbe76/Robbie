@@ -1,0 +1,329 @@
+Build the Public Launch + ATS Replay Narrative Layer for the Recruiting Intelligence Framework.
+
+IMPORTANT:
+The framework now has:
+- deterministic cognition
+- provenance-first replay
+- ATS ingestion strategy
+- real ATS adapters
+- replayable hiring decisions
+- calibration
+- disagreement preservation
+- escalation reconstruction
+- organizational memory
+- public demo routes
+
+The next phase is NOT:
+- more infrastructure
+- more cognition primitives
+- more security layers
+
+The next phase is:
+- public comprehension
+- operational resonance
+- category formation
+- ATS replay storytelling
+- design-partner readability
+
+This phase should transform the framework from:
+"technically impressive"
+
+into:
+"immediately understandable and operationally compelling."
+
+--------------------------------------------------
+Core Thesis
+--------------------------------------------------
+
+Most ATS systems:
+- store hiring decisions.
+
+This framework:
+- replays how organizations reasoned about them.
+
+That is now the core public story.
+
+--------------------------------------------------
+Build These Components
+--------------------------------------------------
+
+Create:
+
+1. ATS Replay Landing Experience
+2. Guided Replay Story Mode
+3. Replay-Centric Homepage Rewrite
+4. Operational Narrative Screens
+5. Design Partner Replay Toolkit
+6. Replay Walkthrough Video Assets
+7. Replay Comparison Surfaces
+8. Calibration Storytelling Layer
+9. Public Trust Signals
+10. Launch Narrative Assets
+
+--------------------------------------------------
+1. ATS Replay Landing Experience
+--------------------------------------------------
+
+Rewrite the homepage around:
+"Replay a hiring decision."
+
+The homepage should explain within 15 seconds:
+
+- ATS stores hiring decisions
+- this framework reconstructs organizational reasoning
+- disagreements are preserved
+- confidence is inspectable
+- calibration is measurable
+- replay is deterministic
+
+Hero CTA:
+"Replay a hiring decision"
+
+Secondary CTA:
+"Open the Cognition Lab"
+
+--------------------------------------------------
+2. Guided Replay Story Mode
+--------------------------------------------------
+
+Build a guided replay walkthrough for:
+/ats-demo
+
+Narrative flow:
+
+1. Candidate initially appears strong
+2. Reviewer disagreement emerges
+3. Confidence propagates
+4. Escalation triggered
+5. Founder override occurs
+6. Calibration critique appears
+7. Organizational reasoning becomes visible
+
+Add:
+- autoplay
+- step narration
+- focus highlights
+- replay bookmarks
+- explanation overlays
+
+Goal:
+a first-time visitor understands the system in <3 minutes.
+
+--------------------------------------------------
+3. Replay-Centric Homepage Rewrite
+--------------------------------------------------
+
+Homepage copy should use:
+- operational recruiting language
+- replay language
+- disagreement language
+- calibration language
+
+Avoid:
+- abstract cognition jargon
+- ATS replacement framing
+- "AI recruiter" framing
+- vague AI language
+
+Strong examples:
+- "Replay every hiring decision."
+- "Trace every recommendation back to evidence."
+- "Preserve disagreement instead of flattening it."
+- "Detect overconfidence before bad hires happen."
+
+--------------------------------------------------
+4. Operational Narrative Screens
+--------------------------------------------------
+
+Create visual storytelling screens.
+
+Examples:
+- disagreement evolution
+- confidence collapse
+- escalation chain
+- founder override
+- calibration failure
+- replay verification
+
+These should feel:
+- operational
+- forensic
+- intelligence-oriented
+
+NOT:
+- dashboard-heavy
+- ATS-like
+
+--------------------------------------------------
+5. Design Partner Replay Toolkit
+--------------------------------------------------
+
+Create:
+docs/design-partners/replay-walkthrough.md
+
+Include:
+- how ATS replay works
+- what organizational memory means
+- what disagreement preservation means
+- how calibration critique works
+- what replay signatures prove
+- current maturity limitations
+
+Add:
+- architecture diagrams
+- replay screenshots
+- escalation screenshots
+- disagreement examples
+
+--------------------------------------------------
+6. Replay Walkthrough Video Assets
+--------------------------------------------------
+
+Generate:
+- replay storyboard
+- narration script
+- replay screenshots
+- animated confidence propagation frames
+- escalation timeline visuals
+- provenance zoom-ins
+
+Create:
+docs/publishing/replay-demo-script.md
+
+Goal:
+support:
+- HN launch
+- X threads
+- design partner demos
+- technical walkthroughs
+
+--------------------------------------------------
+7. Replay Comparison Surfaces
+--------------------------------------------------
+
+Add:
+"Compare two hiring decisions"
+
+Examples:
+- successful hire vs failed hire
+- calibrated vs overconfident
+- disagreement-heavy vs low disagreement
+
+Visualize:
+- escalation differences
+- reviewer disagreement differences
+- calibration differences
+- confidence propagation differences
+
+This should become:
+one of the strongest public differentiators.
+
+--------------------------------------------------
+8. Calibration Storytelling Layer
+--------------------------------------------------
+
+Make calibration understandable to non-ML audiences.
+
+Explain visually:
+- overconfidence
+- fragile confidence
+- disagreement predictive value
+- uncertainty preservation
+
+Use:
+- operational examples
+- replay examples
+- reviewer examples
+
+NOT:
+- abstract ML terminology first.
+
+--------------------------------------------------
+9. Public Trust Signals
+--------------------------------------------------
+
+Add visible public signals:
+- deterministic replay signatures
+- benchmark pass counts
+- provenance completeness
+- mutation guard status
+- replay verification status
+
+Show:
+- the system critiques itself
+- failures are visible
+- calibration issues are surfaced
+
+This is critical.
+
+--------------------------------------------------
+10. Launch Narrative Assets
+--------------------------------------------------
+
+Create:
+docs/publishing/
+
+Include:
+
+- HN launch draft
+- X thread draft
+- launch blog post
+- "Determinism is the New Explainability"
+- ATS replay explainer
+- replay screenshots
+- replay GIFs
+- architecture diagrams
+- benchmark visuals
+
+Recommended HN framing:
+"Show HN: Replayable hiring intelligence built on top of ATS evidence"
+
+Alternative:
+"Show HN: Deterministic recruiting intelligence with replayable audits"
+
+--------------------------------------------------
+UI Philosophy
+--------------------------------------------------
+
+The public experience should feel like:
+- organizational reasoning replay
+- operational intelligence
+- forensic investigation
+- calibration-aware cognition
+
+NOT:
+- HR SaaS
+- ATS dashboard
+- AI assistant
+- chatbot recruiter
+
+--------------------------------------------------
+Critical Constraints
+--------------------------------------------------
+
+Maintain:
+- deterministic replay
+- provenance-first architecture
+- disagreement preservation
+- explicit uncertainty
+- replay verification
+- benchmark integrity
+
+Do NOT:
+- imply autonomous hiring
+- flatten disagreement
+- hide calibration failures
+- market generic AI automation
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+A founder, governance lead, or recruiting-tech builder should immediately understand:
+
+"This system replays how organizations reasoned about hiring decisions —
+including disagreement, escalation, confidence shifts, and calibration."
+
+The emotional reaction should become:
+
+"We have never been able to inspect hiring reasoning like this before."

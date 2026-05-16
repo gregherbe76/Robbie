@@ -38,6 +38,7 @@ import { BenchmarksPublic } from "@/pages/public/benchmarks-public";
 import { Docs } from "@/pages/public/docs";
 import { ApiExplorer } from "@/pages/public/api-explorer";
 import { ATSDemo } from "@/pages/public/ats-demo";
+import { ATSCompare } from "@/pages/public/ats-compare";
 
 // Demo + replay (public, but use their own padded container)
 import { DemoIndex } from "@/pages/demo";
@@ -112,6 +113,7 @@ function PublicArea() {
         </Route>
         <Route path="/api-explorer" component={ApiExplorer} />
         <Route path="/ats-demo" component={ATSDemo} />
+        <Route path="/ats-compare" component={ATSCompare} />
         <Route path="/demo">
           <PaddedContainer>
             <DemoIndex />

@@ -14,7 +14,9 @@ import type {
 } from "./types.js";
 import {
   SYNTHETIC_CANDIDATE,
+  SYNTHETIC_CANDIDATE_B,
   buildSyntheticAshbyRecords,
+  buildSyntheticAshbyRecordsB,
 } from "./synthetic_fixtures.js";
 
 export const SYNTHETIC_CONNECTION: ATSConnection = {
@@ -43,11 +45,16 @@ export class SyntheticATSAdapter implements ATSAdapter {
   }
 
   async listCandidateIds(): Promise<string[]> {
-    return [SYNTHETIC_CANDIDATE.atsId];
+    return [SYNTHETIC_CANDIDATE.atsId, SYNTHETIC_CANDIDATE_B.atsId];
   }
 
   async fetchHiringProcess(candidateAtsId: string): Promise<ATSRawRecord[]> {
-    if (candidateAtsId !== SYNTHETIC_CANDIDATE.atsId) return [];
-    return buildSyntheticAshbyRecords();
+    if (candidateAtsId === SYNTHETIC_CANDIDATE.atsId) {
+      return buildSyntheticAshbyRecords();
+    }
+    if (candidateAtsId === SYNTHETIC_CANDIDATE_B.atsId) {
+      return buildSyntheticAshbyRecordsB();
+    }
+    return [];
   }
 }

@@ -29,50 +29,66 @@ export function Landing() {
             framework
           </div>
           <h1 className="mt-6 max-w-3xl text-4xl md:text-6xl font-mono font-bold tracking-tight leading-[1.05]">
-            Deterministic recruiting
-            <br />
-            <span className="text-primary">intelligence infrastructure.</span>
+            Replay every <br />
+            <span className="text-primary">hiring decision.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-lg md:text-xl text-muted-foreground leading-relaxed">
-            Recruiting is organizational reasoning. This is the framework — not
-            another ATS, not an &ldquo;AI recruiter,&rdquo; not a CV matcher.
-            Open-source agents with persistent memory, probabilistic reasoning,
-            calibration-aware decisions, and provenance you can replay byte for
-            byte.
+            Your ATS stores hiring decisions. This framework reconstructs how
+            the organization reasoned about them — disagreement preserved,
+            escalation explicit, override attributed, calibration honest.
+            Open-source, read-only, deterministic. Same evidence in, same
+            signed trace out, every time.
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link
-              href="/lab"
+              href="/ats-demo"
               className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
-              Open the Cognition Lab <ArrowRight className="size-4" />
+              Replay a hiring decision <ArrowRight className="size-4" />
             </Link>
             <Link
-              href="/demo"
+              href="/ats-compare"
               className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-5 py-2.5 text-sm font-semibold hover:border-primary/50 transition-colors"
             >
-              Replay a hero case
+              Compare two hires
+            </Link>
+            <Link
+              href="/lab"
+              className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-5 py-2.5 text-sm font-semibold hover:border-primary/50 transition-colors"
+            >
+              Cognition Lab
             </Link>
             <Link
               href="/architecture"
-              className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-5 py-2.5 text-sm font-semibold hover:border-primary/50 transition-colors"
+              className="inline-flex items-center gap-2 rounded-md border border-border/60 px-5 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-border transition-colors"
             >
               How it works
             </Link>
-            <Link
-              href="/benchmarks-public"
-              className="inline-flex items-center gap-2 rounded-md border border-border/60 px-5 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-border transition-colors"
-            >
-              Benchmarks
-            </Link>
           </div>
 
-          {/* Tiny live-status strip */}
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-px rounded-lg overflow-hidden border border-border/60 bg-border/60 text-xs">
+          {/* Trust signal strip */}
+          <div className="mt-12 grid grid-cols-2 md:grid-cols-5 gap-px rounded-lg overflow-hidden border border-border/60 bg-border/60 text-xs">
             <StatusCell label="Determinism" value="Verified" tone="ok" />
             <StatusCell label="Provenance" value="Complete" tone="ok" />
-            <StatusCell label="Calibration" value="Self-critiqued" tone="warn" />
             <StatusCell label="Disagreement" value="Preserved" tone="ok" />
+            <StatusCell label="Calibration" value="Self-critiqued" tone="warn" />
+            <StatusCell label="Write-back" value="None — read-only" tone="ok" />
+          </div>
+
+          {/* Three-line story */}
+          <div className="mt-10 grid gap-3 md:grid-cols-3 max-w-4xl">
+            <ThesisCard
+              n="1"
+              body="Most ATS systems store hiring decisions. They throw away the reasoning that produced them."
+            />
+            <ThesisCard
+              n="2"
+              body="This framework reads the same data, reconstructs the disagreement, escalation, and override structure, and signs it."
+            />
+            <ThesisCard
+              n="3"
+              body="Six months later, when the hire fails, the trace is still there. Byte for byte."
+            />
           </div>
         </div>
       </section>
@@ -278,6 +294,17 @@ function StatusCell({
       >
         {value}
       </span>
+    </div>
+  );
+}
+
+function ThesisCard({ n, body }: { n: string; body: string }) {
+  return (
+    <div className="rounded-lg border border-border/60 bg-card/40 p-4">
+      <div className="text-[10px] font-mono uppercase tracking-wider text-primary">
+        {n}
+      </div>
+      <p className="mt-1.5 text-sm text-foreground leading-relaxed">{body}</p>
     </div>
   );
 }
