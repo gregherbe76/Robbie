@@ -1,0 +1,388 @@
+```txt id="r7m4xz"
+Build the Operational Maturity Layer for the Recruiting Intelligence Framework.
+
+IMPORTANT:
+The framework already has:
+- ingestion
+- cognition
+- organization intelligence
+- collaboration
+- security boundaries
+- calibration/evaluation
+- deterministic replay
+- provenance-first architecture
+- benchmarks
+- public demo
+- cognition lab
+
+The next phase is NOT:
+- more agents
+- more cognition depth
+- more benchmark complexity
+
+The next phase is:
+- operational maturity
+- persistence
+- longitudinal workflows
+- real-world resilience
+- investigation ergonomics
+- deployment readiness
+
+This phase should evolve the framework from:
+"advanced OSS cognition infrastructure"
+
+into:
+"a deployable operational intelligence system."
+
+--------------------------------------------------
+Core Thesis
+--------------------------------------------------
+
+The framework must now support:
+- durable organizational memory
+- replayable operational history
+- persistent investigations
+- real reviewer workflows
+- resilient ingestion
+- deployable operations
+- longitudinal cognition evolution
+
+The goal is:
+operational credibility,
+not theoretical sophistication.
+
+--------------------------------------------------
+Build These Components
+--------------------------------------------------
+
+Create:
+
+lib/framework/src/operations_maturity/
+
+Required components:
+
+1. PersistentEventStore
+2. LongitudinalMemoryPersistence
+3. DurableInvestigationState
+4. OperationalWorkflowEngine
+5. ReviewerErgonomicsLayer
+6. RealWorldIngestionResilience
+7. ReplayPersistenceEngine
+8. OperationalObservabilityLayer
+9. DeploymentRuntimeLayer
+10. ProductionReadinessBenchmarkSuite
+
+--------------------------------------------------
+1. PersistentEventStore
+--------------------------------------------------
+
+Build durable persistence.
+
+Requirements:
+- PostgreSQL-backed
+- append-only event model
+- replayable event sourcing
+- deterministic ordering
+- organization-scoped
+- provenance-preserving
+
+Persist:
+- cognition runs
+- evidence
+- investigations
+- reviewer actions
+- escalations
+- overrides
+- calibration events
+- benchmark runs
+- audit trails
+
+Use:
+- Drizzle ORM
+- PostgreSQL
+- pgvector-ready schema
+
+IMPORTANT:
+Replayability must survive persistence.
+
+--------------------------------------------------
+2. LongitudinalMemoryPersistence
+--------------------------------------------------
+
+Persist organizational cognition over time.
+
+Persist:
+- organization memory
+- reviewer calibration history
+- archetype evolution
+- disagreement patterns
+- override outcomes
+- trajectory outcomes
+- org-fit outcomes
+
+Support:
+- temporal queries
+- historical replay
+- cognition-at-time-T reconstruction
+- calibration evolution
+
+--------------------------------------------------
+3. DurableInvestigationState
+--------------------------------------------------
+
+Persist investigations fully.
+
+Requirements:
+- investigation lifecycle persistence
+- unresolved question persistence
+- escalation persistence
+- reviewer thread persistence
+- disagreement persistence
+- evidence request persistence
+
+Support:
+- reopen investigation
+- historical investigation replay
+- investigation branching
+- investigation snapshots
+
+--------------------------------------------------
+4. OperationalWorkflowEngine
+--------------------------------------------------
+
+Build operational orchestration.
+
+NOT ATS workflows.
+
+Support:
+- investigation queues
+- escalation queues
+- reviewer assignment
+- unresolved ambiguity queues
+- evidence review queues
+- calibration warning queues
+
+Requirements:
+- deterministic queue ordering
+- replayable transitions
+- explicit state changes
+- provenance-preserving transitions
+
+--------------------------------------------------
+5. ReviewerErgonomicsLayer
+--------------------------------------------------
+
+Improve operational usability.
+
+Build:
+- reviewer inbox
+- unresolved tension focus mode
+- escalation focus mode
+- evidence review shortcuts
+- replay bookmarks
+- investigation summaries
+- reviewer context persistence
+
+Goal:
+reduce cognitive overload.
+
+The framework must remain:
+- deep,
+but:
+- operationally usable.
+
+--------------------------------------------------
+6. RealWorldIngestionResilience
+--------------------------------------------------
+
+Harden ingestion.
+
+Add:
+- retry policies
+- partial ingestion handling
+- malformed input handling
+- transcript corruption handling
+- GitHub API failure handling
+- LinkedIn structure drift handling
+- provenance-repair workflows
+
+Support:
+- ingestion diagnostics
+- ingestion replay
+- ingestion recovery
+
+IMPORTANT:
+Never silently discard evidence.
+
+--------------------------------------------------
+7. ReplayPersistenceEngine
+--------------------------------------------------
+
+Persist replay traces durably.
+
+Persist:
+- cognition traces
+- propagation traces
+- disagreement traces
+- escalation traces
+- calibration snapshots
+- replay signatures
+
+Support:
+- replay diffing
+- historical replay comparison
+- replay export/import
+- replay snapshots
+
+--------------------------------------------------
+8. OperationalObservabilityLayer
+--------------------------------------------------
+
+Build production observability.
+
+Add:
+- structured logs
+- cognition metrics
+- replay metrics
+- ingestion metrics
+- escalation metrics
+- calibration drift metrics
+- benchmark health metrics
+
+Support:
+- tracing
+- correlation ids
+- deterministic replay diagnostics
+- provenance diagnostics
+
+IMPORTANT:
+Observability must remain:
+- provenance-aware
+- organization-scoped
+- replay-friendly
+
+--------------------------------------------------
+9. DeploymentRuntimeLayer
+--------------------------------------------------
+
+Build deployment readiness.
+
+Add:
+- Dockerfile
+- docker-compose
+- production env validation
+- persistence migrations
+- health endpoints
+- readiness checks
+- startup diagnostics
+- deployment docs
+
+Support:
+- local deployment
+- Replit deployment
+- Render/Fly deployment
+- self-hosting
+
+IMPORTANT:
+The framework must become:
+- deployable by third parties.
+
+--------------------------------------------------
+10. ProductionReadinessBenchmarkSuite
+--------------------------------------------------
+
+Add operational maturity benchmarks.
+
+Scenarios:
+- persistence replay integrity
+- replay-after-restart
+- investigation recovery
+- escalation persistence
+- malformed ingestion recovery
+- concurrent reviewer actions
+- organization isolation under persistence
+- replay export/import integrity
+- migration integrity
+- deterministic persistence replay
+
+Verify:
+- replay signatures stable
+- provenance preserved
+- no event loss
+- no ordering drift
+- no cross-org leakage
+
+--------------------------------------------------
+API Requirements
+--------------------------------------------------
+
+Add:
+- persistence-backed repositories
+- replay retrieval APIs
+- investigation history APIs
+- observability endpoints
+- health endpoints
+- metrics endpoints
+
+OpenAPI-first.
+Generate:
+- schemas
+- hooks
+- validators
+
+--------------------------------------------------
+Console Requirements
+--------------------------------------------------
+
+Add:
+/operations-maturity
+
+Sections:
+- event store explorer
+- replay persistence explorer
+- investigation recovery
+- ingestion diagnostics
+- observability dashboard
+- queue explorer
+- reviewer workload
+- replay diff explorer
+- persistence benchmark panel
+
+UI philosophy:
+- operational intelligence runtime
+- not admin dashboard
+- not ATS operations
+
+--------------------------------------------------
+Critical Constraints
+--------------------------------------------------
+
+Maintain:
+- deterministic replay
+- provenance-first architecture
+- append-only auditability
+- explicit uncertainty
+- organization isolation
+- benchmark integrity
+
+Do NOT:
+- silently mutate history
+- overwrite replay traces
+- hide ingestion failures
+- flatten disagreement
+- lose provenance through persistence
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+The framework should evolve from:
+"advanced OSS cognition infrastructure"
+
+into:
+
+"a deployable operational intelligence platform
+with durable organizational memory,
+persistent replay,
+and longitudinal reasoning integrity."
+```
