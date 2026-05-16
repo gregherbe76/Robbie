@@ -25,6 +25,7 @@ import { OperationsMaturity } from "@/pages/operations-maturity";
 import { Benchmarks } from "@/pages/benchmarks";
 import { Ingestion } from "@/pages/ingestion";
 import { ATS } from "@/pages/ats";
+import { Integrations } from "@/pages/integrations";
 import { Collaboration } from "@/pages/collaboration";
 import { Security } from "@/pages/security";
 import { CandidateGraph } from "@/pages/graph/candidate";
@@ -77,6 +78,7 @@ function ConsoleArea() {
         <Route path="/console/benchmarks" component={Benchmarks} />
         <Route path="/console/ingestion" component={Ingestion} />
         <Route path="/console/ats" component={ATS} />
+        <Route path="/console/integrations" component={Integrations} />
         <Route path="/console/collaboration" component={Collaboration} />
         <Route path="/console/security" component={Security} />
         <Route path="/console/agents" component={Agents} />

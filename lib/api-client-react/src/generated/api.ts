@@ -23,6 +23,19 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ATSCalibrationReport,
+  ATSCompareResponse,
+  ATSConnectRequest,
+  ATSConnectResponse,
+  ATSConnectionList,
+  ATSDisagreementList,
+  ATSProvider,
+  ATSReplaySummaryList,
+  ATSReviewerList,
+  ATSSyncRequest,
+  ATSSyncResponse,
+  ATSWebhookRequest,
+  ATSWebhookResponse,
   Agent,
   AuditEvent,
   BenchmarkReport,
@@ -41,11 +54,13 @@ import type {
   CollaborationReviewerCalibrationReport,
   CollaborationStateResponse,
   CollaborativeCase,
+  CompareATSReplaysParams,
   DemoCaseSummary,
   DemoReplayTrace,
   EvaluationReport,
   GraphSnapshot,
   HealthStatus,
+  HiringDecisionReplay,
   IngestCandidateRequest,
   IngestOrganizationRequest,
   IngestTranscriptRequest,
@@ -65,6 +80,8 @@ import type {
   OutcomeEvent,
   PredictionRecord,
   Provider,
+  ReasoningReconstruction,
+  ReplaySignatureRecord,
   Report,
   SecurityAccessDecision,
   SecurityAccessLog,
@@ -4048,6 +4065,931 @@ export function useGetLabRunSignature<TData = Awaited<ReturnType<typeof getLabRu
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetLabRunSignatureQueryOptions(runId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListATSConnectionsUrl = () => {
+
+
+
+
+  return `/api/ats/connections`
+}
+
+/**
+ * @summary List registered ATS connections
+ */
+export const listATSConnections = async ( options?: RequestInit): Promise<ATSConnectionList> => {
+
+  return customFetch<ATSConnectionList>(getListATSConnectionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListATSConnectionsQueryKey = () => {
+    return [
+    `/api/ats/connections`
+    ] as const;
+    }
+
+
+export const getListATSConnectionsQueryOptions = <TData = Awaited<ReturnType<typeof listATSConnections>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listATSConnections>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListATSConnectionsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listATSConnections>>> = ({ signal }) => listATSConnections({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listATSConnections>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListATSConnectionsQueryResult = NonNullable<Awaited<ReturnType<typeof listATSConnections>>>
+export type ListATSConnectionsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List registered ATS connections
+ */
+
+export function useListATSConnections<TData = Awaited<ReturnType<typeof listATSConnections>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listATSConnections>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListATSConnectionsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getConnectATSUrl = () => {
+
+
+
+
+  return `/api/ats/connect`
+}
+
+/**
+ * The framework registers all supported adapters at boot. This
+endpoint surfaces friendly errors when an operator tries to
+connect a provider whose credentials are missing. No inline
+credentials are accepted — secrets must be configured via the
+environment.
+
+ * @summary Acknowledge an ATS connection (no-op when env keys missing)
+ */
+export const connectATS = async (aTSConnectRequest: ATSConnectRequest, options?: RequestInit): Promise<ATSConnectResponse> => {
+
+  return customFetch<ATSConnectResponse>(getConnectATSUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      aTSConnectRequest,)
+  }
+);}
+
+
+
+
+export const getConnectATSMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof connectATS>>, TError,{data: BodyType<ATSConnectRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof connectATS>>, TError,{data: BodyType<ATSConnectRequest>}, TContext> => {
+
+const mutationKey = ['connectATS'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof connectATS>>, {data: BodyType<ATSConnectRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  connectATS(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConnectATSMutationResult = NonNullable<Awaited<ReturnType<typeof connectATS>>>
+    export type ConnectATSMutationBody = BodyType<ATSConnectRequest>
+    export type ConnectATSMutationError = ErrorType<void>
+
+    /**
+ * @summary Acknowledge an ATS connection (no-op when env keys missing)
+ */
+export const useConnectATS = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof connectATS>>, TError,{data: BodyType<ATSConnectRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof connectATS>>,
+        TError,
+        {data: BodyType<ATSConnectRequest>},
+        TContext
+      > => {
+      return useMutation(getConnectATSMutationOptions(options));
+    }
+
+export const getSyncATSConnectionUrl = () => {
+
+
+
+
+  return `/api/ats/sync`
+}
+
+/**
+ * @summary Sync a connection — read-only, deterministic
+ */
+export const syncATSConnection = async (aTSSyncRequest: ATSSyncRequest, options?: RequestInit): Promise<ATSSyncResponse> => {
+
+  return customFetch<ATSSyncResponse>(getSyncATSConnectionUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      aTSSyncRequest,)
+  }
+);}
+
+
+
+
+export const getSyncATSConnectionMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof syncATSConnection>>, TError,{data: BodyType<ATSSyncRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof syncATSConnection>>, TError,{data: BodyType<ATSSyncRequest>}, TContext> => {
+
+const mutationKey = ['syncATSConnection'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof syncATSConnection>>, {data: BodyType<ATSSyncRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  syncATSConnection(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SyncATSConnectionMutationResult = NonNullable<Awaited<ReturnType<typeof syncATSConnection>>>
+    export type SyncATSConnectionMutationBody = BodyType<ATSSyncRequest>
+    export type SyncATSConnectionMutationError = ErrorType<void>
+
+    /**
+ * @summary Sync a connection — read-only, deterministic
+ */
+export const useSyncATSConnection = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof syncATSConnection>>, TError,{data: BodyType<ATSSyncRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof syncATSConnection>>,
+        TError,
+        {data: BodyType<ATSSyncRequest>},
+        TContext
+      > => {
+      return useMutation(getSyncATSConnectionMutationOptions(options));
+    }
+
+export const getIngestATSWebhookUrl = (provider: ATSProvider,) => {
+
+
+
+
+  return `/api/ats/webhook/${provider}`
+}
+
+/**
+ * Acknowledges a provider-signed webhook event and re-syncs the
+affected connection. The framework never writes back to the
+ATS in response to a webhook. Provider signature verification
+is the adapter's responsibility before reaching this handler.
+
+ * @summary Append-only webhook ingestion for ATS events
+ */
+export const ingestATSWebhook = async (provider: ATSProvider,
+    aTSWebhookRequest: ATSWebhookRequest, options?: RequestInit): Promise<ATSWebhookResponse> => {
+
+  return customFetch<ATSWebhookResponse>(getIngestATSWebhookUrl(provider),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      aTSWebhookRequest,)
+  }
+);}
+
+
+
+
+export const getIngestATSWebhookMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ingestATSWebhook>>, TError,{provider: ATSProvider;data: BodyType<ATSWebhookRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof ingestATSWebhook>>, TError,{provider: ATSProvider;data: BodyType<ATSWebhookRequest>}, TContext> => {
+
+const mutationKey = ['ingestATSWebhook'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof ingestATSWebhook>>, {provider: ATSProvider;data: BodyType<ATSWebhookRequest>}> = (props) => {
+          const {provider,data} = props ?? {};
+
+          return  ingestATSWebhook(provider,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type IngestATSWebhookMutationResult = NonNullable<Awaited<ReturnType<typeof ingestATSWebhook>>>
+    export type IngestATSWebhookMutationBody = BodyType<ATSWebhookRequest>
+    export type IngestATSWebhookMutationError = ErrorType<void>
+
+    /**
+ * @summary Append-only webhook ingestion for ATS events
+ */
+export const useIngestATSWebhook = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof ingestATSWebhook>>, TError,{provider: ATSProvider;data: BodyType<ATSWebhookRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof ingestATSWebhook>>,
+        TError,
+        {provider: ATSProvider;data: BodyType<ATSWebhookRequest>},
+        TContext
+      > => {
+      return useMutation(getIngestATSWebhookMutationOptions(options));
+    }
+
+export const getListATSReplaysUrl = () => {
+
+
+
+
+  return `/api/ats/replays`
+}
+
+/**
+ * @summary List hiring decision replays (summary rows)
+ */
+export const listATSReplays = async ( options?: RequestInit): Promise<ATSReplaySummaryList> => {
+
+  return customFetch<ATSReplaySummaryList>(getListATSReplaysUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListATSReplaysQueryKey = () => {
+    return [
+    `/api/ats/replays`
+    ] as const;
+    }
+
+
+export const getListATSReplaysQueryOptions = <TData = Awaited<ReturnType<typeof listATSReplays>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listATSReplays>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListATSReplaysQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listATSReplays>>> = ({ signal }) => listATSReplays({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listATSReplays>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListATSReplaysQueryResult = NonNullable<Awaited<ReturnType<typeof listATSReplays>>>
+export type ListATSReplaysQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List hiring decision replays (summary rows)
+ */
+
+export function useListATSReplays<TData = Awaited<ReturnType<typeof listATSReplays>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listATSReplays>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListATSReplaysQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetATSReplayUrl = (id: string,) => {
+
+
+
+
+  return `/api/ats/replay/${id}`
+}
+
+/**
+ * @summary Fetch a single hiring decision replay
+ */
+export const getATSReplay = async (id: string, options?: RequestInit): Promise<HiringDecisionReplay> => {
+
+  return customFetch<HiringDecisionReplay>(getGetATSReplayUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetATSReplayQueryKey = (id: string,) => {
+    return [
+    `/api/ats/replay/${id}`
+    ] as const;
+    }
+
+
+export const getGetATSReplayQueryOptions = <TData = Awaited<ReturnType<typeof getATSReplay>>, TError = ErrorType<void>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getATSReplay>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetATSReplayQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getATSReplay>>> = ({ signal }) => getATSReplay(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getATSReplay>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetATSReplayQueryResult = NonNullable<Awaited<ReturnType<typeof getATSReplay>>>
+export type GetATSReplayQueryError = ErrorType<void>
+
+
+/**
+ * @summary Fetch a single hiring decision replay
+ */
+
+export function useGetATSReplay<TData = Awaited<ReturnType<typeof getATSReplay>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getATSReplay>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetATSReplayQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getVerifyATSReplayUrl = (id: string,) => {
+
+
+
+
+  return `/api/ats/replay/${id}/verify`
+}
+
+/**
+ * @summary Recompute and compare a replay signature
+ */
+export const verifyATSReplay = async (id: string, options?: RequestInit): Promise<ReplaySignatureRecord> => {
+
+  return customFetch<ReplaySignatureRecord>(getVerifyATSReplayUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getVerifyATSReplayQueryKey = (id: string,) => {
+    return [
+    `/api/ats/replay/${id}/verify`
+    ] as const;
+    }
+
+
+export const getVerifyATSReplayQueryOptions = <TData = Awaited<ReturnType<typeof verifyATSReplay>>, TError = ErrorType<void>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof verifyATSReplay>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getVerifyATSReplayQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof verifyATSReplay>>> = ({ signal }) => verifyATSReplay(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof verifyATSReplay>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type VerifyATSReplayQueryResult = NonNullable<Awaited<ReturnType<typeof verifyATSReplay>>>
+export type VerifyATSReplayQueryError = ErrorType<void>
+
+
+/**
+ * @summary Recompute and compare a replay signature
+ */
+
+export function useVerifyATSReplay<TData = Awaited<ReturnType<typeof verifyATSReplay>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof verifyATSReplay>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getVerifyATSReplayQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetATSReplayReasoningUrl = (id: string,) => {
+
+
+
+
+  return `/api/ats/replay/${id}/reasoning`
+}
+
+/**
+ * @summary Reconstruct reviewer reasoning for a replay
+ */
+export const getATSReplayReasoning = async (id: string, options?: RequestInit): Promise<ReasoningReconstruction> => {
+
+  return customFetch<ReasoningReconstruction>(getGetATSReplayReasoningUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetATSReplayReasoningQueryKey = (id: string,) => {
+    return [
+    `/api/ats/replay/${id}/reasoning`
+    ] as const;
+    }
+
+
+export const getGetATSReplayReasoningQueryOptions = <TData = Awaited<ReturnType<typeof getATSReplayReasoning>>, TError = ErrorType<void>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getATSReplayReasoning>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetATSReplayReasoningQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getATSReplayReasoning>>> = ({ signal }) => getATSReplayReasoning(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getATSReplayReasoning>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetATSReplayReasoningQueryResult = NonNullable<Awaited<ReturnType<typeof getATSReplayReasoning>>>
+export type GetATSReplayReasoningQueryError = ErrorType<void>
+
+
+/**
+ * @summary Reconstruct reviewer reasoning for a replay
+ */
+
+export function useGetATSReplayReasoning<TData = Awaited<ReturnType<typeof getATSReplayReasoning>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getATSReplayReasoning>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetATSReplayReasoningQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetATSCalibrationUrl = () => {
+
+
+
+
+  return `/api/ats/calibration`
+}
+
+/**
+ * @summary Organization calibration report (uses synthetic outcomes)
+ */
+export const getATSCalibration = async ( options?: RequestInit): Promise<ATSCalibrationReport> => {
+
+  return customFetch<ATSCalibrationReport>(getGetATSCalibrationUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetATSCalibrationQueryKey = () => {
+    return [
+    `/api/ats/calibration`
+    ] as const;
+    }
+
+
+export const getGetATSCalibrationQueryOptions = <TData = Awaited<ReturnType<typeof getATSCalibration>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getATSCalibration>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetATSCalibrationQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getATSCalibration>>> = ({ signal }) => getATSCalibration({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getATSCalibration>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetATSCalibrationQueryResult = NonNullable<Awaited<ReturnType<typeof getATSCalibration>>>
+export type GetATSCalibrationQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Organization calibration report (uses synthetic outcomes)
+ */
+
+export function useGetATSCalibration<TData = Awaited<ReturnType<typeof getATSCalibration>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getATSCalibration>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetATSCalibrationQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListATSDisagreementsUrl = () => {
+
+
+
+
+  return `/api/ats/disagreements`
+}
+
+/**
+ * @summary Flat list of reviewer disagreements across all replays
+ */
+export const listATSDisagreements = async ( options?: RequestInit): Promise<ATSDisagreementList> => {
+
+  return customFetch<ATSDisagreementList>(getListATSDisagreementsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListATSDisagreementsQueryKey = () => {
+    return [
+    `/api/ats/disagreements`
+    ] as const;
+    }
+
+
+export const getListATSDisagreementsQueryOptions = <TData = Awaited<ReturnType<typeof listATSDisagreements>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listATSDisagreements>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListATSDisagreementsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listATSDisagreements>>> = ({ signal }) => listATSDisagreements({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listATSDisagreements>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListATSDisagreementsQueryResult = NonNullable<Awaited<ReturnType<typeof listATSDisagreements>>>
+export type ListATSDisagreementsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Flat list of reviewer disagreements across all replays
+ */
+
+export function useListATSDisagreements<TData = Awaited<ReturnType<typeof listATSDisagreements>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listATSDisagreements>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListATSDisagreementsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListATSReviewersUrl = () => {
+
+
+
+
+  return `/api/ats/reviewers`
+}
+
+/**
+ * @summary Reviewer reliability rows from the calibration report
+ */
+export const listATSReviewers = async ( options?: RequestInit): Promise<ATSReviewerList> => {
+
+  return customFetch<ATSReviewerList>(getListATSReviewersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListATSReviewersQueryKey = () => {
+    return [
+    `/api/ats/reviewers`
+    ] as const;
+    }
+
+
+export const getListATSReviewersQueryOptions = <TData = Awaited<ReturnType<typeof listATSReviewers>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listATSReviewers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListATSReviewersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listATSReviewers>>> = ({ signal }) => listATSReviewers({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listATSReviewers>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListATSReviewersQueryResult = NonNullable<Awaited<ReturnType<typeof listATSReviewers>>>
+export type ListATSReviewersQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Reviewer reliability rows from the calibration report
+ */
+
+export function useListATSReviewers<TData = Awaited<ReturnType<typeof listATSReviewers>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listATSReviewers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListATSReviewersQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCompareATSReplaysUrl = (params: CompareATSReplaysParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/ats/compare?${stringifiedParams}` : `/api/ats/compare`
+}
+
+/**
+ * @summary Two replays plus a structured diff
+ */
+export const compareATSReplays = async (params: CompareATSReplaysParams, options?: RequestInit): Promise<ATSCompareResponse> => {
+
+  return customFetch<ATSCompareResponse>(getCompareATSReplaysUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getCompareATSReplaysQueryKey = (params?: CompareATSReplaysParams,) => {
+    return [
+    `/api/ats/compare`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getCompareATSReplaysQueryOptions = <TData = Awaited<ReturnType<typeof compareATSReplays>>, TError = ErrorType<void>>(params: CompareATSReplaysParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof compareATSReplays>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCompareATSReplaysQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof compareATSReplays>>> = ({ signal }) => compareATSReplays(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof compareATSReplays>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type CompareATSReplaysQueryResult = NonNullable<Awaited<ReturnType<typeof compareATSReplays>>>
+export type CompareATSReplaysQueryError = ErrorType<void>
+
+
+/**
+ * @summary Two replays plus a structured diff
+ */
+
+export function useCompareATSReplays<TData = Awaited<ReturnType<typeof compareATSReplays>>, TError = ErrorType<void>>(
+ params: CompareATSReplaysParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof compareATSReplays>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getCompareATSReplaysQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

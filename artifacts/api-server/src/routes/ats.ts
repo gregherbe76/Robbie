@@ -3,6 +3,7 @@
  *
  *   POST /ats/connect                — register/re-register a connection (no-op when env keys missing)
  *   POST /ats/sync                   — sync a connection by id
+ *   POST /ats/webhook/:provider      — append-only event ingestion
  *   GET  /ats/connections            — list connections + health
  *   GET  /ats/replays                — list hiring decision replays
  *   GET  /ats/replay/:id             — fetch a single replay
@@ -11,6 +12,7 @@
  *   GET  /ats/calibration            — org calibration report (uses synthetic outcomes)
  *   GET  /ats/disagreements          — flat list of reviewer disagreements
  *   GET  /ats/reviewers              — reviewer reliability rows
+ *   GET  /ats/compare?a=&b=          — two replays + structured diff
  *
  * Read-only contract for the ATS itself. Sync is a server-side
  * operation against the registered adapters; it never writes back
@@ -20,6 +22,7 @@
 import { Router, type IRouter } from "express";
 import {
   buildCalibrationReport,
+  buildReplayDiff,
   reconstructReasoning,
   verifyReplaySignature,
   SYNTHETIC_OUTCOMES,
@@ -153,6 +156,78 @@ router.get("/ats/reviewers", async (_req, res) => {
   const replays = gateway.listReplays();
   const report = buildCalibrationReport(replays, SYNTHETIC_OUTCOMES);
   res.json({ reviewers: report.reviewers });
+});
+
+router.get("/ats/compare", async (req, res) => {
+  const aId = String(req.query.a ?? "");
+  const bId = String(req.query.b ?? "");
+  if (!aId || !bId) {
+    res.status(400).json({ error: "missing_replay_ids" });
+    return;
+  }
+  const gateway = await getATSGateway();
+  const a = gateway.getReplay(aId);
+  const b = gateway.getReplay(bId);
+  if (!a) {
+    res.status(404).json({ error: "unknown_replay", id: aId });
+    return;
+  }
+  if (!b) {
+    res.status(404).json({ error: "unknown_replay", id: bId });
+    return;
+  }
+  res.json({ a, b, diff: buildReplayDiff(a, b) });
+});
+
+/**
+ * Webhook ingestion — append-only.
+ *
+ * The framework does not synthesise reasoning from the webhook
+ * payload; it acknowledges the event, re-syncs the affected
+ * connection (so the replay is rebuilt deterministically from the
+ * ATS as the source of truth), and returns the resulting replay
+ * delta. We never write back to the ATS in response to a webhook.
+ *
+ * Body shape:
+ *   { connectionId: string, event: { kind: string, atsId?: string } }
+ *
+ * Auth (production): adapters MUST verify provider-specific webhook
+ * signatures before reaching this handler. The skeleton accepts any
+ * body so the synthetic provider can be exercised locally.
+ */
+router.post("/ats/webhook/:provider", async (req, res) => {
+  const provider = String(req.params.provider ?? "");
+  const connectionId = String(req.body?.connectionId ?? "");
+  const event = (req.body?.event ?? {}) as {
+    kind?: string;
+    atsId?: string;
+  };
+  if (!connectionId) {
+    res.status(400).json({ error: "missing_connectionId" });
+    return;
+  }
+  const gateway = await getATSGateway();
+  const connection = gateway.getConnection(connectionId);
+  if (!connection || connection.provider !== provider) {
+    res.status(404).json({ error: "unknown_connection", connectionId });
+    return;
+  }
+  try {
+    const before = gateway.listReplays().length;
+    const result = await gateway.syncConnection(connectionId);
+    const after = gateway.listReplays().length;
+    res.json({
+      acknowledged: true,
+      provider,
+      connectionId,
+      event: { kind: event.kind ?? "unknown", atsId: event.atsId },
+      replayDelta: after - before,
+      sync: result,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "ingest_failed";
+    res.status(409).json({ error: "ingest_failed", message });
+  }
 });
 
 export default router;

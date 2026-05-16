@@ -31,6 +31,8 @@ tags:
     description: Cognitive benchmark + smoke-test report (deterministic regression protection)
   - name: demo
     description: Public demo replay — deterministic end-to-end traces for the 5 hero cases
+  - name: ats
+    description: ATS Connection & Historical Replay — connections, replays, calibration, disagreements, reviewers, compare, webhook
 paths:
   /healthz:
     get:
@@ -927,8 +929,798 @@ paths:
                 $ref: "#/components/schemas/LabRunSignature"
         "404":
           description: Unknown or expired run id
+  /ats/connections:
+    get:
+      operationId: listATSConnections
+      tags: [ats]
+      summary: List registered ATS connections
+      responses:
+        "200":
+          description: Connections
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ATSConnectionList"
+  /ats/connect:
+    post:
+      operationId: connectATS
+      tags: [ats]
+      summary: Acknowledge an ATS connection (no-op when env keys missing)
+      description: |
+        The framework registers all supported adapters at boot. This
+        endpoint surfaces friendly errors when an operator tries to
+        connect a provider whose credentials are missing. No inline
+        credentials are accepted — secrets must be configured via the
+        environment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ATSConnectRequest"
+      responses:
+        "200":
+          description: Connection acknowledged
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ATSConnectResponse"
+        "400":
+          description: Unknown provider
+  /ats/sync:
+    post:
+      operationId: syncATSConnection
+      tags: [ats]
+      summary: Sync a connection — read-only, deterministic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ATSSyncRequest"
+      responses:
+        "200":
+          description: Sync result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ATSSyncResponse"
+        "400":
+          description: Missing connectionId
+        "409":
+          description: Sync failed
+  /ats/webhook/{provider}:
+    post:
+      operationId: ingestATSWebhook
+      tags: [ats]
+      summary: Append-only webhook ingestion for ATS events
+      description: |
+        Acknowledges a provider-signed webhook event and re-syncs the
+        affected connection. The framework never writes back to the
+        ATS in response to a webhook. Provider signature verification
+        is the adapter's responsibility before reaching this handler.
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/ATSProvider"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ATSWebhookRequest"
+      responses:
+        "200":
+          description: Webhook acknowledged
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ATSWebhookResponse"
+        "400":
+          description: Missing connectionId
+        "404":
+          description: Unknown connection for provider
+        "409":
+          description: Ingest failed
+  /ats/replays:
+    get:
+      operationId: listATSReplays
+      tags: [ats]
+      summary: List hiring decision replays (summary rows)
+      responses:
+        "200":
+          description: Replays
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ATSReplaySummaryList"
+  /ats/replay/{id}:
+    get:
+      operationId: getATSReplay
+      tags: [ats]
+      summary: Fetch a single hiring decision replay
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Replay
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HiringDecisionReplay"
+        "404":
+          description: Unknown replay
+  /ats/replay/{id}/verify:
+    get:
+      operationId: verifyATSReplay
+      tags: [ats]
+      summary: Recompute and compare a replay signature
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Signature record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReplaySignatureRecord"
+        "404":
+          description: Unknown replay
+  /ats/replay/{id}/reasoning:
+    get:
+      operationId: getATSReplayReasoning
+      tags: [ats]
+      summary: Reconstruct reviewer reasoning for a replay
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Reasoning reconstruction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReasoningReconstruction"
+        "404":
+          description: Unknown replay
+  /ats/calibration:
+    get:
+      operationId: getATSCalibration
+      tags: [ats]
+      summary: Organization calibration report (uses synthetic outcomes)
+      responses:
+        "200":
+          description: Calibration report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ATSCalibrationReport"
+  /ats/disagreements:
+    get:
+      operationId: listATSDisagreements
+      tags: [ats]
+      summary: Flat list of reviewer disagreements across all replays
+      responses:
+        "200":
+          description: Disagreements
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ATSDisagreementList"
+  /ats/reviewers:
+    get:
+      operationId: listATSReviewers
+      tags: [ats]
+      summary: Reviewer reliability rows from the calibration report
+      responses:
+        "200":
+          description: Reviewers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ATSReviewerList"
+  /ats/compare:
+    get:
+      operationId: compareATSReplays
+      tags: [ats]
+      summary: Two replays plus a structured diff
+      parameters:
+        - name: a
+          in: query
+          required: true
+          description: Replay id for the left side of the diff.
+          schema: { type: string }
+        - name: b
+          in: query
+          required: true
+          description: Replay id for the right side of the diff.
+          schema: { type: string }
+      responses:
+        "200":
+          description: Both replays plus the computed diff
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ATSCompareResponse"
+        "400":
+          description: Missing replay ids
+        "404":
+          description: Unknown replay
 components:
   schemas:
+    ATSProvider:
+      type: string
+      enum: [ashby, greenhouse, synthetic]
+    ATSHiringOutcome:
+      type: string
+      enum: [hired, declined, withdrawn, open]
+    ATSConnectionStatus:
+      type: string
+      enum: [connected, unconfigured, error]
+    ATSReviewer:
+      type: object
+      required: [id, displayName]
+      properties:
+        id: { type: string }
+        displayName: { type: string }
+        role: { type: string }
+    ATSConnection:
+      type: object
+      required: [id, provider, label, status, connectedAt, statusDetail]
+      properties:
+        id: { type: string }
+        provider: { $ref: "#/components/schemas/ATSProvider" }
+        label: { type: string }
+        status: { $ref: "#/components/schemas/ATSConnectionStatus" }
+        connectedAt: { type: string, format: date-time }
+        workspaceHint: { type: string }
+        statusDetail: { type: string }
+        lastSyncedAt: { type: string, format: date-time }
+        lastSyncCounts:
+          type: object
+          additionalProperties: { type: integer }
+    ATSConnectionList:
+      type: object
+      required: [connections]
+      properties:
+        connections:
+          type: array
+          items: { $ref: "#/components/schemas/ATSConnection" }
+    ATSConnectRequest:
+      type: object
+      required: [provider]
+      properties:
+        provider: { $ref: "#/components/schemas/ATSProvider" }
+    ATSConnectResponse:
+      type: object
+      required: [connection]
+      properties:
+        connection: { $ref: "#/components/schemas/ATSConnection" }
+    ATSSyncRequest:
+      type: object
+      required: [connectionId]
+      properties:
+        connectionId: { type: string }
+    SyncResult:
+      type: object
+      required:
+        - connectionId
+        - candidatesSeen
+        - replaysBuilt
+        - rawRecordsIngested
+        - normalizedEvidence
+        - durationMs
+        - startedAt
+        - completedAt
+      properties:
+        connectionId: { type: string }
+        candidatesSeen: { type: integer }
+        replaysBuilt: { type: integer }
+        rawRecordsIngested: { type: integer }
+        normalizedEvidence: { type: integer }
+        durationMs: { type: integer }
+        startedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time }
+    ATSSyncResponse:
+      type: object
+      required: [result]
+      properties:
+        result: { $ref: "#/components/schemas/SyncResult" }
+    ATSWebhookEvent:
+      type: object
+      properties:
+        kind: { type: string }
+        atsId: { type: string }
+    ATSWebhookRequest:
+      type: object
+      required: [connectionId, event]
+      properties:
+        connectionId: { type: string }
+        event: { $ref: "#/components/schemas/ATSWebhookEvent" }
+    ATSWebhookResponse:
+      type: object
+      required: [acknowledged, provider, connectionId, event, replayDelta, sync]
+      properties:
+        acknowledged: { type: boolean }
+        provider: { $ref: "#/components/schemas/ATSProvider" }
+        connectionId: { type: string }
+        event: { $ref: "#/components/schemas/ATSWebhookEvent" }
+        replayDelta: { type: integer }
+        sync: { $ref: "#/components/schemas/SyncResult" }
+    NormalizedEvidenceKind:
+      type: string
+      enum:
+        - explicit_claim
+        - reviewer_assessment
+        - contradiction_signal
+        - uncertainty_signal
+        - escalation_signal
+        - override_signal
+        - calibration_signal
+    ATSObjectKind:
+      type: string
+      enum:
+        - candidate
+        - application
+        - interview_plan
+        - interview
+        - scorecard
+        - interview_kit
+        - feedback
+        - note
+        - activity
+        - decision
+        - approval
+        - rejection_rationale
+        - reviewer
+    NormalizedEvidence:
+      type: object
+      required:
+        - id
+        - kind
+        - provider
+        - sourceAtsId
+        - sourceKind
+        - summary
+        - occurredAt
+        - ingestedAt
+        - payloadHash
+        - provenanceChain
+      properties:
+        id: { type: string }
+        kind: { $ref: "#/components/schemas/NormalizedEvidenceKind" }
+        provider: { $ref: "#/components/schemas/ATSProvider" }
+        sourceAtsId: { type: string }
+        sourceKind: { $ref: "#/components/schemas/ATSObjectKind" }
+        reviewer: { $ref: "#/components/schemas/ATSReviewer" }
+        summary: { type: string }
+        detail: { type: string }
+        occurredAt: { type: string, format: date-time }
+        ingestedAt: { type: string, format: date-time }
+        payloadHash: { type: string }
+        provenanceChain:
+          type: array
+          items: { type: string }
+        reviewerConfidence: { type: number, format: float }
+        assessmentScore: { type: number, format: float }
+        topic: { type: string }
+    ReviewerDisagreement:
+      type: object
+      required: [id, topic, reviewers, spread, high, low]
+      properties:
+        id: { type: string }
+        topic: { type: string }
+        reviewers:
+          type: array
+          items: { $ref: "#/components/schemas/ATSReviewer" }
+        spread: { type: number, format: float }
+        high:
+          type: object
+          required: [reviewerId, score, summary]
+          properties:
+            reviewerId: { type: string }
+            score: { type: number, format: float }
+            summary: { type: string }
+        low:
+          type: object
+          required: [reviewerId, score, summary]
+          properties:
+            reviewerId: { type: string }
+            score: { type: number, format: float }
+            summary: { type: string }
+        resolvedAt: { type: string, format: date-time }
+        resolution:
+          type: string
+          enum: [consensus, override, unresolved]
+    EscalationMoment:
+      type: object
+      required: [id, occurredAt, trigger, summary, evidenceIds]
+      properties:
+        id: { type: string }
+        occurredAt: { type: string, format: date-time }
+        trigger:
+          type: string
+          enum:
+            - additional-loop
+            - loop-extension
+            - hiring-manager-intervention
+            - founder-intervention
+            - bar-recalibration
+            - compensation-exception
+        summary: { type: string }
+        evidenceIds:
+          type: array
+          items: { type: string }
+    OverrideMoment:
+      type: object
+      required: [id, occurredAt, byReviewerId, overrides, rationale, evidenceIds]
+      properties:
+        id: { type: string }
+        occurredAt: { type: string, format: date-time }
+        byReviewerId: { type: string }
+        overrides:
+          type: string
+          enum: [decline, advance, hold]
+        rationale: { type: string }
+        evidenceIds:
+          type: array
+          items: { type: string }
+    ConfidencePoint:
+      type: object
+      required: [occurredAt, estimate, evidenceIds]
+      properties:
+        occurredAt: { type: string, format: date-time }
+        estimate: { type: number, format: float }
+        evidenceIds:
+          type: array
+          items: { type: string }
+    HiringDecisionReplay:
+      type: object
+      required:
+        - id
+        - connectionId
+        - provider
+        - candidateAtsId
+        - candidateName
+        - targetRole
+        - organization
+        - openedAt
+        - outcome
+        - reviewers
+        - evidence
+        - disagreements
+        - escalations
+        - overrides
+        - confidenceTrajectory
+        - unresolvedTensions
+        - signature
+      properties:
+        id: { type: string }
+        connectionId: { type: string }
+        provider: { $ref: "#/components/schemas/ATSProvider" }
+        candidateAtsId: { type: string }
+        candidateName: { type: string }
+        targetRole: { type: string }
+        organization: { type: string }
+        openedAt: { type: string, format: date-time }
+        closedAt: { type: string, format: date-time }
+        outcome: { $ref: "#/components/schemas/ATSHiringOutcome" }
+        reviewers:
+          type: array
+          items: { $ref: "#/components/schemas/ATSReviewer" }
+        evidence:
+          type: array
+          items: { $ref: "#/components/schemas/NormalizedEvidence" }
+        disagreements:
+          type: array
+          items: { $ref: "#/components/schemas/ReviewerDisagreement" }
+        escalations:
+          type: array
+          items: { $ref: "#/components/schemas/EscalationMoment" }
+        overrides:
+          type: array
+          items: { $ref: "#/components/schemas/OverrideMoment" }
+        confidenceTrajectory:
+          type: array
+          items: { $ref: "#/components/schemas/ConfidencePoint" }
+        unresolvedTensions:
+          type: array
+          items: { type: string }
+        signature: { type: string }
+    ATSReplaySummary:
+      type: object
+      required:
+        - id
+        - connectionId
+        - provider
+        - candidateName
+        - targetRole
+        - organization
+        - openedAt
+        - outcome
+        - reviewerCount
+        - evidenceCount
+        - disagreementCount
+        - escalationCount
+        - overrideCount
+        - signature
+      properties:
+        id: { type: string }
+        connectionId: { type: string }
+        provider: { $ref: "#/components/schemas/ATSProvider" }
+        candidateName: { type: string }
+        targetRole: { type: string }
+        organization: { type: string }
+        openedAt: { type: string, format: date-time }
+        closedAt: { type: string, format: date-time }
+        outcome: { $ref: "#/components/schemas/ATSHiringOutcome" }
+        reviewerCount: { type: integer }
+        evidenceCount: { type: integer }
+        disagreementCount: { type: integer }
+        escalationCount: { type: integer }
+        overrideCount: { type: integer }
+        signature: { type: string }
+    ATSReplaySummaryList:
+      type: object
+      required: [replays]
+      properties:
+        replays:
+          type: array
+          items: { $ref: "#/components/schemas/ATSReplaySummary" }
+    ReplaySignatureRecord:
+      type: object
+      required: [replayId, storedSignature, recomputedSignature, match, verifiedAt]
+      properties:
+        replayId: { type: string }
+        storedSignature: { type: string }
+        recomputedSignature: { type: string }
+        match: { type: boolean }
+        verifiedAt: { type: string, format: date-time }
+    DisagreementClusterNode:
+      type: object
+      required: [reviewerId, displayName, meanScore, topics]
+      properties:
+        reviewerId: { type: string }
+        displayName: { type: string }
+        meanScore: { type: number, format: float }
+        topics:
+          type: array
+          items: { type: string }
+    DisagreementClusterEdge:
+      type: object
+      required: [from, to, weight, topics]
+      properties:
+        from: { type: string }
+        to: { type: string }
+        weight: { type: number, format: float }
+        topics:
+          type: array
+          items: { type: string }
+    ReasoningReconstruction:
+      type: object
+      required:
+        - replayId
+        - disagreementGraph
+        - escalationPatterns
+        - confidenceShifts
+        - overrideDynamics
+        - pressurePoints
+        - caveat
+      properties:
+        replayId: { type: string }
+        disagreementGraph:
+          type: object
+          required: [nodes, edges]
+          properties:
+            nodes:
+              type: array
+              items: { $ref: "#/components/schemas/DisagreementClusterNode" }
+            edges:
+              type: array
+              items: { $ref: "#/components/schemas/DisagreementClusterEdge" }
+        escalationPatterns:
+          type: array
+          items:
+            type: object
+            required: [pattern, occurredAt, evidenceIds]
+            properties:
+              pattern: { type: string }
+              occurredAt: { type: string, format: date-time }
+              evidenceIds:
+                type: array
+                items: { type: string }
+        confidenceShifts:
+          type: array
+          items:
+            type: object
+            required: [from, to, delta, triggerEvidenceId, summary]
+            properties:
+              from: { type: number, format: float }
+              to: { type: number, format: float }
+              delta: { type: number, format: float }
+              triggerEvidenceId: { type: string }
+              summary: { type: string }
+        overrideDynamics:
+          type: array
+          items:
+            type: object
+            required: [overrideId, confidenceAtOverride, counterEvidenceCount, summary]
+            properties:
+              overrideId: { type: string }
+              confidenceAtOverride: { type: number, format: float }
+              counterEvidenceCount: { type: integer }
+              summary: { type: string }
+        pressurePoints:
+          type: array
+          items: { type: string }
+        caveat: { type: string }
+    ReviewerReliability:
+      type: object
+      required:
+        - reviewerId
+        - displayName
+        - predictions
+        - meanClaimed
+        - meanRealized
+        - expectedCalibrationError
+        - brierScore
+        - drift
+        - topics
+      properties:
+        reviewerId: { type: string }
+        displayName: { type: string }
+        predictions: { type: integer }
+        meanClaimed: { type: number, format: float }
+        meanRealized: { type: number, format: float }
+        expectedCalibrationError: { type: number, format: float }
+        brierScore: { type: number, format: float }
+        drift: { type: number, format: float }
+        topics:
+          type: array
+          items: { type: string }
+    ATSCalibrationBucket:
+      type: object
+      required: [range, lower, upper, claimed, actual, count, overconfident]
+      properties:
+        range: { type: string }
+        lower: { type: number, format: float }
+        upper: { type: number, format: float }
+        claimed: { type: number, format: float }
+        actual: { type: number, format: float }
+        count: { type: integer }
+        overconfident: { type: boolean }
+    ATSCalibrationReport:
+      type: object
+      required:
+        - orgId
+        - expectedCalibrationError
+        - brierScore
+        - buckets
+        - reviewers
+        - measuredAt
+        - caveat
+      properties:
+        orgId: { type: string }
+        expectedCalibrationError: { type: number, format: float }
+        brierScore: { type: number, format: float }
+        buckets:
+          type: array
+          items: { $ref: "#/components/schemas/ATSCalibrationBucket" }
+        reviewers:
+          type: array
+          items: { $ref: "#/components/schemas/ReviewerReliability" }
+        measuredAt: { type: string, format: date-time }
+        caveat: { type: string }
+    DisagreementSummary:
+      type: object
+      required: [replayId, candidateName, topic, spread, highReviewer, lowReviewer]
+      properties:
+        replayId: { type: string }
+        candidateName: { type: string }
+        topic: { type: string }
+        spread: { type: number, format: float }
+        highReviewer: { type: string }
+        lowReviewer: { type: string }
+        resolution:
+          type: string
+          enum: [consensus, override, unresolved]
+    ATSDisagreementList:
+      type: object
+      required: [disagreements]
+      properties:
+        disagreements:
+          type: array
+          items: { $ref: "#/components/schemas/DisagreementSummary" }
+    ATSReviewerList:
+      type: object
+      required: [reviewers]
+      properties:
+        reviewers:
+          type: array
+          items: { $ref: "#/components/schemas/ReviewerReliability" }
+    DiffTone:
+      type: string
+      enum: [neutral, left-heavy, right-heavy, even]
+    CountDelta:
+      type: object
+      required: [label, left, right, delta, tone]
+      properties:
+        label: { type: string }
+        left: { type: number, format: float }
+        right: { type: number, format: float }
+        delta: { type: number, format: float }
+        tone: { $ref: "#/components/schemas/DiffTone" }
+    TrajectoryDelta:
+      type: object
+      required: [leftFinal, rightFinal, leftVolatility, rightVolatility]
+      properties:
+        leftFinal: { type: number, format: float }
+        rightFinal: { type: number, format: float }
+        leftVolatility: { type: number, format: float }
+        rightVolatility: { type: number, format: float }
+    ReplayDiff:
+      type: object
+      required:
+        - left
+        - right
+        - commonReviewers
+        - leftOnlyReviewers
+        - rightOnlyReviewers
+        - outcomeAlignment
+        - counts
+        - trajectory
+        - headline
+        - computedAt
+      properties:
+        left:
+          type: object
+          required: [id, signature, outcome]
+          properties:
+            id: { type: string }
+            signature: { type: string }
+            outcome: { type: string }
+        right:
+          type: object
+          required: [id, signature, outcome]
+          properties:
+            id: { type: string }
+            signature: { type: string }
+            outcome: { type: string }
+        commonReviewers:
+          type: array
+          items: { type: string }
+        leftOnlyReviewers:
+          type: array
+          items: { type: string }
+        rightOnlyReviewers:
+          type: array
+          items: { type: string }
+        outcomeAlignment:
+          type: string
+          enum: [same, different, one-open]
+        counts:
+          type: array
+          items: { $ref: "#/components/schemas/CountDelta" }
+        trajectory: { $ref: "#/components/schemas/TrajectoryDelta" }
+        headline: { type: string }
+        computedAt: { type: string, format: date-time }
+    ATSCompareResponse:
+      type: object
+      required: [a, b, diff]
+      properties:
+        a: { $ref: "#/components/schemas/HiringDecisionReplay" }
+        b: { $ref: "#/components/schemas/HiringDecisionReplay" }
+        diff: { $ref: "#/components/schemas/ReplayDiff" }
     SecurityOrganizationTier:
       type: string
       enum: [founder, growth, enterprise, demo]

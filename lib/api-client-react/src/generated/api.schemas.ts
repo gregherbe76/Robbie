@@ -8,6 +8,455 @@ graph snapshots, reports and the system overview used by the console.
 
  * OpenAPI spec version: 0.1.0
  */
+export type ATSProvider = typeof ATSProvider[keyof typeof ATSProvider];
+
+
+export const ATSProvider = {
+  ashby: 'ashby',
+  greenhouse: 'greenhouse',
+  synthetic: 'synthetic',
+} as const;
+
+export type ATSHiringOutcome = typeof ATSHiringOutcome[keyof typeof ATSHiringOutcome];
+
+
+export const ATSHiringOutcome = {
+  hired: 'hired',
+  declined: 'declined',
+  withdrawn: 'withdrawn',
+  open: 'open',
+} as const;
+
+export type ATSConnectionStatus = typeof ATSConnectionStatus[keyof typeof ATSConnectionStatus];
+
+
+export const ATSConnectionStatus = {
+  connected: 'connected',
+  unconfigured: 'unconfigured',
+  error: 'error',
+} as const;
+
+export interface ATSReviewer {
+  id: string;
+  displayName: string;
+  role?: string;
+}
+
+export type ATSConnectionLastSyncCounts = {[key: string]: number};
+
+export interface ATSConnection {
+  id: string;
+  provider: ATSProvider;
+  label: string;
+  status: ATSConnectionStatus;
+  connectedAt: string;
+  workspaceHint?: string;
+  statusDetail: string;
+  lastSyncedAt?: string;
+  lastSyncCounts?: ATSConnectionLastSyncCounts;
+}
+
+export interface ATSConnectionList {
+  connections: ATSConnection[];
+}
+
+export interface ATSConnectRequest {
+  provider: ATSProvider;
+}
+
+export interface ATSConnectResponse {
+  connection: ATSConnection;
+}
+
+export interface ATSSyncRequest {
+  connectionId: string;
+}
+
+export interface SyncResult {
+  connectionId: string;
+  candidatesSeen: number;
+  replaysBuilt: number;
+  rawRecordsIngested: number;
+  normalizedEvidence: number;
+  durationMs: number;
+  startedAt: string;
+  completedAt: string;
+}
+
+export interface ATSSyncResponse {
+  result: SyncResult;
+}
+
+export interface ATSWebhookEvent {
+  kind?: string;
+  atsId?: string;
+}
+
+export interface ATSWebhookRequest {
+  connectionId: string;
+  event: ATSWebhookEvent;
+}
+
+export interface ATSWebhookResponse {
+  acknowledged: boolean;
+  provider: ATSProvider;
+  connectionId: string;
+  event: ATSWebhookEvent;
+  replayDelta: number;
+  sync: SyncResult;
+}
+
+export type NormalizedEvidenceKind = typeof NormalizedEvidenceKind[keyof typeof NormalizedEvidenceKind];
+
+
+export const NormalizedEvidenceKind = {
+  explicit_claim: 'explicit_claim',
+  reviewer_assessment: 'reviewer_assessment',
+  contradiction_signal: 'contradiction_signal',
+  uncertainty_signal: 'uncertainty_signal',
+  escalation_signal: 'escalation_signal',
+  override_signal: 'override_signal',
+  calibration_signal: 'calibration_signal',
+} as const;
+
+export type ATSObjectKind = typeof ATSObjectKind[keyof typeof ATSObjectKind];
+
+
+export const ATSObjectKind = {
+  candidate: 'candidate',
+  application: 'application',
+  interview_plan: 'interview_plan',
+  interview: 'interview',
+  scorecard: 'scorecard',
+  interview_kit: 'interview_kit',
+  feedback: 'feedback',
+  note: 'note',
+  activity: 'activity',
+  decision: 'decision',
+  approval: 'approval',
+  rejection_rationale: 'rejection_rationale',
+  reviewer: 'reviewer',
+} as const;
+
+export interface NormalizedEvidence {
+  id: string;
+  kind: NormalizedEvidenceKind;
+  provider: ATSProvider;
+  sourceAtsId: string;
+  sourceKind: ATSObjectKind;
+  reviewer?: ATSReviewer;
+  summary: string;
+  detail?: string;
+  occurredAt: string;
+  ingestedAt: string;
+  payloadHash: string;
+  provenanceChain: string[];
+  reviewerConfidence?: number;
+  assessmentScore?: number;
+  topic?: string;
+}
+
+export type ReviewerDisagreementHigh = {
+  reviewerId: string;
+  score: number;
+  summary: string;
+};
+
+export type ReviewerDisagreementLow = {
+  reviewerId: string;
+  score: number;
+  summary: string;
+};
+
+export type ReviewerDisagreementResolution = typeof ReviewerDisagreementResolution[keyof typeof ReviewerDisagreementResolution];
+
+
+export const ReviewerDisagreementResolution = {
+  consensus: 'consensus',
+  override: 'override',
+  unresolved: 'unresolved',
+} as const;
+
+export interface ReviewerDisagreement {
+  id: string;
+  topic: string;
+  reviewers: ATSReviewer[];
+  spread: number;
+  high: ReviewerDisagreementHigh;
+  low: ReviewerDisagreementLow;
+  resolvedAt?: string;
+  resolution?: ReviewerDisagreementResolution;
+}
+
+export type EscalationMomentTrigger = typeof EscalationMomentTrigger[keyof typeof EscalationMomentTrigger];
+
+
+export const EscalationMomentTrigger = {
+  'additional-loop': 'additional-loop',
+  'loop-extension': 'loop-extension',
+  'hiring-manager-intervention': 'hiring-manager-intervention',
+  'founder-intervention': 'founder-intervention',
+  'bar-recalibration': 'bar-recalibration',
+  'compensation-exception': 'compensation-exception',
+} as const;
+
+export interface EscalationMoment {
+  id: string;
+  occurredAt: string;
+  trigger: EscalationMomentTrigger;
+  summary: string;
+  evidenceIds: string[];
+}
+
+export type OverrideMomentOverrides = typeof OverrideMomentOverrides[keyof typeof OverrideMomentOverrides];
+
+
+export const OverrideMomentOverrides = {
+  decline: 'decline',
+  advance: 'advance',
+  hold: 'hold',
+} as const;
+
+export interface OverrideMoment {
+  id: string;
+  occurredAt: string;
+  byReviewerId: string;
+  overrides: OverrideMomentOverrides;
+  rationale: string;
+  evidenceIds: string[];
+}
+
+export interface ConfidencePoint {
+  occurredAt: string;
+  estimate: number;
+  evidenceIds: string[];
+}
+
+export interface HiringDecisionReplay {
+  id: string;
+  connectionId: string;
+  provider: ATSProvider;
+  candidateAtsId: string;
+  candidateName: string;
+  targetRole: string;
+  organization: string;
+  openedAt: string;
+  closedAt?: string;
+  outcome: ATSHiringOutcome;
+  reviewers: ATSReviewer[];
+  evidence: NormalizedEvidence[];
+  disagreements: ReviewerDisagreement[];
+  escalations: EscalationMoment[];
+  overrides: OverrideMoment[];
+  confidenceTrajectory: ConfidencePoint[];
+  unresolvedTensions: string[];
+  signature: string;
+}
+
+export interface ATSReplaySummary {
+  id: string;
+  connectionId: string;
+  provider: ATSProvider;
+  candidateName: string;
+  targetRole: string;
+  organization: string;
+  openedAt: string;
+  closedAt?: string;
+  outcome: ATSHiringOutcome;
+  reviewerCount: number;
+  evidenceCount: number;
+  disagreementCount: number;
+  escalationCount: number;
+  overrideCount: number;
+  signature: string;
+}
+
+export interface ATSReplaySummaryList {
+  replays: ATSReplaySummary[];
+}
+
+export interface ReplaySignatureRecord {
+  replayId: string;
+  storedSignature: string;
+  recomputedSignature: string;
+  match: boolean;
+  verifiedAt: string;
+}
+
+export interface DisagreementClusterNode {
+  reviewerId: string;
+  displayName: string;
+  meanScore: number;
+  topics: string[];
+}
+
+export interface DisagreementClusterEdge {
+  from: string;
+  to: string;
+  weight: number;
+  topics: string[];
+}
+
+export type ReasoningReconstructionDisagreementGraph = {
+  nodes: DisagreementClusterNode[];
+  edges: DisagreementClusterEdge[];
+};
+
+export type ReasoningReconstructionEscalationPatternsItem = {
+  pattern: string;
+  occurredAt: string;
+  evidenceIds: string[];
+};
+
+export type ReasoningReconstructionConfidenceShiftsItem = {
+  from: number;
+  to: number;
+  delta: number;
+  triggerEvidenceId: string;
+  summary: string;
+};
+
+export type ReasoningReconstructionOverrideDynamicsItem = {
+  overrideId: string;
+  confidenceAtOverride: number;
+  counterEvidenceCount: number;
+  summary: string;
+};
+
+export interface ReasoningReconstruction {
+  replayId: string;
+  disagreementGraph: ReasoningReconstructionDisagreementGraph;
+  escalationPatterns: ReasoningReconstructionEscalationPatternsItem[];
+  confidenceShifts: ReasoningReconstructionConfidenceShiftsItem[];
+  overrideDynamics: ReasoningReconstructionOverrideDynamicsItem[];
+  pressurePoints: string[];
+  caveat: string;
+}
+
+export interface ReviewerReliability {
+  reviewerId: string;
+  displayName: string;
+  predictions: number;
+  meanClaimed: number;
+  meanRealized: number;
+  expectedCalibrationError: number;
+  brierScore: number;
+  drift: number;
+  topics: string[];
+}
+
+export interface ATSCalibrationBucket {
+  range: string;
+  lower: number;
+  upper: number;
+  claimed: number;
+  actual: number;
+  count: number;
+  overconfident: boolean;
+}
+
+export interface ATSCalibrationReport {
+  orgId: string;
+  expectedCalibrationError: number;
+  brierScore: number;
+  buckets: ATSCalibrationBucket[];
+  reviewers: ReviewerReliability[];
+  measuredAt: string;
+  caveat: string;
+}
+
+export type DisagreementSummaryResolution = typeof DisagreementSummaryResolution[keyof typeof DisagreementSummaryResolution];
+
+
+export const DisagreementSummaryResolution = {
+  consensus: 'consensus',
+  override: 'override',
+  unresolved: 'unresolved',
+} as const;
+
+export interface DisagreementSummary {
+  replayId: string;
+  candidateName: string;
+  topic: string;
+  spread: number;
+  highReviewer: string;
+  lowReviewer: string;
+  resolution?: DisagreementSummaryResolution;
+}
+
+export interface ATSDisagreementList {
+  disagreements: DisagreementSummary[];
+}
+
+export interface ATSReviewerList {
+  reviewers: ReviewerReliability[];
+}
+
+export type DiffTone = typeof DiffTone[keyof typeof DiffTone];
+
+
+export const DiffTone = {
+  neutral: 'neutral',
+  'left-heavy': 'left-heavy',
+  'right-heavy': 'right-heavy',
+  even: 'even',
+} as const;
+
+export interface CountDelta {
+  label: string;
+  left: number;
+  right: number;
+  delta: number;
+  tone: DiffTone;
+}
+
+export interface TrajectoryDelta {
+  leftFinal: number;
+  rightFinal: number;
+  leftVolatility: number;
+  rightVolatility: number;
+}
+
+export type ReplayDiffLeft = {
+  id: string;
+  signature: string;
+  outcome: string;
+};
+
+export type ReplayDiffRight = {
+  id: string;
+  signature: string;
+  outcome: string;
+};
+
+export type ReplayDiffOutcomeAlignment = typeof ReplayDiffOutcomeAlignment[keyof typeof ReplayDiffOutcomeAlignment];
+
+
+export const ReplayDiffOutcomeAlignment = {
+  same: 'same',
+  different: 'different',
+  'one-open': 'one-open',
+} as const;
+
+export interface ReplayDiff {
+  left: ReplayDiffLeft;
+  right: ReplayDiffRight;
+  commonReviewers: string[];
+  leftOnlyReviewers: string[];
+  rightOnlyReviewers: string[];
+  outcomeAlignment: ReplayDiffOutcomeAlignment;
+  counts: CountDelta[];
+  trajectory: TrajectoryDelta;
+  headline: string;
+  computedAt: string;
+}
+
+export interface ATSCompareResponse {
+  a: HiringDecisionReplay;
+  b: HiringDecisionReplay;
+  diff: ReplayDiff;
+}
+
 export type SecurityOrganizationTier = typeof SecurityOrganizationTier[keyof typeof SecurityOrganizationTier];
 
 
@@ -2863,4 +3312,15 @@ export interface LabRunSignature {
   runId: string;
   signature: string;
 }
+
+export type CompareATSReplaysParams = {
+/**
+ * Replay id for the left side of the diff.
+ */
+a: string;
+/**
+ * Replay id for the right side of the diff.
+ */
+b: string;
+};
 

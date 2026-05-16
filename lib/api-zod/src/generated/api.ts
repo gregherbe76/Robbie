@@ -3537,3 +3537,562 @@ export const GetLabRunSignatureResponse = zod.object({
 })
 
 
+/**
+ * @summary List registered ATS connections
+ */
+export const ListATSConnectionsResponse = zod.object({
+  "connections": zod.array(zod.object({
+  "id": zod.string(),
+  "provider": zod.enum(['ashby', 'greenhouse', 'synthetic']),
+  "label": zod.string(),
+  "status": zod.enum(['connected', 'unconfigured', 'error']),
+  "connectedAt": zod.coerce.date(),
+  "workspaceHint": zod.string().optional(),
+  "statusDetail": zod.string(),
+  "lastSyncedAt": zod.coerce.date().optional(),
+  "lastSyncCounts": zod.record(zod.string(), zod.number()).optional()
+}))
+})
+
+
+/**
+ * The framework registers all supported adapters at boot. This
+endpoint surfaces friendly errors when an operator tries to
+connect a provider whose credentials are missing. No inline
+credentials are accepted — secrets must be configured via the
+environment.
+
+ * @summary Acknowledge an ATS connection (no-op when env keys missing)
+ */
+export const ConnectATSBody = zod.object({
+  "provider": zod.enum(['ashby', 'greenhouse', 'synthetic'])
+})
+
+export const ConnectATSResponse = zod.object({
+  "connection": zod.object({
+  "id": zod.string(),
+  "provider": zod.enum(['ashby', 'greenhouse', 'synthetic']),
+  "label": zod.string(),
+  "status": zod.enum(['connected', 'unconfigured', 'error']),
+  "connectedAt": zod.coerce.date(),
+  "workspaceHint": zod.string().optional(),
+  "statusDetail": zod.string(),
+  "lastSyncedAt": zod.coerce.date().optional(),
+  "lastSyncCounts": zod.record(zod.string(), zod.number()).optional()
+})
+})
+
+
+/**
+ * @summary Sync a connection — read-only, deterministic
+ */
+export const SyncATSConnectionBody = zod.object({
+  "connectionId": zod.string()
+})
+
+export const SyncATSConnectionResponse = zod.object({
+  "result": zod.object({
+  "connectionId": zod.string(),
+  "candidatesSeen": zod.number(),
+  "replaysBuilt": zod.number(),
+  "rawRecordsIngested": zod.number(),
+  "normalizedEvidence": zod.number(),
+  "durationMs": zod.number(),
+  "startedAt": zod.coerce.date(),
+  "completedAt": zod.coerce.date()
+})
+})
+
+
+/**
+ * Acknowledges a provider-signed webhook event and re-syncs the
+affected connection. The framework never writes back to the
+ATS in response to a webhook. Provider signature verification
+is the adapter's responsibility before reaching this handler.
+
+ * @summary Append-only webhook ingestion for ATS events
+ */
+export const IngestATSWebhookParams = zod.object({
+  "provider": zod.enum(['ashby', 'greenhouse', 'synthetic'])
+})
+
+export const IngestATSWebhookBody = zod.object({
+  "connectionId": zod.string(),
+  "event": zod.object({
+  "kind": zod.string().optional(),
+  "atsId": zod.string().optional()
+})
+})
+
+export const IngestATSWebhookResponse = zod.object({
+  "acknowledged": zod.boolean(),
+  "provider": zod.enum(['ashby', 'greenhouse', 'synthetic']),
+  "connectionId": zod.string(),
+  "event": zod.object({
+  "kind": zod.string().optional(),
+  "atsId": zod.string().optional()
+}),
+  "replayDelta": zod.number(),
+  "sync": zod.object({
+  "connectionId": zod.string(),
+  "candidatesSeen": zod.number(),
+  "replaysBuilt": zod.number(),
+  "rawRecordsIngested": zod.number(),
+  "normalizedEvidence": zod.number(),
+  "durationMs": zod.number(),
+  "startedAt": zod.coerce.date(),
+  "completedAt": zod.coerce.date()
+})
+})
+
+
+/**
+ * @summary List hiring decision replays (summary rows)
+ */
+export const ListATSReplaysResponse = zod.object({
+  "replays": zod.array(zod.object({
+  "id": zod.string(),
+  "connectionId": zod.string(),
+  "provider": zod.enum(['ashby', 'greenhouse', 'synthetic']),
+  "candidateName": zod.string(),
+  "targetRole": zod.string(),
+  "organization": zod.string(),
+  "openedAt": zod.coerce.date(),
+  "closedAt": zod.coerce.date().optional(),
+  "outcome": zod.enum(['hired', 'declined', 'withdrawn', 'open']),
+  "reviewerCount": zod.number(),
+  "evidenceCount": zod.number(),
+  "disagreementCount": zod.number(),
+  "escalationCount": zod.number(),
+  "overrideCount": zod.number(),
+  "signature": zod.string()
+}))
+})
+
+
+/**
+ * @summary Fetch a single hiring decision replay
+ */
+export const GetATSReplayParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetATSReplayResponse = zod.object({
+  "id": zod.string(),
+  "connectionId": zod.string(),
+  "provider": zod.enum(['ashby', 'greenhouse', 'synthetic']),
+  "candidateAtsId": zod.string(),
+  "candidateName": zod.string(),
+  "targetRole": zod.string(),
+  "organization": zod.string(),
+  "openedAt": zod.coerce.date(),
+  "closedAt": zod.coerce.date().optional(),
+  "outcome": zod.enum(['hired', 'declined', 'withdrawn', 'open']),
+  "reviewers": zod.array(zod.object({
+  "id": zod.string(),
+  "displayName": zod.string(),
+  "role": zod.string().optional()
+})),
+  "evidence": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['explicit_claim', 'reviewer_assessment', 'contradiction_signal', 'uncertainty_signal', 'escalation_signal', 'override_signal', 'calibration_signal']),
+  "provider": zod.enum(['ashby', 'greenhouse', 'synthetic']),
+  "sourceAtsId": zod.string(),
+  "sourceKind": zod.enum(['candidate', 'application', 'interview_plan', 'interview', 'scorecard', 'interview_kit', 'feedback', 'note', 'activity', 'decision', 'approval', 'rejection_rationale', 'reviewer']),
+  "reviewer": zod.object({
+  "id": zod.string(),
+  "displayName": zod.string(),
+  "role": zod.string().optional()
+}).optional(),
+  "summary": zod.string(),
+  "detail": zod.string().optional(),
+  "occurredAt": zod.coerce.date(),
+  "ingestedAt": zod.coerce.date(),
+  "payloadHash": zod.string(),
+  "provenanceChain": zod.array(zod.string()),
+  "reviewerConfidence": zod.number().optional(),
+  "assessmentScore": zod.number().optional(),
+  "topic": zod.string().optional()
+})),
+  "disagreements": zod.array(zod.object({
+  "id": zod.string(),
+  "topic": zod.string(),
+  "reviewers": zod.array(zod.object({
+  "id": zod.string(),
+  "displayName": zod.string(),
+  "role": zod.string().optional()
+})),
+  "spread": zod.number(),
+  "high": zod.object({
+  "reviewerId": zod.string(),
+  "score": zod.number(),
+  "summary": zod.string()
+}),
+  "low": zod.object({
+  "reviewerId": zod.string(),
+  "score": zod.number(),
+  "summary": zod.string()
+}),
+  "resolvedAt": zod.coerce.date().optional(),
+  "resolution": zod.enum(['consensus', 'override', 'unresolved']).optional()
+})),
+  "escalations": zod.array(zod.object({
+  "id": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "trigger": zod.enum(['additional-loop', 'loop-extension', 'hiring-manager-intervention', 'founder-intervention', 'bar-recalibration', 'compensation-exception']),
+  "summary": zod.string(),
+  "evidenceIds": zod.array(zod.string())
+})),
+  "overrides": zod.array(zod.object({
+  "id": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "byReviewerId": zod.string(),
+  "overrides": zod.enum(['decline', 'advance', 'hold']),
+  "rationale": zod.string(),
+  "evidenceIds": zod.array(zod.string())
+})),
+  "confidenceTrajectory": zod.array(zod.object({
+  "occurredAt": zod.coerce.date(),
+  "estimate": zod.number(),
+  "evidenceIds": zod.array(zod.string())
+})),
+  "unresolvedTensions": zod.array(zod.string()),
+  "signature": zod.string()
+})
+
+
+/**
+ * @summary Recompute and compare a replay signature
+ */
+export const VerifyATSReplayParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const VerifyATSReplayResponse = zod.object({
+  "replayId": zod.string(),
+  "storedSignature": zod.string(),
+  "recomputedSignature": zod.string(),
+  "match": zod.boolean(),
+  "verifiedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Reconstruct reviewer reasoning for a replay
+ */
+export const GetATSReplayReasoningParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetATSReplayReasoningResponse = zod.object({
+  "replayId": zod.string(),
+  "disagreementGraph": zod.object({
+  "nodes": zod.array(zod.object({
+  "reviewerId": zod.string(),
+  "displayName": zod.string(),
+  "meanScore": zod.number(),
+  "topics": zod.array(zod.string())
+})),
+  "edges": zod.array(zod.object({
+  "from": zod.string(),
+  "to": zod.string(),
+  "weight": zod.number(),
+  "topics": zod.array(zod.string())
+}))
+}),
+  "escalationPatterns": zod.array(zod.object({
+  "pattern": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "evidenceIds": zod.array(zod.string())
+})),
+  "confidenceShifts": zod.array(zod.object({
+  "from": zod.number(),
+  "to": zod.number(),
+  "delta": zod.number(),
+  "triggerEvidenceId": zod.string(),
+  "summary": zod.string()
+})),
+  "overrideDynamics": zod.array(zod.object({
+  "overrideId": zod.string(),
+  "confidenceAtOverride": zod.number(),
+  "counterEvidenceCount": zod.number(),
+  "summary": zod.string()
+})),
+  "pressurePoints": zod.array(zod.string()),
+  "caveat": zod.string()
+})
+
+
+/**
+ * @summary Organization calibration report (uses synthetic outcomes)
+ */
+export const GetATSCalibrationResponse = zod.object({
+  "orgId": zod.string(),
+  "expectedCalibrationError": zod.number(),
+  "brierScore": zod.number(),
+  "buckets": zod.array(zod.object({
+  "range": zod.string(),
+  "lower": zod.number(),
+  "upper": zod.number(),
+  "claimed": zod.number(),
+  "actual": zod.number(),
+  "count": zod.number(),
+  "overconfident": zod.boolean()
+})),
+  "reviewers": zod.array(zod.object({
+  "reviewerId": zod.string(),
+  "displayName": zod.string(),
+  "predictions": zod.number(),
+  "meanClaimed": zod.number(),
+  "meanRealized": zod.number(),
+  "expectedCalibrationError": zod.number(),
+  "brierScore": zod.number(),
+  "drift": zod.number(),
+  "topics": zod.array(zod.string())
+})),
+  "measuredAt": zod.coerce.date(),
+  "caveat": zod.string()
+})
+
+
+/**
+ * @summary Flat list of reviewer disagreements across all replays
+ */
+export const ListATSDisagreementsResponse = zod.object({
+  "disagreements": zod.array(zod.object({
+  "replayId": zod.string(),
+  "candidateName": zod.string(),
+  "topic": zod.string(),
+  "spread": zod.number(),
+  "highReviewer": zod.string(),
+  "lowReviewer": zod.string(),
+  "resolution": zod.enum(['consensus', 'override', 'unresolved']).optional()
+}))
+})
+
+
+/**
+ * @summary Reviewer reliability rows from the calibration report
+ */
+export const ListATSReviewersResponse = zod.object({
+  "reviewers": zod.array(zod.object({
+  "reviewerId": zod.string(),
+  "displayName": zod.string(),
+  "predictions": zod.number(),
+  "meanClaimed": zod.number(),
+  "meanRealized": zod.number(),
+  "expectedCalibrationError": zod.number(),
+  "brierScore": zod.number(),
+  "drift": zod.number(),
+  "topics": zod.array(zod.string())
+}))
+})
+
+
+/**
+ * @summary Two replays plus a structured diff
+ */
+export const CompareATSReplaysQueryParams = zod.object({
+  "a": zod.coerce.string().describe('Replay id for the left side of the diff.'),
+  "b": zod.coerce.string().describe('Replay id for the right side of the diff.')
+})
+
+export const CompareATSReplaysResponse = zod.object({
+  "a": zod.object({
+  "id": zod.string(),
+  "connectionId": zod.string(),
+  "provider": zod.enum(['ashby', 'greenhouse', 'synthetic']),
+  "candidateAtsId": zod.string(),
+  "candidateName": zod.string(),
+  "targetRole": zod.string(),
+  "organization": zod.string(),
+  "openedAt": zod.coerce.date(),
+  "closedAt": zod.coerce.date().optional(),
+  "outcome": zod.enum(['hired', 'declined', 'withdrawn', 'open']),
+  "reviewers": zod.array(zod.object({
+  "id": zod.string(),
+  "displayName": zod.string(),
+  "role": zod.string().optional()
+})),
+  "evidence": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['explicit_claim', 'reviewer_assessment', 'contradiction_signal', 'uncertainty_signal', 'escalation_signal', 'override_signal', 'calibration_signal']),
+  "provider": zod.enum(['ashby', 'greenhouse', 'synthetic']),
+  "sourceAtsId": zod.string(),
+  "sourceKind": zod.enum(['candidate', 'application', 'interview_plan', 'interview', 'scorecard', 'interview_kit', 'feedback', 'note', 'activity', 'decision', 'approval', 'rejection_rationale', 'reviewer']),
+  "reviewer": zod.object({
+  "id": zod.string(),
+  "displayName": zod.string(),
+  "role": zod.string().optional()
+}).optional(),
+  "summary": zod.string(),
+  "detail": zod.string().optional(),
+  "occurredAt": zod.coerce.date(),
+  "ingestedAt": zod.coerce.date(),
+  "payloadHash": zod.string(),
+  "provenanceChain": zod.array(zod.string()),
+  "reviewerConfidence": zod.number().optional(),
+  "assessmentScore": zod.number().optional(),
+  "topic": zod.string().optional()
+})),
+  "disagreements": zod.array(zod.object({
+  "id": zod.string(),
+  "topic": zod.string(),
+  "reviewers": zod.array(zod.object({
+  "id": zod.string(),
+  "displayName": zod.string(),
+  "role": zod.string().optional()
+})),
+  "spread": zod.number(),
+  "high": zod.object({
+  "reviewerId": zod.string(),
+  "score": zod.number(),
+  "summary": zod.string()
+}),
+  "low": zod.object({
+  "reviewerId": zod.string(),
+  "score": zod.number(),
+  "summary": zod.string()
+}),
+  "resolvedAt": zod.coerce.date().optional(),
+  "resolution": zod.enum(['consensus', 'override', 'unresolved']).optional()
+})),
+  "escalations": zod.array(zod.object({
+  "id": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "trigger": zod.enum(['additional-loop', 'loop-extension', 'hiring-manager-intervention', 'founder-intervention', 'bar-recalibration', 'compensation-exception']),
+  "summary": zod.string(),
+  "evidenceIds": zod.array(zod.string())
+})),
+  "overrides": zod.array(zod.object({
+  "id": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "byReviewerId": zod.string(),
+  "overrides": zod.enum(['decline', 'advance', 'hold']),
+  "rationale": zod.string(),
+  "evidenceIds": zod.array(zod.string())
+})),
+  "confidenceTrajectory": zod.array(zod.object({
+  "occurredAt": zod.coerce.date(),
+  "estimate": zod.number(),
+  "evidenceIds": zod.array(zod.string())
+})),
+  "unresolvedTensions": zod.array(zod.string()),
+  "signature": zod.string()
+}),
+  "b": zod.object({
+  "id": zod.string(),
+  "connectionId": zod.string(),
+  "provider": zod.enum(['ashby', 'greenhouse', 'synthetic']),
+  "candidateAtsId": zod.string(),
+  "candidateName": zod.string(),
+  "targetRole": zod.string(),
+  "organization": zod.string(),
+  "openedAt": zod.coerce.date(),
+  "closedAt": zod.coerce.date().optional(),
+  "outcome": zod.enum(['hired', 'declined', 'withdrawn', 'open']),
+  "reviewers": zod.array(zod.object({
+  "id": zod.string(),
+  "displayName": zod.string(),
+  "role": zod.string().optional()
+})),
+  "evidence": zod.array(zod.object({
+  "id": zod.string(),
+  "kind": zod.enum(['explicit_claim', 'reviewer_assessment', 'contradiction_signal', 'uncertainty_signal', 'escalation_signal', 'override_signal', 'calibration_signal']),
+  "provider": zod.enum(['ashby', 'greenhouse', 'synthetic']),
+  "sourceAtsId": zod.string(),
+  "sourceKind": zod.enum(['candidate', 'application', 'interview_plan', 'interview', 'scorecard', 'interview_kit', 'feedback', 'note', 'activity', 'decision', 'approval', 'rejection_rationale', 'reviewer']),
+  "reviewer": zod.object({
+  "id": zod.string(),
+  "displayName": zod.string(),
+  "role": zod.string().optional()
+}).optional(),
+  "summary": zod.string(),
+  "detail": zod.string().optional(),
+  "occurredAt": zod.coerce.date(),
+  "ingestedAt": zod.coerce.date(),
+  "payloadHash": zod.string(),
+  "provenanceChain": zod.array(zod.string()),
+  "reviewerConfidence": zod.number().optional(),
+  "assessmentScore": zod.number().optional(),
+  "topic": zod.string().optional()
+})),
+  "disagreements": zod.array(zod.object({
+  "id": zod.string(),
+  "topic": zod.string(),
+  "reviewers": zod.array(zod.object({
+  "id": zod.string(),
+  "displayName": zod.string(),
+  "role": zod.string().optional()
+})),
+  "spread": zod.number(),
+  "high": zod.object({
+  "reviewerId": zod.string(),
+  "score": zod.number(),
+  "summary": zod.string()
+}),
+  "low": zod.object({
+  "reviewerId": zod.string(),
+  "score": zod.number(),
+  "summary": zod.string()
+}),
+  "resolvedAt": zod.coerce.date().optional(),
+  "resolution": zod.enum(['consensus', 'override', 'unresolved']).optional()
+})),
+  "escalations": zod.array(zod.object({
+  "id": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "trigger": zod.enum(['additional-loop', 'loop-extension', 'hiring-manager-intervention', 'founder-intervention', 'bar-recalibration', 'compensation-exception']),
+  "summary": zod.string(),
+  "evidenceIds": zod.array(zod.string())
+})),
+  "overrides": zod.array(zod.object({
+  "id": zod.string(),
+  "occurredAt": zod.coerce.date(),
+  "byReviewerId": zod.string(),
+  "overrides": zod.enum(['decline', 'advance', 'hold']),
+  "rationale": zod.string(),
+  "evidenceIds": zod.array(zod.string())
+})),
+  "confidenceTrajectory": zod.array(zod.object({
+  "occurredAt": zod.coerce.date(),
+  "estimate": zod.number(),
+  "evidenceIds": zod.array(zod.string())
+})),
+  "unresolvedTensions": zod.array(zod.string()),
+  "signature": zod.string()
+}),
+  "diff": zod.object({
+  "left": zod.object({
+  "id": zod.string(),
+  "signature": zod.string(),
+  "outcome": zod.string()
+}),
+  "right": zod.object({
+  "id": zod.string(),
+  "signature": zod.string(),
+  "outcome": zod.string()
+}),
+  "commonReviewers": zod.array(zod.string()),
+  "leftOnlyReviewers": zod.array(zod.string()),
+  "rightOnlyReviewers": zod.array(zod.string()),
+  "outcomeAlignment": zod.enum(['same', 'different', 'one-open']),
+  "counts": zod.array(zod.object({
+  "label": zod.string(),
+  "left": zod.number(),
+  "right": zod.number(),
+  "delta": zod.number(),
+  "tone": zod.enum(['neutral', 'left-heavy', 'right-heavy', 'even'])
+})),
+  "trajectory": zod.object({
+  "leftFinal": zod.number(),
+  "rightFinal": zod.number(),
+  "leftVolatility": zod.number(),
+  "rightVolatility": zod.number()
+}),
+  "headline": zod.string(),
+  "computedAt": zod.coerce.date()
+})
+})
+
+

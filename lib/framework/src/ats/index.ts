@@ -29,3 +29,10 @@ export { buildCalibrationReport, type OutcomeRecord } from "./calibration.js";
 export { verifyReplaySignature } from "./audit.js";
 export { ATSIngestionGateway } from "./ingestion_gateway.js";
 export { shortSignature, canonicalStringify } from "./signature.js";
+export {
+  buildReplayDiff,
+  type ReplayDiff,
+  type CountDelta,
+  type TrajectoryDelta,
+  type DiffTone,
+} from "./replay_diff.js";
