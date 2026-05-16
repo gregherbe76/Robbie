@@ -1,0 +1,269 @@
+Do the 3 follow-ups.
+
+All three are high-leverage and low-cost.
+
+Especially now that:
+
+```txt id="u8m4qx"
+the repo’s core claim is deterministic replay integrity
+```
+
+You should aggressively harden anything around:
+
+* replay signatures,
+* canonicalization,
+* replay semantics,
+* forensic traceability.
+
+---
+
+# 1. Pin signatures as regression tests
+
+This should absolutely exist.
+
+Because right now:
+
+```txt id="g7v1pk"
+determinism is a philosophical claim
+```
+
+You want it to become:
+
+```txt id="r5m8tw"
+a continuously enforced invariant
+```
+
+Very important difference.
+
+---
+
+# Why this matters
+
+Without pinned replay tests:
+future contributors can accidentally:
+
+* reorder normalization,
+* tweak canonicalization,
+* mutate payload shape,
+* introduce serialization drift.
+
+And:
+nobody notices immediately.
+
+---
+
+# So yes:
+
+Add:
+
+```txt id="m2q7vx"
+replay signature golden tests
+```
+
+Example:
+
+```txt id="f9v4pk"
+Marcus replay signature
+=== bec5e26434ecc4ea
+```
+
+CI should fail immediately if it changes unexpectedly.
+
+This is exactly aligned with:
+
+* replay philosophy,
+* benchmark rigor,
+* audit-grade positioning.
+
+---
+
+# 2. replayBuilderVersion / canonicalBodyVersion
+
+Also yes.
+Strong recommendation.
+
+Because:
+right now:
+
+```txt id="w4x9mq"
+payload evolution
+and
+semantic evolution
+look identical externally
+```
+
+That becomes dangerous later.
+
+---
+
+# You need to distinguish:
+
+## A.
+
+```txt id="d7m2tr"
+fixture refinement
+```
+
+from:
+
+## B.
+
+```txt id="k8v5wp"
+replay semantics evolution
+```
+
+Very important forensic distinction.
+
+---
+
+# This matters especially because:
+
+Your repo increasingly positions itself as:
+
+```txt id="h1q8vx"
+audit-grade cognition infrastructure
+```
+
+Audit systems LOVE explicit semantic versioning.
+
+---
+
+# Recommended structure
+
+Something like:
+
+```txt id="u3m7pk"
+canonicalBodyVersion
+replayBuilderVersion
+normalizationVersion
+```
+
+inside replay metadata.
+
+This is extremely useful long term.
+
+---
+
+# 3. Remove the dead disagreement placeholder
+
+Definitely.
+
+Because:
+
+```txt id="n4v1wr"
+dead placeholder logic
+```
+
+inside:
+
+* replay,
+* disagreement,
+* escalation,
+* determinism,
+  is exactly the kind of thing that later causes:
+* invisible semantic drift,
+* false assumptions,
+* debugging nightmares.
+
+Especially:
+
+```txt id="q9m5tx"
+&& false
+```
+
+inside cognition logic is dangerous.
+
+Even if harmless today.
+
+Remove it cleanly now.
+
+---
+
+# Important meta-point
+
+This entire investigation was actually GOOD.
+
+Very good, honestly.
+
+Because it demonstrated:
+
+```txt id="s2v8pk"
+the framework is now serious enough
+that replay drift investigations matter
+```
+
+That is a major maturity signal.
+
+Most recruiting systems:
+
+* cannot even define replay drift.
+
+You now:
+
+* detected,
+* isolated,
+* traced,
+* explained,
+* validated,
+* verified,
+  the drift causally.
+
+That is very strong operationally.
+
+---
+
+# Another important observation
+
+This:
+
+```txt id="p5x4vn"
+no stale public references
+```
+
+was also VERY important to verify.
+
+Because:
+once you publicly anchor:
+
+* replay hashes,
+* signatures,
+* benchmark outputs,
+
+they become:
+
+```txt id="f7m2qw"
+public integrity artifacts
+```
+
+This is closer to:
+
+* infra engineering,
+* security engineering,
+* audit systems,
+  than:
+* recruiting SaaS.
+
+Very interesting positioning.
+
+---
+
+# My recommendation
+
+Do the follow-ups NOW before public launch.
+
+Because:
+they:
+
+* reinforce your strongest claim,
+* cost almost nothing,
+* reduce future ambiguity,
+* improve contributor safety,
+* strengthen OSS credibility.
+
+This is exactly the kind of:
+
+```txt id="w1v9mk"
+small but serious engineering detail
+```
+
+that sophisticated people notice immediately.

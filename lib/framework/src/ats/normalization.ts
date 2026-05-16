@@ -20,6 +20,16 @@ import type {
   ATSProvider,
 } from "./types.js";
 
+/**
+ * Semantic version of the normalization layer. Bump only when the
+ * mapping from raw records to `NormalizedEvidence` changes in a way
+ * that materially alters the canonical replay body (new evidence
+ * kinds, changed topic strings, changed sort order, changed id
+ * scheme, changed signal classification). Fixture/payload
+ * refinements that do not change the mapping do NOT bump this.
+ */
+export const NORMALIZATION_VERSION = 1 as const;
+
 interface ScorecardAttribute {
   topic?: string;
   score?: number;

@@ -9,7 +9,8 @@
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "benchmark:cognition": "pnpm --filter @workspace/scripts run benchmark:cognition",
     "benchmark:cognition:update": "pnpm --filter @workspace/scripts run benchmark:cognition:update",
-    "test:cognitive-smoke": "pnpm --filter @workspace/scripts run test:cognitive-smoke"
+    "test:cognitive-smoke": "pnpm --filter @workspace/scripts run test:cognitive-smoke",
+    "test:replay-goldens": "pnpm --filter @workspace/scripts run test:replay-goldens"
   },
   "private": true,
   "devDependencies": {

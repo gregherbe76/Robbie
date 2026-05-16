@@ -8,6 +8,7 @@
     "benchmark:cognition": "tsx ./src/benchmark-cognition.ts",
     "benchmark:cognition:update": "tsx ./src/benchmark-cognition-update.ts",
     "test:cognitive-smoke": "tsx ./src/test-cognitive-smoke.ts",
+    "test:replay-goldens": "tsx ./src/test-replay-goldens.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

@@ -35,5 +35,11 @@ export interface HiringDecisionReplay {
   overrides: OverrideMoment[];
   confidenceTrajectory: ConfidencePoint[];
   unresolvedTensions: string[];
+  /** Schema version of the signed canonical body. */
+  canonicalBodyVersion: number;
+  /** Semantic version of buildHiringDecisionReplay. */
+  replayBuilderVersion: number;
+  /** Semantic version of normalizeATSRecords. */
+  normalizationVersion: number;
   signature: string;
 }

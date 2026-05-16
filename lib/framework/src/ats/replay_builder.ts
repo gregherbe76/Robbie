@@ -21,8 +21,25 @@ import type {
   OverrideMoment,
   ConfidencePoint,
 } from "./types.js";
-import { listReviewers, normalizeATSRecords } from "./normalization.js";
+import { listReviewers, normalizeATSRecords, NORMALIZATION_VERSION } from "./normalization.js";
 import { shortSignature } from "./signature.js";
+
+/**
+ * Schema version of the canonical body that is hashed into the
+ * replay signature. Bump ONLY when fields are added, removed, or
+ * reordered inside `canonicalBody`. This is the forensic anchor
+ * that lets future readers distinguish "the inputs evolved" from
+ * "the contract evolved" when signatures move.
+ */
+export const CANONICAL_BODY_VERSION = 1 as const;
+
+/**
+ * Semantic version of `buildHiringDecisionReplay`. Bumped when the
+ * derivation logic (disagreement clustering, escalation/override
+ * detection, trajectory math, resolution semantics) changes in a way
+ * that alters the canonical body for the same inputs.
+ */
+export const REPLAY_BUILDER_VERSION = 1 as const;
 
 export interface ReplayBuildOptions {
   connectionId: string;
@@ -221,23 +238,17 @@ export function buildHiringDecisionReplay(
   const escalations = buildEscalations(evidence);
   const overrides = buildOverrides(evidence);
 
-  // Mark disagreements that an override touched as resolved=override.
-  if (overrides.length > 0) {
+  // When an override exists and the candidate was hired, mark every
+  // disagreement as resolved-by-override (rather than by consensus)
+  // and anchor the resolution timestamp to the hire moment. This is
+  // the observable behaviour we want today; per-disagreement temporal
+  // pairing against specific overrides is intentionally deferred
+  // until override records carry a topic affinity field. When that
+  // arrives, bump REPLAY_BUILDER_VERSION.
+  if (overrides.length > 0 && outcome.outcome === "hired") {
     for (const d of disagreements) {
-      const overrideAfter = overrides.find(
-        (o) => o.occurredAt >= d.high.summary && false, // placeholder, see below
-      );
-      if (overrideAfter) {
-        d.resolvedAt = overrideAfter.occurredAt;
-        d.resolution = "override";
-      } else {
-        // If outcome is hired but disagreement remained unresolved by
-        // consensus, mark as override-resolved if any override exists.
-        if (outcome.outcome === "hired") {
-          d.resolution = "override";
-          d.resolvedAt = outcome.closedAt;
-        }
-      }
+      d.resolution = "override";
+      d.resolvedAt = outcome.closedAt;
     }
   }
 
@@ -248,8 +259,14 @@ export function buildHiringDecisionReplay(
   const replayId = `replay_${provider}_${opts.candidateAtsId}`;
 
   // Canonical body for signing: everything that materially defines
-  // the replay. We omit `signature` itself.
+  // the replay. We omit `signature` itself. The three `*Version`
+  // fields are INSIDE the signed body on purpose — a signature is
+  // therefore an audit-grade commitment to a specific schema +
+  // builder + normalization contract.
   const canonicalBody = {
+    canonicalBodyVersion: CANONICAL_BODY_VERSION as number,
+    replayBuilderVersion: REPLAY_BUILDER_VERSION as number,
+    normalizationVersion: NORMALIZATION_VERSION as number,
     id: replayId,
     connectionId: opts.connectionId,
     provider,

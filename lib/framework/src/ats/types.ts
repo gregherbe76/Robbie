@@ -234,6 +234,22 @@ export interface HiringDecisionReplay {
   overrides: OverrideMoment[];
   confidenceTrajectory: ConfidencePoint[];
   unresolvedTensions: string[];
+  /**
+   * Schema version of the canonical body that was signed. Bumped only
+   * when fields are added/removed/reordered inside the signed body.
+   */
+  canonicalBodyVersion: number;
+  /**
+   * Semantic version of `buildHiringDecisionReplay`. Bumped only when
+   * derivation logic (disagreement / escalation / override /
+   * trajectory) changes in a way that alters the canonical body.
+   */
+  replayBuilderVersion: number;
+  /**
+   * Semantic version of `normalizeATSRecords`. Bumped only when
+   * raw → evidence mapping semantics change.
+   */
+  normalizationVersion: number;
   /** sha256-first-16 of the canonical replay body. */
   signature: string;
 }

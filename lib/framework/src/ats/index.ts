@@ -22,8 +22,16 @@ export {
   GreenhouseAdapter,
   GreenhouseAPIUnconfiguredError,
 } from "./greenhouse_adapter.js";
-export { normalizeATSRecords, listReviewers } from "./normalization.js";
-export { buildHiringDecisionReplay } from "./replay_builder.js";
+export {
+  normalizeATSRecords,
+  listReviewers,
+  NORMALIZATION_VERSION,
+} from "./normalization.js";
+export {
+  buildHiringDecisionReplay,
+  CANONICAL_BODY_VERSION,
+  REPLAY_BUILDER_VERSION,
+} from "./replay_builder.js";
 export { reconstructReasoning } from "./reasoning_reconstruction.js";
 export { buildCalibrationReport, type OutcomeRecord } from "./calibration.js";
 export { verifyReplaySignature } from "./audit.js";

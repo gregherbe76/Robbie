@@ -3757,6 +3757,9 @@ export const GetATSReplayResponse = zod.object({
   "evidenceIds": zod.array(zod.string())
 })),
   "unresolvedTensions": zod.array(zod.string()),
+  "canonicalBodyVersion": zod.number().describe('Schema version of the signed canonical body.'),
+  "replayBuilderVersion": zod.number().describe('Semantic version of buildHiringDecisionReplay.'),
+  "normalizationVersion": zod.number().describe('Semantic version of normalizeATSRecords.'),
   "signature": zod.string()
 })
 
@@ -3978,6 +3981,9 @@ export const CompareATSReplaysResponse = zod.object({
   "evidenceIds": zod.array(zod.string())
 })),
   "unresolvedTensions": zod.array(zod.string()),
+  "canonicalBodyVersion": zod.number().describe('Schema version of the signed canonical body.'),
+  "replayBuilderVersion": zod.number().describe('Semantic version of buildHiringDecisionReplay.'),
+  "normalizationVersion": zod.number().describe('Semantic version of normalizeATSRecords.'),
   "signature": zod.string()
 }),
   "b": zod.object({
@@ -4060,6 +4066,9 @@ export const CompareATSReplaysResponse = zod.object({
   "evidenceIds": zod.array(zod.string())
 })),
   "unresolvedTensions": zod.array(zod.string()),
+  "canonicalBodyVersion": zod.number().describe('Schema version of the signed canonical body.'),
+  "replayBuilderVersion": zod.number().describe('Semantic version of buildHiringDecisionReplay.'),
+  "normalizationVersion": zod.number().describe('Semantic version of normalizeATSRecords.'),
   "signature": zod.string()
 }),
   "diff": zod.object({

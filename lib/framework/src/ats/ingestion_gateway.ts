@@ -104,9 +104,24 @@ export class ATSIngestionGateway {
       for (const r of records) {
         lastSyncCounts[r.kind] = (lastSyncCounts[r.kind] ?? 0) + 1;
       }
+      // Derive ingestedAt deterministically from the records' own
+      // fetchedAt timestamps rather than reading wallclock. This is
+      // the semantic value we want ("when this batch was fetched from
+      // the source") and it makes replay signatures stable across
+      // server restarts — a hard requirement of the determinism
+      // claim. Wallclock fallback is only used if a record stream
+      // somehow has no fetchedAt at all.
+      const ingestedAt =
+        records.length > 0
+          ? records.reduce<string>(
+              (max, r) => (r.fetchedAt > max ? r.fetchedAt : max),
+              records[0]!.fetchedAt,
+            )
+          : new Date(0).toISOString();
       const replay = buildHiringDecisionReplay(records, {
         connectionId,
         candidateAtsId: cid,
+        ingestedAt,
       });
       this.replays.set(replay.id, replay);
       replaysBuilt += 1;
