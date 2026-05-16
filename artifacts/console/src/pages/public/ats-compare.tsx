@@ -5,9 +5,13 @@
  * Lena Park (calibrated decline) replay. The shape of the difference
  * is the point: same reviewer panel, same evidence union, two
  * radically different reasoning shapes.
+ *
+ * Wired to `GET /ats/compare` via the generated React Query hook so
+ * the diff metrics and the descriptive headline come from the
+ * framework's ReplayDiffEngine rather than being recomputed in the
+ * browser.
  */
 
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import {
   AlertTriangle,
@@ -17,85 +21,51 @@ import {
   GitBranch,
   ShieldCheck,
   ArrowRight,
+  Sparkles,
 } from "lucide-react";
+import {
+  useCompareATSReplays,
+  useGetATSCalibration,
+} from "@workspace/api-client-react";
+import type {
+  HiringDecisionReplay,
+  CountDelta,
+  DiffTone,
+} from "@workspace/api-client-react";
 import { cn } from "@/lib/utils";
 
 const REPLAY_A = "replay_synthetic_cand_marcus_vega";
 const REPLAY_B = "replay_synthetic_cand_lena_park";
 
-type Replay = {
-  id: string;
-  candidateName: string;
-  targetRole: string;
-  organization: string;
-  outcome: string;
-  signature: string;
-  openedAt: string;
-  closedAt?: string;
-  reviewers: Array<{ id: string; displayName: string; role?: string }>;
-  evidence: Array<{
-    id: string;
-    kind: string;
-    summary: string;
-    occurredAt: string;
-    topic?: string;
-    assessmentScore?: number;
-  }>;
-  disagreements: Array<{
-    id: string;
-    topic: string;
-    spread: number;
-    resolution?: string;
-  }>;
-  escalations: Array<{ id: string; trigger: string; summary: string }>;
-  overrides: Array<{ id: string; byReviewerId: string; rationale: string }>;
-  confidenceTrajectory: Array<{ occurredAt: string; estimate: number }>;
-  unresolvedTensions: string[];
+const COUNT_TONE_MAP: Partial<
+  Record<string, (left: number, right: number) => "warn" | "good" | "bad">
+> = {
+  disagreements: (l, r) => (l > r ? "warn" : "good"),
+  escalations: (l, r) => (l > r ? "warn" : "good"),
+  overrides: (l, r) => (l > r ? "bad" : "good"),
 };
 
-type Calibration = {
-  expectedCalibrationError: number;
-  brierScore: number;
-  reviewers: Array<{
-    reviewerId: string;
-    displayName: string;
-    predictions: number;
-    meanClaimed: number;
-    meanRealized: number;
-    drift: number;
-  }>;
-  caveat: string;
+const COUNT_LABEL_MAP: Record<string, string> = {
+  evidence: "Evidence units",
+  disagreements: "Disagreements",
+  escalations: "Escalations",
+  overrides: "Overrides",
+  unresolvedTensions: "Unresolved",
 };
-
-async function getJson<T>(path: string): Promise<T> {
-  const base = import.meta.env.BASE_URL ?? "/";
-  const url = `${base.replace(/\/$/, "")}/api${path}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-  return (await res.json()) as T;
-}
 
 export function ATSCompare() {
-  const a = useQuery({
-    queryKey: ["compare", REPLAY_A],
-    queryFn: () => getJson<Replay>(`/ats/replay/${REPLAY_A}`),
-  });
-  const b = useQuery({
-    queryKey: ["compare", REPLAY_B],
-    queryFn: () => getJson<Replay>(`/ats/replay/${REPLAY_B}`),
-  });
-  const cal = useQuery({
-    queryKey: ["compare", "cal"],
-    queryFn: () => getJson<Calibration>(`/ats/calibration`),
-  });
+  const compare = useCompareATSReplays({ a: REPLAY_A, b: REPLAY_B });
+  const cal = useGetATSCalibration();
 
-  if (!a.data || !b.data) {
+  if (!compare.data) {
     return (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 text-muted-foreground">
         Loading comparison…
       </div>
     );
   }
+
+  const { a, b, diff } = compare.data;
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 md:py-14 space-y-8">
@@ -116,48 +86,64 @@ export function ATSCompare() {
 
       {/* Headline row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Headline replay={a.data} tone="warn" tag="regretted override" />
-        <Headline replay={b.data} tone="good" tag="calibrated decline" />
+        <Headline replay={a} tone="warn" tag="regretted override" />
+        <Headline replay={b} tone="good" tag="calibrated decline" />
       </div>
 
-      {/* Metric strip */}
-      <section className="grid grid-cols-2 md:grid-cols-5 gap-px overflow-hidden rounded-lg border border-border/60 bg-border/60 text-xs">
-        <CompareCell label="Outcome" left={a.data.outcome} right={b.data.outcome} />
-        <CompareCell
-          label="Disagreements"
-          left={a.data.disagreements.length}
-          right={b.data.disagreements.length}
-          tone={(l, r) => (l > r ? "warn" : "good")}
-        />
-        <CompareCell
-          label="Escalations"
-          left={a.data.escalations.length}
-          right={b.data.escalations.length}
-          tone={(l, r) => (l > r ? "warn" : "good")}
-        />
-        <CompareCell
-          label="Overrides"
-          left={a.data.overrides.length}
-          right={b.data.overrides.length}
-          tone={(l, r) => (l > r ? "bad" : "good")}
-        />
-        <CompareCell
-          label="Evidence units"
-          left={a.data.evidence.length}
-          right={b.data.evidence.length}
-        />
+      {/* Diff headline from the framework */}
+      <section className="rounded-lg border border-primary/30 bg-primary/5 px-5 py-3 flex items-start gap-3">
+        <Sparkles className="size-4 text-primary mt-0.5 shrink-0" />
+        <div>
+          <div className="text-[10px] font-mono uppercase tracking-wider text-primary">
+            framework diff · outcomeAlignment={diff.outcomeAlignment}
+          </div>
+          <p className="mt-1 text-sm text-foreground">{diff.headline}</p>
+          <p className="mt-1 text-[11px] font-mono text-muted-foreground">
+            common reviewers: {diff.commonReviewers.length} ·
+            {" "}left-only: {diff.leftOnlyReviewers.length} ·
+            {" "}right-only: {diff.rightOnlyReviewers.length}
+          </p>
+        </div>
+      </section>
+
+      {/* Metric strip — driven by diff.counts */}
+      <section
+        className={cn(
+          "grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border/60 bg-border/60 text-xs",
+          diff.counts.length >= 5 ? "md:grid-cols-5" : "md:grid-cols-4",
+        )}
+      >
+        <CompareCell label="Outcome" left={a.outcome} right={b.outcome} />
+        {diff.counts.map((c) => (
+          <CompareCell
+            key={c.label}
+            label={COUNT_LABEL_MAP[c.label] ?? c.label}
+            left={c.left}
+            right={c.right}
+            tone={COUNT_TONE_MAP[c.label]}
+            diffTone={c.tone}
+          />
+        ))}
       </section>
 
       {/* Dynamics */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Column replay={a.data} title="Marcus Vega · regretted hire" tone="warn" />
-        <Column replay={b.data} title="Lena Park · calibrated decline" tone="good" />
+        <Column replay={a} title="Marcus Vega · regretted hire" tone="warn" />
+        <Column replay={b} title="Lena Park · calibrated decline" tone="good" />
       </section>
 
       {/* Confidence trajectories */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <TrajectoryPanel replay={a.data} />
-        <TrajectoryPanel replay={b.data} />
+        <TrajectoryPanel
+          replay={a}
+          final={diff.trajectory.leftFinal}
+          volatility={diff.trajectory.leftVolatility}
+        />
+        <TrajectoryPanel
+          replay={b}
+          final={diff.trajectory.rightFinal}
+          volatility={diff.trajectory.rightVolatility}
+        />
       </section>
 
       {/* Calibration delta */}
@@ -226,7 +212,7 @@ function Headline({
   tone,
   tag,
 }: {
-  replay: Replay;
+  replay: HiringDecisionReplay;
   tone: "warn" | "good";
   tag: string;
 }) {
@@ -267,11 +253,13 @@ function CompareCell({
   left,
   right,
   tone,
+  diffTone,
 }: {
   label: string;
   left: string | number;
   right: string | number;
   tone?: (l: number, r: number) => "warn" | "good" | "bad";
+  diffTone?: DiffTone;
 }) {
   const lTone =
     typeof left === "number" && typeof right === "number" && tone
@@ -283,8 +271,20 @@ function CompareCell({
       : undefined;
   return (
     <div className="bg-background/60 p-3">
-      <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
-        {label}
+      <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground flex items-center gap-1.5">
+        <span>{label}</span>
+        {diffTone && diffTone !== "even" && diffTone !== "neutral" ? (
+          <span
+            className={cn(
+              "rounded px-1 py-0.5 text-[9px]",
+              diffTone === "left-heavy"
+                ? "bg-amber-500/15 text-amber-300"
+                : "bg-emerald-500/15 text-emerald-300",
+            )}
+          >
+            {diffTone === "left-heavy" ? "L+" : "R+"}
+          </span>
+        ) : null}
       </div>
       <div className="mt-1 flex items-center justify-between font-mono">
         <span className={toneCls(lTone)}>{left}</span>
@@ -307,7 +307,7 @@ function Column({
   title,
   tone,
 }: {
-  replay: Replay;
+  replay: HiringDecisionReplay;
   title: string;
   tone: "warn" | "good";
 }) {
@@ -384,11 +384,25 @@ function Block({
   );
 }
 
-function TrajectoryPanel({ replay }: { replay: Replay }) {
+function TrajectoryPanel({
+  replay,
+  final,
+  volatility,
+}: {
+  replay: HiringDecisionReplay;
+  final: number;
+  volatility: number;
+}) {
   return (
     <div className="rounded-lg border border-border bg-card/40 p-5">
-      <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground flex items-center gap-1 mb-3">
-        <GitBranch className="size-3 text-primary" /> {replay.candidateName} · rolling P(hire)
+      <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground flex items-center justify-between gap-1 mb-3">
+        <span className="flex items-center gap-1">
+          <GitBranch className="size-3 text-primary" />
+          {replay.candidateName} · rolling P(hire)
+        </span>
+        <span className="text-muted-foreground/80">
+          final {final.toFixed(2)} · swing {volatility.toFixed(2)}
+        </span>
       </div>
       <div className="space-y-1">
         {replay.confidenceTrajectory.map((p, i) => (
