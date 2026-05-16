@@ -28,6 +28,12 @@ const PIPELINE: Array<{
     body: "Multi-source input is normalised into evidence + claims with provenance, reliability, and uncertainty. The boundary refuses to absorb data it cannot attribute.",
   },
   {
+    step: "1b",
+    module: "ats",
+    icon: Inbox,
+    body: "Operational evidence from Ashby, Greenhouse, or synthetic fixtures is normalised into a closed evidence union and replayed as disagreement, escalation, and override structure. Read-only, signed, byte-stable.",
+  },
+  {
     step: "2",
     module: "agents · flagship",
     icon: Brain,

@@ -127,12 +127,20 @@ export function Landing() {
                 evaluation engine.
               </p>
             </div>
-            <Link
-              href="/demo"
-              className="inline-flex items-center gap-1.5 text-sm font-mono text-primary hover:underline"
-            >
-              All five cases <ArrowRight className="size-3.5" />
-            </Link>
+            <div className="flex flex-wrap gap-4">
+              <Link
+                href="/demo"
+                className="inline-flex items-center gap-1.5 text-sm font-mono text-primary hover:underline"
+              >
+                All five cases <ArrowRight className="size-3.5" />
+              </Link>
+              <Link
+                href="/ats-demo"
+                className="inline-flex items-center gap-1.5 text-sm font-mono text-primary hover:underline"
+              >
+                ATS evidence replay <ArrowRight className="size-3.5" />
+              </Link>
+            </div>
           </div>
 
           <div className="mt-8 grid gap-4 md:grid-cols-3">

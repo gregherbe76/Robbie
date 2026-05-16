@@ -27,6 +27,7 @@ const navItems = [
   { name: "Overview", path: "/console", icon: Activity },
   { name: "Demo", path: "/demo", icon: Play },
   { name: "Ingestion", path: "/console/ingestion", icon: Inbox },
+  { name: "ATS", path: "/console/ats", icon: Workflow },
   { name: "Collaboration", path: "/console/collaboration", icon: Users },
   { name: "Security", path: "/console/security", icon: Shield },
   { name: "Intelligence", path: "/console/intelligence", icon: Sparkles },

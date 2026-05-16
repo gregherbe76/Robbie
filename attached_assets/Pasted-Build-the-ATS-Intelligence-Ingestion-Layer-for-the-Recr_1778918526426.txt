@@ -1,0 +1,383 @@
+Build the ATS Intelligence Ingestion Layer for the Recruiting Intelligence Framework.
+
+IMPORTANT:
+The framework is NOT:
+- an ATS
+- a recruiting CRM
+- a workflow replacement system
+
+The framework IS:
+- a provenance-first recruiting intelligence layer
+- a replayable organizational reasoning system
+- an audit-grade cognition infrastructure
+
+The ATS strategy is now explicit:
+
+ATS systems are:
+- the operational system of record
+- the source of hiring evidence
+- the source of organizational reasoning traces
+
+The framework reconstructs:
+- hiring cognition
+- disagreement
+- escalation
+- calibration
+- overrides
+- organizational reasoning lineage
+
+--------------------------------------------------
+Core Thesis
+--------------------------------------------------
+
+Organizations already store:
+- scorecards
+- interview notes
+- hiring decisions
+- reviewer comments
+- overrides
+- escalation rationale
+
+inside ATS systems.
+
+But almost no system can:
+- replay how the organization reasoned,
+- inspect disagreement,
+- audit confidence,
+- analyze calibration,
+- reconstruct hiring cognition over time.
+
+This layer bridges:
+ATS operational evidence
+→ recruiting intelligence replay.
+
+--------------------------------------------------
+Build These Components
+--------------------------------------------------
+
+Create:
+
+lib/framework/src/ats/
+
+Required components:
+
+1. ATSIngestionGateway
+2. AshbyAdapter
+3. GreenhouseAdapter
+4. ATSNormalizationEngine
+5. HiringDecisionReplayBuilder
+6. ATSReasoningReconstructionEngine
+7. HistoricalReplayEngine
+8. ATSCalibrationLayer
+9. ATSAuditReplayLayer
+10. ATSIntegrationConsole
+
+--------------------------------------------------
+1. ATSIngestionGateway
+--------------------------------------------------
+
+Build the ATS orchestration layer.
+
+Supported:
+- read-only ingestion
+- historical replay ingestion
+- webhook ingestion
+- scheduled sync ingestion
+
+Supported ATS providers:
+- Ashby
+- Greenhouse
+
+Architecture:
+ATS
+→ Adapter
+→ Normalization
+→ Evidence graph
+→ Cognition replay
+→ Organizational memory
+
+IMPORTANT:
+No ATS workflow replacement.
+No stage automation.
+No write-back initially.
+
+--------------------------------------------------
+2. AshbyAdapter
+--------------------------------------------------
+
+Build a real Ashby ingestion adapter.
+
+Supported ingestion:
+- candidates
+- interview plans
+- scorecards
+- interviewer feedback
+- notes
+- hiring decisions
+- timelines
+- reviewer identities
+
+Requirements:
+- deterministic normalization
+- provenance preservation
+- replay-safe ingestion
+- historical ingestion support
+- pagination support
+- retry support
+
+Every imported item must preserve:
+- ATS source ids
+- timestamps
+- reviewer attribution
+- raw payload reference
+
+--------------------------------------------------
+3. GreenhouseAdapter
+--------------------------------------------------
+
+Build a real Greenhouse ingestion adapter.
+
+Supported ingestion:
+- applications
+- scorecards
+- interviews
+- interview kits
+- notes
+- activity feed
+- hiring decisions
+- approvals
+- rejection rationale
+
+Requirements:
+- deterministic ingestion
+- provenance-first mapping
+- replay-compatible normalization
+- audit-safe evidence retention
+
+--------------------------------------------------
+4. ATSNormalizationEngine
+--------------------------------------------------
+
+Normalize ATS operational evidence.
+
+Convert ATS artifacts into:
+- explicit_claim
+- reviewer_assessment
+- contradiction_signal
+- uncertainty_signal
+- escalation_signal
+- override_signal
+- calibration_signal
+
+Every normalized evidence item must include:
+- source ATS
+- ATS object id
+- reviewer identity
+- ingestion timestamp
+- original payload hash
+- provenance chain
+
+IMPORTANT:
+Do NOT flatten disagreement.
+Preserve reviewer separation.
+
+--------------------------------------------------
+5. HiringDecisionReplayBuilder
+--------------------------------------------------
+
+Build the core replay feature.
+
+Input:
+Historical ATS hiring process.
+
+Output:
+Replayable cognition trace.
+
+Replay must reconstruct:
+- evidence arrival order
+- reviewer disagreement
+- escalation moments
+- override events
+- confidence evolution
+- unresolved tensions
+- final recommendation dynamics
+
+This becomes:
+"Replay this hiring decision."
+
+--------------------------------------------------
+6. ATSReasoningReconstructionEngine
+--------------------------------------------------
+
+Reconstruct organizational reasoning from ATS history.
+
+The engine must infer:
+- reviewer disagreement structure
+- escalation patterns
+- confidence shifts
+- override dynamics
+- founder intervention
+- organizational ambiguity
+- decision pressure points
+
+IMPORTANT:
+Do NOT hallucinate hidden reasoning.
+Only reconstruct from explicit operational evidence.
+
+--------------------------------------------------
+7. HistoricalReplayEngine
+--------------------------------------------------
+
+Support historical replay.
+
+Examples:
+- replay a controversial hire
+- replay a failed hire
+- replay a founder override
+- replay disagreement-heavy processes
+- replay calibration failures
+
+Features:
+- timeline replay
+- cognition diffing
+- reviewer evolution
+- confidence propagation replay
+- escalation replay
+
+--------------------------------------------------
+8. ATSCalibrationLayer
+--------------------------------------------------
+
+Build ATS-driven calibration analysis.
+
+Track:
+- interviewer overconfidence
+- reviewer calibration drift
+- disagreement predictive value
+- override success/failure
+- org-fit prediction quality
+- escalation predictive quality
+
+Generate:
+- reviewer reliability maps
+- calibration timelines
+- disagreement heatmaps
+- organizational calibration reports
+
+--------------------------------------------------
+9. ATSAuditReplayLayer
+--------------------------------------------------
+
+Build audit-grade replay infrastructure.
+
+Every replay must expose:
+- provenance
+- ATS source lineage
+- evidence hashes
+- reviewer attribution
+- replay signature
+- deterministic replay verification
+
+Add:
+GET /ats/replay/:id/verify
+
+The replay must be:
+- reproducible
+- inspectable
+- replay-safe
+- audit-grade
+
+--------------------------------------------------
+10. ATSIntegrationConsole
+--------------------------------------------------
+
+Add:
+/ats
+
+Main sections:
+- connected ATS systems
+- ingestion status
+- replayable hiring decisions
+- disagreement explorer
+- calibration explorer
+- reviewer reliability
+- escalation timelines
+- historical replay viewer
+- provenance explorer
+
+UI philosophy:
+- intelligence reconstruction layer
+- organizational reasoning replay
+- not ATS workflow UI
+
+--------------------------------------------------
+Public Demo Requirement
+--------------------------------------------------
+
+Add a public-safe replay case:
+
+"Replay a hiring decision from Ashby/Greenhouse"
+
+using:
+- synthetic ATS-derived evidence
+- synthetic scorecards
+- synthetic reviewer disagreement
+- synthetic override events
+
+This should become:
+the canonical operational demo.
+
+--------------------------------------------------
+API Requirements
+--------------------------------------------------
+
+Add:
+POST /ats/connect
+POST /ats/sync
+GET /ats/replays
+GET /ats/replay/:id
+GET /ats/replay/:id/verify
+GET /ats/calibration
+GET /ats/disagreements
+
+OpenAPI-first.
+Generate:
+- hooks
+- schemas
+- validators
+
+--------------------------------------------------
+Security Constraints
+--------------------------------------------------
+
+Maintain:
+- organization isolation
+- provenance-first architecture
+- append-only auditability
+- deterministic replay
+- replay signatures
+- reviewer attribution
+
+Do NOT:
+- write back to ATS
+- mutate ATS workflows
+- automate stage progression
+- silently infer reasoning
+- flatten reviewer disagreement
+
+--------------------------------------------------
+Target Outcome
+--------------------------------------------------
+
+The framework should evolve from:
+"a synthetic cognition framework"
+
+into:
+
+"a replayable intelligence layer
+built on top of ATS operational evidence."
+
+The core emotional reaction should become:
+
+"We have never been able to replay and audit
+how our organization actually reasoned about hiring."

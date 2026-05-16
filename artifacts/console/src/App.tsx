@@ -24,6 +24,7 @@ import { Operations } from "@/pages/operations";
 import { OperationsMaturity } from "@/pages/operations-maturity";
 import { Benchmarks } from "@/pages/benchmarks";
 import { Ingestion } from "@/pages/ingestion";
+import { ATS } from "@/pages/ats";
 import { Collaboration } from "@/pages/collaboration";
 import { Security } from "@/pages/security";
 import { CandidateGraph } from "@/pages/graph/candidate";
@@ -36,6 +37,7 @@ import { Architecture } from "@/pages/public/architecture";
 import { BenchmarksPublic } from "@/pages/public/benchmarks-public";
 import { Docs } from "@/pages/public/docs";
 import { ApiExplorer } from "@/pages/public/api-explorer";
+import { ATSDemo } from "@/pages/public/ats-demo";
 
 // Demo + replay (public, but use their own padded container)
 import { DemoIndex } from "@/pages/demo";
@@ -73,6 +75,7 @@ function ConsoleArea() {
         />
         <Route path="/console/benchmarks" component={Benchmarks} />
         <Route path="/console/ingestion" component={Ingestion} />
+        <Route path="/console/ats" component={ATS} />
         <Route path="/console/collaboration" component={Collaboration} />
         <Route path="/console/security" component={Security} />
         <Route path="/console/agents" component={Agents} />
@@ -108,6 +111,7 @@ function PublicArea() {
           <RedirectDocs hash="plugins" />
         </Route>
         <Route path="/api-explorer" component={ApiExplorer} />
+        <Route path="/ats-demo" component={ATSDemo} />
         <Route path="/demo">
           <PaddedContainer>
             <DemoIndex />

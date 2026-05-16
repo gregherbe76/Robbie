@@ -105,6 +105,10 @@
     "./operations-maturity": {
       "types": "./dist/operations_maturity/index.d.ts",
       "import": "./dist/operations_maturity/index.js"
+    },
+    "./ats": {
+      "types": "./dist/ats/index.d.ts",
+      "import": "./dist/ats/index.js"
     }
   },
   "scripts": {

@@ -51,6 +51,7 @@ import type {
 import { buildEvaluationContext } from "./evaluation";
 import { buildOperationsContext } from "./operations";
 import { getPersistenceLayer } from "../operations_maturity/bootstrap";
+import { getATSGateway } from "../ats/bootstrap";
 import type { OperationsReport } from "@workspace/framework/intelligence-operations";
 import {
   runBenchmarkSuite,
@@ -705,6 +706,14 @@ export function initFramework(): Promise<FrameworkRegistry> {
     // Initialise the operational-maturity persistence layer eagerly so
     // the seed runs at startup, not on first request.
     await getPersistenceLayer();
+    // Eagerly initialise the ATS gateway too, so the synthetic
+    // replay is available on first page load of /console/ats and
+    // /ats-demo.
+    try {
+      await getATSGateway();
+    } catch {
+      // never block boot on a sync failure
+    }
     cached = registry;
     return registry;
   })();

@@ -17,6 +17,7 @@ import demoRouter from "./demo";
 import labRouter from "./lab";
 import operationsMaturityRouter from "./operations_maturity";
 import analyticsRouter from "./analytics";
+import atsRouter from "./ats";
 
 const router: IRouter = Router();
 
@@ -38,5 +39,6 @@ router.use(demoRouter);
 router.use(labRouter);
 router.use(operationsMaturityRouter);
 router.use(analyticsRouter);
+router.use(atsRouter);
 
 export default router;
