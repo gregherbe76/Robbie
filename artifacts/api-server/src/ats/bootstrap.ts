@@ -20,7 +20,7 @@ import {
   AshbyAdapter,
   GreenhouseAdapter,
   SyntheticATSAdapter,
-} from "@workspace/framework/ats";
+} from "@robbie/framework/ats";
 import { getPersistenceLayer } from "../operations_maturity/bootstrap";
 
 const ORG_ID = "demo";

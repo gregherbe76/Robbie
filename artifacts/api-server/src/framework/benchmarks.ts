@@ -1,8 +1,8 @@
 import type {
   BenchmarkReport as FrameworkBenchmarkReport,
   ScenarioResult,
-} from "@workspace/framework/benchmarks";
-import { BENCHMARK_SCENARIOS } from "@workspace/framework/benchmarks";
+} from "@robbie/framework/benchmarks";
+import { BENCHMARK_SCENARIOS } from "@robbie/framework/benchmarks";
 
 export interface BenchmarkApiExpectationFailure {
   type: string;

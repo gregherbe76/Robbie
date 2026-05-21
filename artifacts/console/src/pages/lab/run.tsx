@@ -4,7 +4,7 @@ import {
   useGetLabRunSummary,
   useGetLabRunTrace,
 } from "@workspace/api-client-react";
-import type { ReplayTrace } from "@workspace/framework/replay";
+import type { ReplayTrace } from "@robbie/framework/replay";
 import { Replay } from "@/pages/demo/replay";
 
 export function LabRun() {

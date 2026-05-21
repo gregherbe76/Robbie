@@ -8,7 +8,7 @@
 import {
   SecurityEngine,
   type BenchmarkContext,
-} from "@workspace/framework/security";
+} from "@robbie/framework/security";
 
 const T0 = "2026-05-15T08:00:00.000Z";
 const T1 = "2026-05-15T08:05:00.000Z";

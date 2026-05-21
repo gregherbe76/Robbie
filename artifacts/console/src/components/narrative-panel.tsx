@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type {
   CaseNarrative,
   NarrativeStep,
-} from "@workspace/framework/replay/narrative";
+} from "@robbie/framework/replay/narrative";
 import { Play, Pause, RotateCcw, BookOpen, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 

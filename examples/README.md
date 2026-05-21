@@ -1,39 +1,49 @@
 # Examples
 
-The framework's worked examples live in **two places**:
+Four runnable scripts demonstrating the Robbie framework. Each is a single self-contained `.ts` file in `src/`.
 
-1. **`lib/framework/src/benchmarks/corpus.ts`** — the 10 deterministic cognition scenarios, runnable as the benchmark suite. These are the canonical examples; they are both documentation and CI gates.
+## Run them
 
-2. **`docs/examples/`** — narrative walkthroughs of each scenario for human readers.
-
-To run the examples:
+From the repo root:
 
 ```bash
-pnpm benchmark:cognition
+pnpm install
+pnpm --filter @workspace/examples run hello-ingest
+pnpm --filter @workspace/examples run full-cognition
+pnpm --filter @workspace/examples run security-audit
+pnpm --filter @workspace/examples run custom-adapter
+
+# or all four in sequence:
+pnpm --filter @workspace/examples run all
 ```
 
-To read about them:
+No database, no API keys, no network calls — everything is in-process and deterministic.
 
-- [docs/examples/](../docs/examples/) — scenario-by-scenario walkthrough.
-- [docs/benchmarks/](../docs/benchmarks/) — the reproducibility contract.
+## What each example shows
 
-## Scenarios at a glance
-
-| Scenario | Cognitive challenge |
+| File | Demonstrates |
 |---|---|
-| `inflated_senior` | Strong surface, weak trajectory |
-| `founder_builder` | Non-traditional path, high agency |
-| `plateaued_staff` | Long tenure, flat scope growth |
-| `elite_ic` | Deliberate IC choice |
-| `high_variance_candidate` | Conflicting strong / weak signals |
-| `ambiguous_generalist` | Wide skills, unclear depth |
-| `fake_oss_signal` | Inflated open-source contribution |
-| `chaos_thriver` | Thrives in unstructured env |
-| `process_dependent_operator` | Thrives in structured env |
-| `underestimated_junior` | Pedigree under-weighting |
+| [`src/01-hello-ingest.ts`](./src/01-hello-ingest.ts) | Minimal use of `IngestionGateway`. Ingests one resume envelope, prints normalized evidence with provenance + reliability + audit trail. |
+| [`src/02-full-cognition.ts`](./src/02-full-cognition.ts) | Ingest → cognition → fit → report. Runs the three flagship agents, `synthesizeCognition`, and `runOrganizationIntelligence`, then persists the synthesis as a `Report`. |
+| [`src/03-security-audit.ts`](./src/03-security-audit.ts) | Capability-based authorization. Same-org read is allowed, cross-org read is refused. Inspects the append-only audit trail with per-org monotonic sequence numbers. |
+| [`src/04-custom-adapter.ts`](./src/04-custom-adapter.ts) | Plugs a new `EvidenceAdapter` (synthetic "portfolio" source) into the `IngestionGateway` and ingests through it. |
 
-Each scenario is synthetic. No real candidate data ships in this repository.
+## Using these outside this monorepo
 
-## Adding your own example
+Inside the repo, examples import from `@robbie/framework` and `pnpm` resolves it to the local workspace package. In your own project:
 
-The right place to add an example is `lib/framework/src/benchmarks/corpus.ts` — write it as a benchmark scenario so it runs in CI alongside the others. See [CONTRIBUTING.md → Adding a benchmark](../CONTRIBUTING.md#adding-a-benchmark).
+```bash
+npm install @robbie/framework zod
+# or
+pnpm add @robbie/framework zod
+```
+
+The imports work unchanged.
+
+## Tutorial
+
+For a 50-line end-to-end walkthrough (ingest → cognition → organization fit → report), see [`docs/tutorial-ingest-cognition-report.md`](../docs/tutorial-ingest-cognition-report.md).
+
+## Benchmark scenarios
+
+The 10 deterministic cognition scenarios used as CI gates live in `lib/framework/src/benchmarks/corpus.ts`. They are not duplicated here — run them with `pnpm benchmark:cognition` from the repo root.

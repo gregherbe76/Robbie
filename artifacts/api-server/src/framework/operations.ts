@@ -11,13 +11,13 @@ import {
   runIntelligenceOperationsLayer,
   type CaseInputs,
   type OperationsReport,
-} from "@workspace/framework/intelligence-operations";
-import type { CognitiveSynthesis } from "@workspace/framework/cognition";
+} from "@robbie/framework/intelligence-operations";
+import type { CognitiveSynthesis } from "@robbie/framework/cognition";
 import type {
   CandidateOrganizationFitResult,
   OrganizationIntelligenceReport,
-} from "@workspace/framework/organization-intelligence";
-import type { EvaluationReport } from "@workspace/framework/evaluation";
+} from "@robbie/framework/organization-intelligence";
+import type { EvaluationReport } from "@robbie/framework/evaluation";
 import type { CandidateAnalysis } from "./bootstrap";
 
 export interface OperationsContext {

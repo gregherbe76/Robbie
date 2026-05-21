@@ -13,8 +13,8 @@ import {
 import type {
   RawInputEnvelope,
   IngestionSourceKind,
-} from "@workspace/framework/ingestion";
-import type { OrganizationSource } from "@workspace/framework/ingestion";
+} from "@robbie/framework/ingestion";
+import type { OrganizationSource } from "@robbie/framework/ingestion";
 import {
   getIngestionGateway,
   getIngestionState,

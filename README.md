@@ -20,7 +20,7 @@
 
 A framework for building **recruiting intelligence systems** — software that reasons about people, organizations, evidence, and uncertainty, with every claim carrying a confidence and a provenance trail.
 
-It is shipped as a library (`@workspace/framework`) with two thin runtime surfaces:
+It is shipped as a library (`@robbie/framework` on npm) with two thin runtime surfaces:
 
 - an **API server** that exposes the framework over HTTP with an OpenAPI contract,
 - a **console** that lets operators introspect the live state of the cognition system (agents, skills, memory, graphs, decisions, audits, benchmarks).
@@ -154,10 +154,22 @@ Benchmarks in this framework are **not** accuracy leaderboards. They are reprodu
 
 See [docs/benchmarks/](./docs/benchmarks/) for the manifest and reproducibility guide.
 
+## Install
+
+```bash
+npm install @robbie/framework zod
+# optional: Postgres-backed memory persistence
+npm install @robbie/memory-postgres pg
+```
+
+`@robbie/framework` is the framework library. `@robbie/memory-postgres` is an optional `MemoryStore` adapter for Postgres (with optional pgvector support).
+
+For a 50-line walkthrough see [`docs/tutorial-ingest-cognition-report.md`](./docs/tutorial-ingest-cognition-report.md). For four runnable scripts see [`examples/`](./examples/).
+
 ## Example intelligence flow
 
 ```ts
-import { ingestion, security } from "@workspace/framework";
+import { ingestion, security } from "@robbie/framework";
 
 // 1. Construct the ingestion gateway. Adapters (GitHub, LinkedIn, resume,
 //    transcript) are plug-in; each declares a reliability profile and
@@ -197,7 +209,7 @@ const decision: security.AccessDecision = securityEngine.checkAccess({
 // decision.allowed, decision.reason, decision.evaluatedRules[]
 ```
 
-See `lib/framework/src/index.ts` for the full public surface and per-module subpath exports (`@workspace/framework/ingestion`, `/cognition`, `/security`, …).
+See `lib/framework/src/index.ts` for the full public surface and per-module subpath exports (`@robbie/framework/ingestion`, `/cognition`, `/security`, …).
 
 ## Example outputs
 

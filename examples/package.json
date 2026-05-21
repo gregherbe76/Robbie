@@ -1,0 +1,22 @@
+{
+  "name": "@workspace/examples",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "hello-ingest": "tsx ./src/01-hello-ingest.ts",
+    "full-cognition": "tsx ./src/02-full-cognition.ts",
+    "security-audit": "tsx ./src/03-security-audit.ts",
+    "custom-adapter": "tsx ./src/04-custom-adapter.ts",
+    "all": "tsx ./src/01-hello-ingest.ts && tsx ./src/02-full-cognition.ts && tsx ./src/03-security-audit.ts && tsx ./src/04-custom-adapter.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@robbie/framework": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "~5.9.3"
+  }
+}

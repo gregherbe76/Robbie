@@ -27,7 +27,7 @@ import {
   REPLAY_BUILDER_VERSION,
   NORMALIZATION_VERSION,
   extractSourceChronologyTimestamp,
-} from "@workspace/framework/ats";
+} from "@robbie/framework/ats";
 
 interface Golden {
   candidateAtsId: string;

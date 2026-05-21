@@ -7,7 +7,7 @@
 import {
   CollaborationEngine,
   type CollaborationSnapshot,
-} from "@workspace/framework/collaboration";
+} from "@robbie/framework/collaboration";
 
 const T0 = "2026-05-15T09:00:00.000Z";
 const T1 = "2026-05-15T09:15:00.000Z";

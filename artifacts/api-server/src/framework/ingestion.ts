@@ -13,7 +13,7 @@ import {
   type IngestionJob,
   type EvidenceItem,
   type IngestionAuditEntry,
-} from "@workspace/framework/ingestion";
+} from "@robbie/framework/ingestion";
 
 const NOW = "2026-05-15T09:00:00.000Z";
 
@@ -268,4 +268,4 @@ export type {
   CandidatePipelineResult,
   OrganizationPipelineResult,
   GatewayState,
-} from "@workspace/framework/ingestion";
+} from "@robbie/framework/ingestion";

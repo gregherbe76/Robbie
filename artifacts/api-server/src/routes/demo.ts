@@ -4,7 +4,7 @@
  * `GET /demo/cases` lists the 5 deterministic hero cases.
  * `GET /demo/replay/:caseId` runs the real framework pipeline live and
  * returns a deterministic replay trace. The trace shape is documented
- * by `ReplayTrace` in `@workspace/framework/replay`.
+ * by `ReplayTrace` in `@robbie/framework/replay`.
  *
  * These endpoints have no side effects, are safe to call publicly, and
  * return identical bytes for the same caseId across requests.
@@ -16,7 +16,7 @@ import {
   runReplayTrace,
   findCase,
   type ReplayCaseId,
-} from "@workspace/framework/replay";
+} from "@robbie/framework/replay";
 
 const router: IRouter = Router();
 

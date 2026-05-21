@@ -12,10 +12,10 @@
 import {
   createFrameworkRegistry,
   type FrameworkRegistry,
-} from "@workspace/framework/registry";
-import type { Skill } from "@workspace/framework/skills";
-import type { LLMProvider } from "@workspace/framework/providers";
-import type { Workflow } from "@workspace/framework/workflows";
+} from "@robbie/framework/registry";
+import type { Skill } from "@robbie/framework/skills";
+import type { LLMProvider } from "@robbie/framework/providers";
+import type { Workflow } from "@robbie/framework/workflows";
 import {
   BayesianScoringAgent,
   ContradictionAgent,
@@ -26,12 +26,12 @@ import {
   type ContradictionResult,
   type TrajectoryResult,
   type CandidateDossier,
-} from "@workspace/framework/agents/flagship";
+} from "@robbie/framework/agents/flagship";
 import {
   synthesizeCognition,
   summarizeArchetypeFrequency,
   type CognitiveSynthesis,
-} from "@workspace/framework/cognition";
+} from "@robbie/framework/cognition";
 import {
   SAMPLE_ORG,
   listOrganizations,
@@ -42,23 +42,23 @@ import {
   buildOrgArchetypeMemory,
   type CandidateOrganizationFitResult,
   type OrganizationIntelligenceReport,
-} from "@workspace/framework/organization-intelligence";
+} from "@robbie/framework/organization-intelligence";
 import type {
   EvaluationReport,
   OutcomeEvent,
   PredictionRecord,
-} from "@workspace/framework/evaluation";
+} from "@robbie/framework/evaluation";
 import { buildEvaluationContext } from "./evaluation";
 import { buildOperationsContext } from "./operations";
 import { getPersistenceLayer } from "../operations_maturity/bootstrap";
 import { getATSGateway } from "../ats/bootstrap";
-import type { OperationsReport } from "@workspace/framework/intelligence-operations";
+import type { OperationsReport } from "@robbie/framework/intelligence-operations";
 import {
   runBenchmarkSuite,
   parseSnapshot,
   type BenchmarkReport as FrameworkBenchmarkReport,
   type SnapshotFile,
-} from "@workspace/framework/benchmarks";
+} from "@robbie/framework/benchmarks";
 import { toBenchmarkApiReport, type BenchmarkApiReport } from "./benchmarks";
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";

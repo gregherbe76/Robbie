@@ -14,10 +14,10 @@ import {
   type EvaluationReport,
   type OutcomeEvent,
   type PredictionRecord,
-} from "@workspace/framework/evaluation";
-import type { CognitiveSynthesis, ArchetypeMatch } from "@workspace/framework/cognition";
-import type { CandidateOrganizationFitResult } from "@workspace/framework/organization-intelligence";
-import type { OrganizationIntelligenceReport } from "@workspace/framework/organization-intelligence";
+} from "@robbie/framework/evaluation";
+import type { CognitiveSynthesis, ArchetypeMatch } from "@robbie/framework/cognition";
+import type { CandidateOrganizationFitResult } from "@robbie/framework/organization-intelligence";
+import type { OrganizationIntelligenceReport } from "@robbie/framework/organization-intelligence";
 import type { CandidateAnalysis } from "./bootstrap";
 
 /** Map fit recommendation enum to a [0,1] positive-class score. */

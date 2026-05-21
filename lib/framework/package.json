@@ -1,10 +1,39 @@
 {
-  "name": "@workspace/framework",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@robbie/framework",
+  "version": "0.1.0",
+  "description": "Provenance-first, deterministic cognition framework for recruiting intelligence. Probabilistic reasoning, capability-based authorization, append-only audit, snapshotted benchmarks.",
+  "keywords": [
+    "recruiting",
+    "intelligence",
+    "cognition",
+    "provenance",
+    "deterministic",
+    "bayesian",
+    "audit",
+    "framework"
+  ],
+  "license": "MIT",
+  "author": "Robbie contributors",
+  "homepage": "https://github.com/gregherbe76/robbie#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gregherbe76/robbie.git",
+    "directory": "lib/framework"
+  },
+  "bugs": {
+    "url": "https://github.com/gregherbe76/robbie/issues"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -111,11 +140,16 @@
       "import": "./dist/ats/index.js"
     }
   },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "tsc -p tsconfig.json"
   },
   "peerDependencies": {
-    "zod": "catalog:"
+    "zod": "^3.25.0"
   },
   "devDependencies": {
     "@types/node": "catalog:",

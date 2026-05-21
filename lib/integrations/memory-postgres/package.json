@@ -1,0 +1,61 @@
+{
+  "name": "@robbie/memory-postgres",
+  "version": "0.1.0",
+  "description": "Postgres-backed MemoryStore adapter for @robbie/framework. Optional pgvector support for semantic queries.",
+  "keywords": [
+    "robbie",
+    "memory",
+    "postgres",
+    "pgvector",
+    "adapter"
+  ],
+  "license": "MIT",
+  "author": "Robbie contributors",
+  "homepage": "https://github.com/gregherbe76/robbie/tree/main/lib/integrations/memory-postgres#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gregherbe76/robbie.git",
+    "directory": "lib/integrations/memory-postgres"
+  },
+  "bugs": {
+    "url": "https://github.com/gregherbe76/robbie/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "schema.sql",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schema.sql": "./schema.sql"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "tsc -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@robbie/framework": "workspace:^",
+    "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "@robbie/framework": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/pg": "^8.20.0",
+    "pg": "^8.20.0",
+    "typescript": "~5.9.3"
+  }
+}

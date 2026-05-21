@@ -36,7 +36,7 @@ export interface ManifestBase {
 
 /**
  * Generic plugin manifest: registers one or more of the more specific
- * manifest kinds. Used by `@workspace/framework` to load extensions at
+ * manifest kinds. Used by `@robbie/framework` to load extensions at
  * runtime without dynamic imports leaking provenance.
  */
 export interface PluginManifest extends ManifestBase {

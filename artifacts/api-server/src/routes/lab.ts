@@ -22,7 +22,7 @@ import {
   runLabTrace,
   type LabRunInput,
   type LabRunResult,
-} from "@workspace/framework/lab";
+} from "@robbie/framework/lab";
 
 // ---------------------------------------------------------------------------
 // In-memory store

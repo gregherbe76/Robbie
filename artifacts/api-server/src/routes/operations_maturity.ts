@@ -19,7 +19,7 @@ import { getPersistenceLayer } from "../operations_maturity/bootstrap";
 import {
   shortSignature,
   type PersistedEventKind,
-} from "@workspace/framework/operations-maturity";
+} from "@robbie/framework/operations-maturity";
 
 const router: IRouter = Router();
 

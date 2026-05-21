@@ -114,7 +114,7 @@ export function Architecture() {
         Eight layers, one trace, zero hidden state.
       </h1>
       <p className="mt-4 max-w-3xl text-muted-foreground leading-relaxed">
-        The framework is a library (<code className="font-mono text-foreground">@workspace/framework</code>)
+        The framework is a library (<code className="font-mono text-foreground">@robbie/framework</code>)
         with thin runtime surfaces. Each layer is a folder under
         <code className="font-mono text-foreground"> lib/framework/src/</code>;
         each layer exposes typed inputs and outputs that are composed by the

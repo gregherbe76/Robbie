@@ -5,7 +5,7 @@ import {
   runBenchmarkSuite,
   serializeSnapshot,
   renderConsoleSummary,
-} from "@workspace/framework/benchmarks";
+} from "@robbie/framework/benchmarks";
 
 const SNAPSHOT_PATH = fileURLToPath(
   new URL("../../tests/cognitive-smoke/snapshot.json", import.meta.url),

@@ -11,7 +11,7 @@ graph snapshots, reports and the system overview used by the console.
 
 /**
  * Deterministic end-to-end trace for a demo case. The full shape is the
-TypeScript `ReplayTrace` type in `@workspace/framework/replay`. The
+TypeScript `ReplayTrace` type in `@robbie/framework/replay`. The
 schema here is intentionally permissive — the contract is the TS type.
 
  */

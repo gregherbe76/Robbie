@@ -3429,7 +3429,7 @@ export const ListDemoCasesResponse = zod.array(ListDemoCasesResponseItem)
  * Runs the real framework pipeline (ingestion → flagship agents → cognition →
 organization-intelligence) for the requested case and returns a deterministic
 replay trace. The trace shape is documented by the TypeScript
-`ReplayTrace` type in `@workspace/framework/replay`; this endpoint returns
+`ReplayTrace` type in `@robbie/framework/replay`; this endpoint returns
 an opaque object that round-trips that type.
 
  * @summary Run a demo case live and return its full trace

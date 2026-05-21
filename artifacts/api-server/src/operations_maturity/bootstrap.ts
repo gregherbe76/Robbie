@@ -13,7 +13,7 @@ import { logger } from "../lib/logger";
 import {
   InMemoryPersistenceLayer,
   type PersistenceLayer,
-} from "@workspace/framework/operations-maturity";
+} from "@robbie/framework/operations-maturity";
 import { PgPersistenceLayer } from "./pg_adapter";
 
 const DEMO_ORG_ID = "demo";

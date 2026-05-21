@@ -3215,7 +3215,7 @@ export interface DemoCaseSummary {
 
 /**
  * Deterministic end-to-end trace for a demo case. The full shape is the
-TypeScript `ReplayTrace` type in `@workspace/framework/replay`. The
+TypeScript `ReplayTrace` type in `@robbie/framework/replay`. The
 schema here is intentionally permissive — the contract is the TS type.
 
  */
@@ -3248,7 +3248,7 @@ export type LabRunRequestOrganization = { [key: string]: unknown } | null;
 
 /**
  * Discriminated by `mode`. The full TS contract lives in
-`@workspace/framework/lab` (`LabRunInput`). For `synthetic` mode,
+`@robbie/framework/lab` (`LabRunInput`). For `synthetic` mode,
 `dossier` and `organization` are opaque JSON whose shape is the
 framework's `CandidateDossier` and `OrganizationContext` types.
 

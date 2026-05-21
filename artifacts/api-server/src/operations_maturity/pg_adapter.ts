@@ -1,7 +1,7 @@
 /**
  * Postgres-backed implementations of the framework's persistence
  * contracts. The contracts themselves live in
- * `@workspace/framework/operations-maturity` and downstream code
+ * `@robbie/framework/operations-maturity` and downstream code
  * (routes, bootstrap, the rest of the framework) reaches only through
  * those contracts — never into Drizzle directly.
  */
@@ -37,7 +37,7 @@ import {
   type PersistenceLayer,
   type WriteCalibrationPointInput,
   type WriteMemoryInput,
-} from "@workspace/framework/operations-maturity";
+} from "@robbie/framework/operations-maturity";
 
 // ---------------------------------------------------------------------------
 // Row mappers

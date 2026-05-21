@@ -16,7 +16,7 @@ import type { LabScenarioId } from './labScenarioId';
 
 /**
  * Discriminated by `mode`. The full TS contract lives in
-`@workspace/framework/lab` (`LabRunInput`). For `synthetic` mode,
+`@robbie/framework/lab` (`LabRunInput`). For `synthetic` mode,
 `dossier` and `organization` are opaque JSON whose shape is the
 framework's `CandidateDossier` and `OrganizationContext` types.
 

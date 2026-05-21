@@ -27,7 +27,7 @@ import {
   verifyReplaySignature,
   SYNTHETIC_OUTCOMES,
   type DisagreementSummary,
-} from "@workspace/framework/ats";
+} from "@robbie/framework/ats";
 import { getATSGateway } from "../ats/bootstrap";
 
 const router: IRouter = Router();

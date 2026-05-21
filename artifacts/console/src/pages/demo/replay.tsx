@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useRoute } from "wouter";
 import { useGetDemoReplay } from "@workspace/api-client-react";
-import type { ReplayTrace, ReplayStep } from "@workspace/framework/replay";
-import { findNarrative } from "@workspace/framework/replay/narrative";
+import type { ReplayTrace, ReplayStep } from "@robbie/framework/replay";
+import { findNarrative } from "@robbie/framework/replay/narrative";
 import { NarrativePanel } from "@/components/narrative-panel";
 import {
   Play,
